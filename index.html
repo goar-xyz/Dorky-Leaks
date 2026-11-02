@@ -6,18 +6,22 @@
   <title>DorkyLeaks — Custom Scan</title>
   <style>
     :root {
-      --bg: #09090b;
-      --panel: #111214;
-      --panel-2: #17181b;
-      --border: #2a2d31;
-      --text: #f5f7fb;
-      --muted: #a4acb8;
-      --good: #2dd4bf;
+      --bg: #07090d;
+      --bg-2: #0d1117;
+      --panel: rgba(17, 20, 24, 0.94);
+      --panel-alt: rgba(12, 15, 18, 0.9);
+      --border: rgba(148, 163, 184, 0.18);
+      --text: #edf3ff;
+      --muted: #a9b7c8;
+      --soft: #dfe8f5;
+      --good: #34d399;
       --warn: #fbbf24;
       --bad: #f87171;
       --pri: #8b5cf6;
       --pri-2: #c084fc;
-      --shadow: rgba(0,0,0,.35);
+      --cyan: #22d3ee;
+      --shadow: rgba(0, 0, 0, 0.38);
+      --radius: 18px;
     }
 
     * { box-sizing: border-box; }
@@ -26,8 +30,9 @@
       margin: 0;
       min-height: 100%;
       background:
-        radial-gradient(circle at top, rgba(139,92,246,.22), transparent 30%),
-        linear-gradient(180deg, #09090b, #121417 35%, #09090b);
+        radial-gradient(circle at top left, rgba(139, 92, 246, 0.25), transparent 26%),
+        radial-gradient(circle at top right, rgba(34, 211, 238, 0.14), transparent 28%),
+        linear-gradient(180deg, #07090d 0%, #0e1116 100%);
       color: var(--text);
       font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
@@ -35,11 +40,11 @@
     body {
       display: flex;
       justify-content: center;
-      padding: 32px 16px 64px;
+      padding: 28px 16px 72px;
     }
 
     .app {
-      width: min(1040px, 100%);
+      width: min(1100px, 100%);
     }
 
     .topbar {
@@ -52,35 +57,55 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(2rem, 3vw, 2.8rem);
-      letter-spacing: -0.06em;
+      font-size: clamp(2.1rem, 3vw, 3rem);
+      letter-spacing: -0.08em;
+      font-weight: 800;
     }
 
-    .badge {
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .live-indicator {
       display: inline-flex;
       align-items: center;
-      padding: 8px 12px;
+      gap: 8px;
       border: 1px solid var(--border);
-      border-radius: 999px;
       background: rgba(255,255,255,0.02);
       color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
+    .live-indicator .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--good);
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.8);
+      display: inline-block;
+    }
+
     .layout {
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
+      grid-template-columns: 1.45fr 1fr;
       gap: 18px;
+      margin-bottom: 18px;
     }
 
     .panel {
-      background: rgba(17, 18, 20, 0.9);
+      background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: 0 16px 32px var(--shadow);
+      border-radius: var(--radius);
+      box-shadow: 0 18px 35px var(--shadow);
       overflow: hidden;
     }
 
@@ -94,13 +119,84 @@
 
     .panel-header h2 {
       margin: 0;
-      font-size: 1.1rem;
-      letter-spacing: -0.03em;
+      font-size: 1.08rem;
+      letter-spacing: -0.04em;
     }
 
     .panel-body {
       padding: 18px;
     }
+
+    .statusbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 10px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.04);
+      display: none;
+    }
+
+    .progress-wrap.show { display: block; }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--pri), var(--cyan), var(--good));
+      border-radius: inherit;
+      transition: width 0.25s ease;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 10px;
+      min-height: 88px;
+    }
+
+    .metric small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.8rem;
+      letter-spacing: -0.08em;
+      line-height: 1;
+    }
+
+    .metric.good strong { color: var(--good); }
+    .metric.warn strong { color: var(--warn); }
+    .metric.bad strong { color: var(--bad); }
+    .metric.neutral strong { color: var(--soft); }
 
     .field {
       display: flex;
@@ -111,8 +207,8 @@
 
     .field label {
       color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
@@ -129,16 +225,16 @@
       color: var(--text);
       padding: 12px 14px;
       outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
 
     input:focus, select:focus, textarea:focus {
-      border-color: rgba(139, 92, 246, 0.8);
+      border-color: rgba(196, 132, 252, 0.9);
       box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.14);
     }
 
     textarea {
-      min-height: 170px;
+      min-height: 150px;
       resize: vertical;
     }
 
@@ -148,11 +244,18 @@
       gap: 14px;
     }
 
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 8px;
+      margin-top: 10px;
     }
 
     button {
@@ -163,26 +266,26 @@
       padding: 10px 14px;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.15s ease, filter 0.2s ease, border-color 0.2s ease;
+      transition: transform 0.15s ease, filter 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    button:hover { filter: brightness(1.05); }
+    button:hover { filter: brightness(1.08); }
     button:active { transform: translateY(1px) scale(0.99); }
 
     button.primary {
       background: linear-gradient(135deg, var(--pri-2), var(--pri));
-      border-color: rgba(192,132,252,0.7);
-      color: #fff;
-      box-shadow: 0 10px 18px rgba(139,92,246,0.28);
+      border-color: rgba(192,132,252,0.72);
+      box-shadow: 0 12px 20px rgba(139, 92, 246, 0.24);
+      color: white;
     }
 
     button.warn {
-      border-color: rgba(251,191,36,0.45);
+      border-color: rgba(251,191,36,0.42);
       color: var(--warn);
     }
 
     button.danger {
-      border-color: rgba(248,113,113,0.45);
+      border-color: rgba(248,113,113,0.42);
       color: var(--bad);
     }
 
@@ -198,6 +301,29 @@
 
     .summary strong {
       color: var(--text);
+      font-weight: 800;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar select, .toolbar input {
+      width: auto;
+      min-width: 140px;
+      background: rgba(255,255,255,0.02);
     }
 
     .results {
@@ -218,41 +344,45 @@
       justify-content: space-between;
       gap: 10px;
       margin-bottom: 8px;
+      flex-wrap: wrap;
     }
 
     .result-url {
       font-weight: 700;
-      letter-spacing: -0.02em;
-      white-space: nowrap;
+      letter-spacing: -0.03em;
+      max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .status-pill {
-      padding: 5px 8px;
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
       border-radius: 999px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 800;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
       border: 1px solid transparent;
     }
 
     .status-pill.ok {
-      background: rgba(45,212,191,0.12);
-      border-color: rgba(45,212,191,0.45);
+      background: rgba(52, 211, 153, 0.12);
+      border-color: rgba(52, 211, 153, 0.48);
       color: var(--good);
     }
 
     .status-pill.warn {
-      background: rgba(251,191,36,0.12);
-      border-color: rgba(251,191,36,0.45);
+      background: rgba(251, 191, 36, 0.12);
+      border-color: rgba(251, 191, 36, 0.45);
       color: var(--warn);
     }
 
     .status-pill.bad {
-      background: rgba(248,113,113,0.12);
-      border-color: rgba(248,113,113,0.45);
+      background: rgba(248, 113, 113, 0.12);
+      border-color: rgba(248, 113, 113, 0.45);
       color: var(--bad);
     }
 
@@ -270,7 +400,7 @@
       word-break: break-word;
       margin: 0;
       font: 12px/1.6 "SFMono-Regular", Consolas, monospace;
-      color: #dfe7f3;
+      color: var(--soft);
       background: rgba(0,0,0,0.22);
       border: 1px solid rgba(255,255,255,0.04);
       border-radius: 10px;
@@ -286,10 +416,24 @@
       background: rgba(255,255,255,0.01);
     }
 
-    @media (max-width: 820px) {
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
       .layout { grid-template-columns: 1fr; }
       .split { grid-template-columns: 1fr; }
-      .topbar { align-items: flex-start; flex-direction: column; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .header-right { justify-content: flex-start; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 520px) {
+      .metrics { grid-template-columns: 1fr; }
+      .results-header { align-items: flex-start; }
+      .toolbar { width: 100%; }
+      .toolbar > * { width: 100%; }
     }
   </style>
 </head>
@@ -297,7 +441,9 @@
   <div class="app">
     <header class="topbar">
       <h1>DorkyLeaks</h1>
-      <span class="badge">Custom Scan</span>
+      <div class="header-right">
+        <span class="live-indicator"><span class="dot"></span> live</span>
+      </div>
     </header>
 
     <div class="layout">
@@ -306,6 +452,34 @@
           <h2>Scan configuration</h2>
         </div>
         <div class="panel-body">
+          <div class="statusbar">
+            <span id="scanStateText">Idle</span>
+            <span id="scanCountdown">0/0 queued</span>
+          </div>
+
+          <div id="progressWrap" class="progress-wrap show">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric neutral">
+              <small>Queued</small>
+              <strong id="metricQueued">0</strong>
+            </div>
+            <div class="metric good">
+              <small>Healthy</small>
+              <strong id="metricGood">0</strong>
+            </div>
+            <div class="metric warn">
+              <small>Warn</small>
+              <strong id="metricWarn">0</strong>
+            </div>
+            <div class="metric bad">
+              <small>Errors</small>
+              <strong id="metricBad">0</strong>
+            </div>
+          </div>
+
           <div class="field">
             <label for="customUrls">Target URLs</label>
             <textarea id="customUrls" spellcheck="false" placeholder="https://example.com&#10;https://shop.example.com&#10;https://api.example.com"></textarea>
@@ -343,7 +517,7 @@
             <button id="clearScan" class="danger" type="button">Clear</button>
           </div>
 
-          <div id="scanSummary" class="summary"><strong>0</strong> URLs queued</div>
+          <div id="scanSummary" class="summary"><strong>0</strong> valid URLs queued</div>
         </div>
       </section>
 
@@ -375,11 +549,24 @@
       </section>
     </div>
 
-    <section class="panel" style="margin-top:18px;">
+    <section class="panel">
       <div class="panel-header">
         <h2>Results</h2>
       </div>
       <div class="panel-body">
+        <div class="results-header">
+          <div class="muted">Live output</div>
+          <div class="toolbar">
+            <select id="resultFilter">
+              <option value="all">All results</option>
+              <option value="ok">Healthy only</option>
+              <option value="warn">Warnings</option>
+              <option value="bad">Errors</option>
+            </select>
+            <input id="resultSearch" type="text" placeholder="Filter by URL" />
+          </div>
+        </div>
+
         <div id="results" class="results">
           <div class="empty">No scan results yet. Add URLs and run a custom scan.</div>
         </div>
@@ -404,7 +591,10 @@
     };
 
     const state = {
-      results: []
+      results: [],
+      scanning: false,
+      progress: 0,
+      queuedTotal: 0
     };
 
     const el = {
@@ -414,10 +604,20 @@
       headerName: document.getElementById('headerName'),
       customQuery: document.getElementById('customQuery'),
       scanSummary: document.getElementById('scanSummary'),
+      scanStateText: document.getElementById('scanStateText'),
+      scanCountdown: document.getElementById('scanCountdown'),
       timeoutMs: document.getElementById('timeoutMs'),
       concurrency: document.getElementById('concurrency'),
       extraHeaders: document.getElementById('extraHeaders'),
-      results: document.getElementById('results')
+      results: document.getElementById('results'),
+      resultFilter: document.getElementById('resultFilter'),
+      resultSearch: document.getElementById('resultSearch'),
+      progressWrap: document.getElementById('progressWrap'),
+      progressBar: document.getElementById('progressBar'),
+      metricQueued: document.getElementById('metricQueued'),
+      metricGood: document.getElementById('metricGood'),
+      metricWarn: document.getElementById('metricWarn'),
+      metricBad: document.getElementById('metricBad')
     };
 
     function safeJsonParse(raw, fallback) {
@@ -495,24 +695,61 @@
 
     function updateSummary(raw) {
       const parsed = parseCustomUrls(raw);
+      state.queuedTotal = parsed.total;
       el.scanSummary.innerHTML = `<strong>${parsed.total}</strong> valid URL${parsed.total === 1 ? '' : 's'} queued`;
       if (parsed.invalid.length) {
         el.scanSummary.innerHTML += ` · ${parsed.invalid.length} invalid ignored`;
       }
+      renderMetrics();
+    }
+
+    function renderMetrics() {
+      const all = state.results.length;
+      const good = state.results.filter(r => r.ok).length;
+      const warn = state.results.filter(r => !r.ok && r.status && r.status < 500 && r.status !== 0).length;
+      const bad = state.results.filter(r => !r.ok && (r.status >= 500 || r.status === 0)).length;
+
+      el.metricQueued.textContent = String(state.queuedTotal || all || 0);
+      el.metricGood.textContent = String(good);
+      el.metricWarn.textContent = String(warn);
+      el.metricBad.textContent = String(bad);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function getFilteredResults() {
+      const filter = el.resultFilter.value;
+      const search = (el.resultSearch.value || '').trim().toLowerCase();
+
+      return state.results.filter(result => {
+        const type = result.ok ? 'ok' : (result.status >= 500 || result.status === 0 ? 'bad' : 'warn');
+        const matchFilter = filter === 'all' || filter === type;
+        const matchSearch = !search || (result.url || '').toLowerCase().includes(search);
+        return matchFilter && matchSearch;
+      });
     }
 
     function renderResults() {
-      if (!state.results.length) {
-        el.results.innerHTML = '<div class="empty">No scan results yet. Add URLs and run a custom scan.</div>';
+      const items = getFilteredResults();
+
+      if (!items.length) {
+        el.results.innerHTML = '<div class="empty">No results match the active filter.</div>';
         return;
       }
 
-      const items = state.results
+      el.results.innerHTML = items
         .slice()
         .reverse()
         .map(result => {
-          const klass = result.ok ? 'ok' : result.status >= 400 ? 'bad' : 'warn';
-          const label = result.ok ? 'OK' : result.status >= 400 ? 'ERR' : 'WARN';
+          const klass = result.ok ? 'ok' : (result.status >= 500 || result.status === 0 ? 'bad' : 'warn');
+          const label = result.ok ? 'OK' : (result.status >= 500 || result.status === 0 ? 'ERR' : 'WARN');
           const snippet = (result.snippet || '').replace(/\s+/g, ' ').trim();
 
           return `
@@ -531,21 +768,10 @@
           `;
         })
         .join('');
-
-      el.results.innerHTML = items;
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
     }
 
     function ctpto(config = {}) {
-      const { apiMode = 'none', apiKey = '', headerName = 'X-API-Key', timeoutMs = 15000, extraHeaders = {} } = config;
+      const { apiMode = 'none', apiKey = '', headerName = 'X-API-Key', extraHeaders = {} } = config;
       const auth = {};
 
       if (apiMode === 'bearer' && apiKey) {
@@ -561,9 +787,16 @@
           ...extraHeaders,
           ...auth
         },
-        timeoutMs,
         mode: apiMode
       };
+    }
+
+    function updateScanState(text, current, total) {
+      el.scanStateText.textContent = text;
+      el.scanCountdown.textContent = current + '/' + total + ' queued';
+      el.progressWrap.classList.toggle('show', total > 0 && state.scanning);
+      const percent = total ? Math.min(100, (current / total) * 100) : 0;
+      el.progressBar.style.width = percent + '%';
     }
 
     async function probeUrl(url, settings) {
@@ -619,9 +852,18 @@
           snippet: 'No valid URL entries were found. Use one URL per line or comma-separated values.',
           mode: settings.apiMode
         }];
+        state.scanning = false;
         renderResults();
+        renderMetrics();
+        updateScanState('Idle', 0, 0);
         return;
       }
+
+      state.scanning = true;
+      state.results = [];
+      renderResults();
+      updateScanState('Scanning', 0, parsed.valid.length);
+      renderMetrics();
 
       const limit = Number(settings.concurrency || 4);
       const queue = parsed.valid.slice(0, 200);
@@ -631,10 +873,17 @@
         const batch = queue.slice(i, i + limit);
         const batchResults = await Promise.all(batch.map(url => probeUrl(url, settings)));
         results.push(...batchResults);
+        state.progress = results.length;
+        updateScanState('Scanning', results.length, queue.length);
+        state.results = results;
+        renderResults();
+        renderMetrics();
       }
 
-      state.results = results;
+      state.scanning = false;
+      updateScanState('Complete', queue.length, queue.length);
       renderResults();
+      renderMetrics();
     }
 
     document.getElementById('parseUrls').addEventListener('click', () => {
@@ -646,8 +895,11 @@
       el.customQuery.value = '';
       el.apiKey.value = '';
       state.results = [];
+      state.scanning = false;
       updateSummary('');
       renderResults();
+      renderMetrics();
+      updateScanState('Idle', 0, 0);
     });
 
     document.getElementById('runCustomScan').addEventListener('click', runCustomScan);
@@ -664,6 +916,7 @@
         mode: settings.apiMode
       }, ...state.results].slice(0, 3);
       renderResults();
+      renderMetrics();
     });
 
     document.getElementById('resetSettings').addEventListener('click', () => {
@@ -673,8 +926,13 @@
     });
 
     el.customUrls.addEventListener('input', () => updateSummary(el.customUrls.value));
+    el.resultFilter.addEventListener('change', renderResults);
+    el.resultSearch.addEventListener('input', renderResults);
+
     hydrateSettings();
     updateSummary(el.customUrls.value);
+    renderMetrics();
+    updateScanState('Idle', 0, 0);
   </script>
 </body>
 </html>
