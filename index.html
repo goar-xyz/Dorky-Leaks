@@ -6,22 +6,18 @@
   <title>DorkyLeaks — Custom Scan</title>
   <style>
     :root {
-      --bg: #07090d;
-      --bg-2: #0d1117;
-      --panel: rgba(17, 20, 24, 0.94);
-      --panel-alt: rgba(12, 15, 18, 0.9);
-      --border: rgba(148, 163, 184, 0.18);
-      --text: #edf3ff;
-      --muted: #a9b7c8;
-      --soft: #dfe8f5;
-      --good: #34d399;
+      --bg: #09090b;
+      --panel: rgba(17, 18, 20, 0.96);
+      --panel-2: #15171b;
+      --border: #2b3037;
+      --text: #f3f6fb;
+      --muted: #a6afba;
+      --good: #2dd4bf;
       --warn: #fbbf24;
       --bad: #f87171;
       --pri: #8b5cf6;
       --pri-2: #c084fc;
-      --cyan: #22d3ee;
-      --shadow: rgba(0, 0, 0, 0.38);
-      --radius: 18px;
+      --shadow: rgba(0,0,0,.35);
     }
 
     * { box-sizing: border-box; }
@@ -30,9 +26,8 @@
       margin: 0;
       min-height: 100%;
       background:
-        radial-gradient(circle at top left, rgba(139, 92, 246, 0.25), transparent 26%),
-        radial-gradient(circle at top right, rgba(34, 211, 238, 0.14), transparent 28%),
-        linear-gradient(180deg, #07090d 0%, #0e1116 100%);
+        radial-gradient(circle at top, rgba(139,92,246,.22), transparent 28%),
+        linear-gradient(180deg, #09090b 0%, #121417 35%, #09090b 100%);
       color: var(--text);
       font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
@@ -40,72 +35,52 @@
     body {
       display: flex;
       justify-content: center;
-      padding: 28px 16px 72px;
+      padding: 32px 16px 64px;
     }
 
     .app {
-      width: min(1100px, 100%);
+      width: min(1040px, 100%);
     }
 
     .topbar {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       gap: 16px;
       margin-bottom: 18px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(2.1rem, 3vw, 3rem);
-      letter-spacing: -0.08em;
-      font-weight: 800;
+      font-size: clamp(2rem, 3vw, 2.8rem);
+      letter-spacing: -0.06em;
     }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .live-indicator {
+    .badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      padding: 8px 12px;
       border: 1px solid var(--border);
+      border-radius: 999px;
       background: rgba(255,255,255,0.02);
       color: var(--muted);
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 11px;
-      font-weight: 800;
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-    }
-
-    .live-indicator .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--good);
-      box-shadow: 0 0 12px rgba(52, 211, 153, 0.8);
-      display: inline-block;
     }
 
     .layout {
       display: grid;
       grid-template-columns: 1.45fr 1fr;
       gap: 18px;
-      margin-bottom: 18px;
     }
 
     .panel {
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 18px 35px var(--shadow);
+      border-radius: 18px;
+      box-shadow: 0 16px 32px var(--shadow);
       overflow: hidden;
     }
 
@@ -120,83 +95,12 @@
     .panel-header h2 {
       margin: 0;
       font-size: 1.08rem;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.03em;
     }
 
     .panel-body {
       padding: 18px;
     }
-
-    .statusbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .progress-wrap {
-      width: 100%;
-      height: 10px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 999px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.04);
-      display: none;
-    }
-
-    .progress-wrap.show { display: block; }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--pri), var(--cyan), var(--good));
-      border-radius: inherit;
-      transition: width 0.25s ease;
-    }
-
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .metric {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 10px;
-      min-height: 88px;
-    }
-
-    .metric small {
-      display: block;
-      color: var(--muted);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .metric strong {
-      display: block;
-      font-size: 1.8rem;
-      letter-spacing: -0.08em;
-      line-height: 1;
-    }
-
-    .metric.good strong { color: var(--good); }
-    .metric.warn strong { color: var(--warn); }
-    .metric.bad strong { color: var(--bad); }
-    .metric.neutral strong { color: var(--soft); }
 
     .field {
       display: flex;
@@ -207,8 +111,8 @@
 
     .field label {
       color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
@@ -225,16 +129,16 @@
       color: var(--text);
       padding: 12px 14px;
       outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     input:focus, select:focus, textarea:focus {
-      border-color: rgba(196, 132, 252, 0.9);
+      border-color: rgba(139, 92, 246, 0.8);
       box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.14);
     }
 
     textarea {
-      min-height: 150px;
+      min-height: 170px;
       resize: vertical;
     }
 
@@ -244,18 +148,11 @@
       gap: 14px;
     }
 
-    .row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
     .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     button {
@@ -266,26 +163,26 @@
       padding: 10px 14px;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.15s ease, filter 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.15s ease, filter 0.2s ease, border-color 0.2s ease;
     }
 
-    button:hover { filter: brightness(1.08); }
+    button:hover { filter: brightness(1.05); }
     button:active { transform: translateY(1px) scale(0.99); }
 
     button.primary {
       background: linear-gradient(135deg, var(--pri-2), var(--pri));
-      border-color: rgba(192,132,252,0.72);
-      box-shadow: 0 12px 20px rgba(139, 92, 246, 0.24);
-      color: white;
+      border-color: rgba(192,132,252,0.7);
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(139,92,246,0.28);
     }
 
     button.warn {
-      border-color: rgba(251,191,36,0.42);
+      border-color: rgba(251,191,36,0.45);
       color: var(--warn);
     }
 
     button.danger {
-      border-color: rgba(248,113,113,0.42);
+      border-color: rgba(248,113,113,0.45);
       color: var(--bad);
     }
 
@@ -301,29 +198,6 @@
 
     .summary strong {
       color: var(--text);
-      font-weight: 800;
-    }
-
-    .results-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .toolbar select, .toolbar input {
-      width: auto;
-      min-width: 140px;
-      background: rgba(255,255,255,0.02);
     }
 
     .results {
@@ -344,45 +218,43 @@
       justify-content: space-between;
       gap: 10px;
       margin-bottom: 8px;
-      flex-wrap: wrap;
     }
 
     .result-url {
       font-weight: 700;
-      letter-spacing: -0.03em;
-      max-width: 100%;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      min-width: 0;
     }
 
     .status-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 5px 9px;
+      padding: 5px 8px;
       border-radius: 999px;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 800;
-      letter-spacing: 0.09em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       border: 1px solid transparent;
+      white-space: nowrap;
     }
 
     .status-pill.ok {
-      background: rgba(52, 211, 153, 0.12);
-      border-color: rgba(52, 211, 153, 0.48);
+      background: rgba(45,212,191,0.12);
+      border-color: rgba(45,212,191,0.45);
       color: var(--good);
     }
 
     .status-pill.warn {
-      background: rgba(251, 191, 36, 0.12);
-      border-color: rgba(251, 191, 36, 0.45);
+      background: rgba(251,191,36,0.12);
+      border-color: rgba(251,191,36,0.45);
       color: var(--warn);
     }
 
     .status-pill.bad {
-      background: rgba(248, 113, 113, 0.12);
-      border-color: rgba(248, 113, 113, 0.45);
+      background: rgba(248,113,113,0.12);
+      border-color: rgba(248,113,113,0.45);
       color: var(--bad);
     }
 
@@ -400,7 +272,7 @@
       word-break: break-word;
       margin: 0;
       font: 12px/1.6 "SFMono-Regular", Consolas, monospace;
-      color: var(--soft);
+      color: #dfe7f3;
       background: rgba(0,0,0,0.22);
       border: 1px solid rgba(255,255,255,0.04);
       border-radius: 10px;
@@ -416,24 +288,10 @@
       background: rgba(255,255,255,0.01);
     }
 
-    .muted {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    @media (max-width: 860px) {
+    @media (max-width: 820px) {
       .layout { grid-template-columns: 1fr; }
       .split { grid-template-columns: 1fr; }
-      .topbar { flex-direction: column; align-items: flex-start; }
-      .header-right { justify-content: flex-start; }
-      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 520px) {
-      .metrics { grid-template-columns: 1fr; }
-      .results-header { align-items: flex-start; }
-      .toolbar { width: 100%; }
-      .toolbar > * { width: 100%; }
+      .topbar { align-items: flex-start; flex-direction: column; }
     }
   </style>
 </head>
@@ -441,9 +299,7 @@
   <div class="app">
     <header class="topbar">
       <h1>DorkyLeaks</h1>
-      <div class="header-right">
-        <span class="live-indicator"><span class="dot"></span> live</span>
-      </div>
+      <span class="badge">Custom Scan</span>
     </header>
 
     <div class="layout">
@@ -452,34 +308,6 @@
           <h2>Scan configuration</h2>
         </div>
         <div class="panel-body">
-          <div class="statusbar">
-            <span id="scanStateText">Idle</span>
-            <span id="scanCountdown">0/0 queued</span>
-          </div>
-
-          <div id="progressWrap" class="progress-wrap show">
-            <div id="progressBar" class="progress-bar"></div>
-          </div>
-
-          <div class="metrics">
-            <div class="metric neutral">
-              <small>Queued</small>
-              <strong id="metricQueued">0</strong>
-            </div>
-            <div class="metric good">
-              <small>Healthy</small>
-              <strong id="metricGood">0</strong>
-            </div>
-            <div class="metric warn">
-              <small>Warn</small>
-              <strong id="metricWarn">0</strong>
-            </div>
-            <div class="metric bad">
-              <small>Errors</small>
-              <strong id="metricBad">0</strong>
-            </div>
-          </div>
-
           <div class="field">
             <label for="customUrls">Target URLs</label>
             <textarea id="customUrls" spellcheck="false" placeholder="https://example.com&#10;https://shop.example.com&#10;https://api.example.com"></textarea>
@@ -508,7 +336,7 @@
 
           <div class="field">
             <label for="customQuery">Optional scan notes / query</label>
-            <input id="customQuery" type="text" placeholder="Example: checkout auth, admin, config, secrets" />
+            <input id="customQuery" type="text" placeholder="Example: auth, admin, config, secrets" />
           </div>
 
           <div class="actions">
@@ -517,7 +345,7 @@
             <button id="clearScan" class="danger" type="button">Clear</button>
           </div>
 
-          <div id="scanSummary" class="summary"><strong>0</strong> valid URLs queued</div>
+          <div id="scanSummary" class="summary"><strong>0</strong> URLs queued</div>
         </div>
       </section>
 
@@ -538,7 +366,10 @@
 
           <div class="field">
             <label for="extraHeaders">Extra headers (JSON)</label>
-            <textarea id="extraHeaders" spellcheck="false">{"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36","Accept":"text/html,application/json;q=0.9,*/*;q=0.8"}</textarea>
+            <textarea id="extraHeaders" spellcheck="false">{
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "Accept": "text/html,application/json;q=0.9,*/*;q=0.8"
+}</textarea>
           </div>
 
           <div class="actions">
@@ -549,24 +380,11 @@
       </section>
     </div>
 
-    <section class="panel">
+    <section class="panel" style="margin-top:18px;">
       <div class="panel-header">
         <h2>Results</h2>
       </div>
       <div class="panel-body">
-        <div class="results-header">
-          <div class="muted">Live output</div>
-          <div class="toolbar">
-            <select id="resultFilter">
-              <option value="all">All results</option>
-              <option value="ok">Healthy only</option>
-              <option value="warn">Warnings</option>
-              <option value="bad">Errors</option>
-            </select>
-            <input id="resultSearch" type="text" placeholder="Filter by URL" />
-          </div>
-        </div>
-
         <div id="results" class="results">
           <div class="empty">No scan results yet. Add URLs and run a custom scan.</div>
         </div>
@@ -583,18 +401,15 @@
       apiMode: 'none',
       apiKey: '',
       headerName: 'X-API-Key',
+      customQuery: '',
       extraHeaders: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         Accept: 'text/html,application/json;q=0.9,*/*;q=0.8'
-      },
-      customQuery: ''
+      }
     };
 
     const state = {
-      results: [],
-      scanning: false,
-      progress: 0,
-      queuedTotal: 0
+      results: []
     };
 
     const el = {
@@ -604,24 +419,15 @@
       headerName: document.getElementById('headerName'),
       customQuery: document.getElementById('customQuery'),
       scanSummary: document.getElementById('scanSummary'),
-      scanStateText: document.getElementById('scanStateText'),
-      scanCountdown: document.getElementById('scanCountdown'),
       timeoutMs: document.getElementById('timeoutMs'),
       concurrency: document.getElementById('concurrency'),
       extraHeaders: document.getElementById('extraHeaders'),
-      results: document.getElementById('results'),
-      resultFilter: document.getElementById('resultFilter'),
-      resultSearch: document.getElementById('resultSearch'),
-      progressWrap: document.getElementById('progressWrap'),
-      progressBar: document.getElementById('progressBar'),
-      metricQueued: document.getElementById('metricQueued'),
-      metricGood: document.getElementById('metricGood'),
-      metricWarn: document.getElementById('metricWarn'),
-      metricBad: document.getElementById('metricBad')
+      results: document.getElementById('results')
     };
 
-    function safeJsonParse(raw, fallback) {
+    function safeJsonParse(value, fallback) {
       try {
+        const raw = value == null ? '{}' : value;
         return JSON.parse(raw || '{}');
       } catch {
         return fallback;
@@ -641,43 +447,43 @@
       };
     }
 
+    function hydrateSettings() {
+      const settings = getSettings();
+      el.timeoutMs.value = settings.timeoutMs;
+      el.concurrency.value = settings.concurrency;
+      el.apiMode.value = settings.apiMode || 'none';
+      el.apiKey.value = settings.apiKey || '';
+      el.headerName.value = settings.headerName || 'X-API-Key';
+      el.customQuery.value = settings.customQuery || '';
+      el.extraHeaders.value = JSON.stringify(settings.extraHeaders, null, 2);
+    }
+
     function saveSettings() {
       const payload = {
         timeoutMs: Number(el.timeoutMs.value || DEFAULTS.timeoutMs),
         concurrency: Number(el.concurrency.value || DEFAULTS.concurrency),
-        apiMode: el.apiMode.value,
+        apiMode: el.apiMode.value || 'none',
         apiKey: normalizeApiKey(el.apiKey.value),
         headerName: (el.headerName.value || 'X-API-Key').trim(),
-        extraHeaders: safeJsonParse(el.extraHeaders.value, DEFAULTS.extraHeaders),
-        customQuery: el.customQuery.value.trim()
+        customQuery: String(el.customQuery.value || '').trim(),
+        extraHeaders: safeJsonParse(el.extraHeaders.value, DEFAULTS.extraHeaders)
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       return payload;
     }
 
-    function hydrateSettings() {
-      const settings = getSettings();
-      el.timeoutMs.value = settings.timeoutMs;
-      el.concurrency.value = settings.concurrency;
-      el.apiMode.value = settings.apiMode;
-      el.apiKey.value = settings.apiKey;
-      el.headerName.value = settings.headerName;
-      el.customQuery.value = settings.customQuery;
-      el.extraHeaders.value = JSON.stringify(settings.extraHeaders, null, 2);
-    }
-
     function parseCustomUrls(raw) {
-      const items = String(raw || '')
+      const list = String(raw || '')
         .split(/\r?\n|,/) 
-        .map(x => x.trim())
+        .map(s => s.trim())
         .filter(Boolean)
         .filter((value, index, arr) => arr.indexOf(value) === index);
 
       const valid = [];
       const invalid = [];
 
-      for (const item of items) {
+      for (const item of list) {
         try {
           const url = new URL(item);
           if (['http:', 'https:'].includes(url.protocol)) {
@@ -695,24 +501,9 @@
 
     function updateSummary(raw) {
       const parsed = parseCustomUrls(raw);
-      state.queuedTotal = parsed.total;
-      el.scanSummary.innerHTML = `<strong>${parsed.total}</strong> valid URL${parsed.total === 1 ? '' : 's'} queued`;
-      if (parsed.invalid.length) {
-        el.scanSummary.innerHTML += ` · ${parsed.invalid.length} invalid ignored`;
-      }
-      renderMetrics();
-    }
-
-    function renderMetrics() {
-      const all = state.results.length;
-      const good = state.results.filter(r => r.ok).length;
-      const warn = state.results.filter(r => !r.ok && r.status && r.status < 500 && r.status !== 0).length;
-      const bad = state.results.filter(r => !r.ok && (r.status >= 500 || r.status === 0)).length;
-
-      el.metricQueued.textContent = String(state.queuedTotal || all || 0);
-      el.metricGood.textContent = String(good);
-      el.metricWarn.textContent = String(warn);
-      el.metricBad.textContent = String(bad);
+      let text = `<strong>${parsed.total}</strong> valid URL${parsed.total === 1 ? '' : 's'} queued`;
+      if (parsed.invalid.length) text += ` · ${parsed.invalid.length} invalid ignored`;
+      el.scanSummary.innerHTML = text;
     }
 
     function escapeHtml(value) {
@@ -724,97 +515,78 @@
         .replace(/'/g, '&#039;');
     }
 
-    function getFilteredResults() {
-      const filter = el.resultFilter.value;
-      const search = (el.resultSearch.value || '').trim().toLowerCase();
+    function buildAuthHeaders(config) {
+      const {
+        apiMode = 'none',
+        apiKey = '',
+        headerName = 'X-API-Key',
+        extraHeaders = {}
+      } = config;
 
-      return state.results.filter(result => {
-        const type = result.ok ? 'ok' : (result.status >= 500 || result.status === 0 ? 'bad' : 'warn');
-        const matchFilter = filter === 'all' || filter === type;
-        const matchSearch = !search || (result.url || '').toLowerCase().includes(search);
-        return matchFilter && matchSearch;
-      });
+      const headers = { ...extraHeaders };
+      const key = String(headerName || 'X-API-Key').trim();
+      const token = normalizeApiKey(apiKey);
+
+      if (apiMode === 'bearer' && token) {
+        headers.Authorization = `Bearer ${token}`;
+      } else if (apiMode === 'custom' && token && key) {
+        headers[key] = token;
+      }
+
+      return headers;
     }
 
     function renderResults() {
-      const items = getFilteredResults();
-
-      if (!items.length) {
-        el.results.innerHTML = '<div class="empty">No results match the active filter.</div>';
+      if (!state.results.length) {
+        el.results.innerHTML = '<div class="empty">No scan results yet. Add URLs and run a custom scan.</div>';
         return;
       }
 
-      el.results.innerHTML = items
+      const html = state.results
         .slice()
         .reverse()
         .map(result => {
-          const klass = result.ok ? 'ok' : (result.status >= 500 || result.status === 0 ? 'bad' : 'warn');
-          const label = result.ok ? 'OK' : (result.status >= 500 || result.status === 0 ? 'ERR' : 'WARN');
+          const status = result.ok ? 'ok' : result.status >= 400 ? 'bad' : 'warn';
+          const label = result.ok ? 'OK' : result.status >= 400 ? 'ERR' : 'WARN';
           const snippet = (result.snippet || '').replace(/\s+/g, ' ').trim();
-
           return `
             <div class="result-item">
               <div class="result-head">
                 <div class="result-url">${escapeHtml(result.url)}</div>
-                <span class="status-pill ${klass}">${label}</span>
+                <span class="status-pill ${status}">${label}</span>
               </div>
               <div class="meta">
-                <span>Status: ${result.status || 'N/A'}</span>
-                <span>Latency: ${result.latency || 0} ms</span>
-                <span>Mode: ${result.mode || 'direct'}</span>
+                <span>Status: ${result.status ?? 'N/A'}</span>
+                <span>Latency: ${result.latency ?? 0} ms</span>
+                <span>Mode: ${escapeHtml(result.mode || 'direct')}</span>
               </div>
               <pre class="snippet">${escapeHtml(snippet || 'No response content captured.')}</pre>
             </div>
           `;
         })
         .join('');
-    }
 
-    function ctpto(config = {}) {
-      const { apiMode = 'none', apiKey = '', headerName = 'X-API-Key', extraHeaders = {} } = config;
-      const auth = {};
-
-      if (apiMode === 'bearer' && apiKey) {
-        auth.Authorization = `Bearer ${apiKey}`;
-      }
-
-      if (apiMode === 'custom' && apiKey && headerName) {
-        auth[headerName] = apiKey;
-      }
-
-      return {
-        headers: {
-          ...extraHeaders,
-          ...auth
-        },
-        mode: apiMode
-      };
-    }
-
-    function updateScanState(text, current, total) {
-      el.scanStateText.textContent = text;
-      el.scanCountdown.textContent = current + '/' + total + ' queued';
-      el.progressWrap.classList.toggle('show', total > 0 && state.scanning);
-      const percent = total ? Math.min(100, (current / total) * 100) : 0;
-      el.progressBar.style.width = percent + '%';
+      el.results.innerHTML = html;
     }
 
     async function probeUrl(url, settings) {
-      const startedAt = performance.now();
+      const started = performance.now();
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), settings.timeoutMs);
+      const timeoutMs = Number(settings.timeoutMs || DEFAULTS.timeoutMs);
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
       try {
+        const requestHeaders = buildAuthHeaders(settings);
         const response = await fetch(url, {
           method: 'GET',
-          headers: ctpto(settings).headers,
+          headers: requestHeaders,
           signal: controller.signal,
           mode: 'cors',
           credentials: 'omit'
         });
 
         const text = await response.text();
-        const latency = Math.round(performance.now() - startedAt);
+        const latency = Math.round(performance.now() - started);
         const snippet = text.slice(0, 500);
 
         return {
@@ -823,17 +595,16 @@
           status: response.status,
           latency,
           snippet: snippet || `HTTP ${response.status} ${response.statusText}`,
-          mode: settings.apiMode
+          mode: settings.apiMode || 'none'
         };
       } catch (error) {
-        const latency = Math.round(performance.now() - startedAt);
         return {
           url,
           ok: false,
           status: 0,
-          latency,
+          latency: Math.round(performance.now() - started),
           snippet: String(error && error.message ? error.message : error),
-          mode: settings.apiMode
+          mode: settings.apiMode || 'none'
         };
       } finally {
         clearTimeout(timeout);
@@ -843,66 +614,53 @@
     async function runCustomScan() {
       const settings = saveSettings();
       const parsed = parseCustomUrls(el.customUrls.value);
+
       if (!parsed.valid.length) {
         state.results = [{
-          url: 'no valid URLs',
+          url: 'No valid URLs',
           ok: false,
           status: 0,
           latency: 0,
           snippet: 'No valid URL entries were found. Use one URL per line or comma-separated values.',
-          mode: settings.apiMode
+          mode: settings.apiMode || 'none'
         }];
-        state.scanning = false;
         renderResults();
-        renderMetrics();
-        updateScanState('Idle', 0, 0);
         return;
       }
 
-      state.scanning = true;
-      state.results = [];
-      renderResults();
-      updateScanState('Scanning', 0, parsed.valid.length);
-      renderMetrics();
-
-      const limit = Number(settings.concurrency || 4);
+      const maxConcurrency = Math.max(1, Number(settings.concurrency || 4));
       const queue = parsed.valid.slice(0, 200);
       const results = [];
 
-      for (let i = 0; i < queue.length; i += limit) {
-        const batch = queue.slice(i, i + limit);
-        const batchResults = await Promise.all(batch.map(url => probeUrl(url, settings)));
-        results.push(...batchResults);
-        state.progress = results.length;
-        updateScanState('Scanning', results.length, queue.length);
-        state.results = results;
-        renderResults();
-        renderMetrics();
+      for (let i = 0; i < queue.length; i += maxConcurrency) {
+        const batch = queue.slice(i, i + maxConcurrency);
+        const batchResults = await Promise.allSettled(batch.map(url => probeUrl(url, settings)));
+        for (const item of batchResults) {
+          results.push(item.status === 'fulfilled' ? item.value : {
+            url: 'batch failure',
+            ok: false,
+            status: 0,
+            latency: 0,
+            snippet: item.reason ? String(item.reason) : 'Probe failed',
+            mode: settings.apiMode || 'none'
+          });
+        }
       }
 
-      state.scanning = false;
-      updateScanState('Complete', queue.length, queue.length);
+      state.results = results;
       renderResults();
-      renderMetrics();
     }
 
-    document.getElementById('parseUrls').addEventListener('click', () => {
-      updateSummary(el.customUrls.value);
-    });
-
+    document.getElementById('parseUrls').addEventListener('click', () => updateSummary(el.customUrls.value));
+    document.getElementById('runCustomScan').addEventListener('click', runCustomScan);
     document.getElementById('clearScan').addEventListener('click', () => {
       el.customUrls.value = '';
       el.customQuery.value = '';
       el.apiKey.value = '';
       state.results = [];
-      state.scanning = false;
       updateSummary('');
       renderResults();
-      renderMetrics();
-      updateScanState('Idle', 0, 0);
     });
-
-    document.getElementById('runCustomScan').addEventListener('click', runCustomScan);
 
     document.getElementById('saveSettings').addEventListener('click', () => {
       const settings = saveSettings();
@@ -913,10 +671,9 @@
         status: 200,
         latency: 0,
         snippet: `Settings updated for timeout=${settings.timeoutMs}ms, concurrency=${settings.concurrency}, API mode=${settings.apiMode || 'none'}.`,
-        mode: settings.apiMode
+        mode: settings.apiMode || 'none'
       }, ...state.results].slice(0, 3);
       renderResults();
-      renderMetrics();
     });
 
     document.getElementById('resetSettings').addEventListener('click', () => {
@@ -926,13 +683,8 @@
     });
 
     el.customUrls.addEventListener('input', () => updateSummary(el.customUrls.value));
-    el.resultFilter.addEventListener('change', renderResults);
-    el.resultSearch.addEventListener('input', renderResults);
-
     hydrateSettings();
     updateSummary(el.customUrls.value);
-    renderMetrics();
-    updateScanState('Idle', 0, 0);
   </script>
 </body>
 </html>
