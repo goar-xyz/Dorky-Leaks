@@ -1285,7 +1285,7 @@ html,body{
 
   function kind(){var r=active&&attached.get(active);return(r&&r.kind)||'text';}
   function isPad(){var k=kind();return k==='pin'||k==='amount';}
-  function haptic(){if(opts.haptics){try{if(navigator.vibrate)navigator.vibrate(6);}catch(e){}}}
+  function haptic(){if(opts.haptics){try{if(navigator.vibrate&&navigator.userActivation&&navigator.userActivation.isActive)navigator.vibrate(6);}catch(e){}}}
   function fire(el){
     el.dispatchEvent(new Event('input',{bubbles:true}));
   }
@@ -5923,7 +5923,7 @@ function navInjectRuntime(BASE_URL,ORIGIN,IS_DESKTOP,INITIAL_COOKIES,INITIAL_STO
     try{ if(window.top && window.top !== window) return window.top; }catch(_){}
     return window.parent;
   })();
-  var _origWinPostMessage = window.postMessage ? window.postMessage.bind(window) : null;
+  var _origWinPostMessage = window.postMessage || null;
   function post(m){
     try{
       if(_realHostParent && _realHostParent.postMessage){
@@ -5932,8 +5932,47 @@ function navInjectRuntime(BASE_URL,ORIGIN,IS_DESKTOP,INITIAL_COOKIES,INITIAL_STO
     }catch(e){}
   }
   window.__sjHostPost = post;
-  window.__sjTop = (window.parent === window.top) ? window : window.parent;
-  window.__sjParent = (window.parent === window.top) ? window : window.parent;
+  var _winProxyCache = typeof WeakMap !== "undefined" ? new WeakMap() : null;
+  function makeSenderBoundWindowProxy(targetWin){
+    if(!targetWin || targetWin === window) return window;
+    if(_winProxyCache && _winProxyCache.has(targetWin)) return _winProxyCache.get(targetWin);
+    try{
+      var p = new Proxy(targetWin, {
+        get: function(t, prop){
+          if(prop === "postMessage"){
+            return function(message, targetOriginOrOpts, transfer){
+              var tOrig = targetOriginOrOpts;
+              if(typeof tOrig === "string" && /^https?:\/\//i.test(tOrig)) tOrig = "*";
+              else if(tOrig && typeof tOrig === "object" && typeof tOrig.targetOrigin === "string" && /^https?:\/\//i.test(tOrig.targetOrigin)){
+                tOrig = Object.assign({}, tOrig, { targetOrigin: "*" });
+              }
+              if(arguments.length >= 3) return _origWinPostMessage.call(t, message, tOrig, transfer);
+              if(arguments.length === 2) return _origWinPostMessage.call(t, message, tOrig);
+              return _origWinPostMessage.call(t, message, "*");
+            };
+          }
+          var v = t[prop];
+          return typeof v === "function" ? v.bind(t) : v;
+        }
+      });
+      if(_winProxyCache) _winProxyCache.set(targetWin, p);
+      return p;
+    }catch(_){ return targetWin; }
+  }
+  window.__sjTop = (window.parent === window.top) ? window : makeSenderBoundWindowProxy(window.parent);
+  window.__sjParent = (window.parent === window.top) ? window : makeSenderBoundWindowProxy(window.parent);
+  try{
+    var _cwDesc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "contentWindow");
+    if(_cwDesc && _cwDesc.get){
+      Object.defineProperty(HTMLIFrameElement.prototype, "contentWindow", {
+        get: markNative(function(){
+          var cw = _cwDesc.get.call(this);
+          return cw ? makeSenderBoundWindowProxy(cw) : null;
+        }, "get contentWindow"),
+        configurable: true
+      });
+    }
+  }catch(_){}
 
   // 0.5 Native Function.prototype.toString Masking, Error.stack Sanitizer, Performance Navigation Timing Cloaking, Dynamic JIT (eval/Function) Rewriter, and WebCrypto Polyfill
   var _nativeFnMap = typeof WeakMap !== 'undefined' ? new WeakMap() : null;
@@ -6416,7 +6455,7 @@ function navInjectRuntime(BASE_URL,ORIGIN,IS_DESKTOP,INITIAL_COOKIES,INITIAL_STO
 
     // Universal Cross-Frame postMessage & MessageEvent.prototype.origin Virtualization (Enables reCAPTCHA Enterprise, OAuth & 3DS MessageChannel handshakes inside srcdoc)
     try{
-      var _origPostMsg = Window.prototype.postMessage;
+      var _origPostMsg = window.postMessage || (typeof Window !== 'undefined' && Window.prototype && Window.prototype.postMessage);
       if(_origPostMsg){
         var _wrappedPostMsg = markNative(function postMessage(message, targetOriginOrOpts, transfer){
           var tOrig = targetOriginOrOpts;
@@ -7392,6 +7431,7 @@ function navInjectRuntime(BASE_URL,ORIGIN,IS_DESKTOP,INITIAL_COOKIES,INITIAL_STO
         var d = ev && ev.data;
         if(!d || d.type !== 'child-iframe-result' || d.id !== reqId) return;
         window.removeEventListener('message', onChildRes);
+        if(ifr.hasAttribute('srcdoc')) return;
         if(d.html && _iframeSrcdocDesc && _iframeSrcdocDesc.set){
           if(d.url) ifr._sjVirtualSrc = d.url;
           _iframeSrcdocDesc.set.call(ifr, d.html);
@@ -7912,6 +7952,9 @@ const _scriptBlobCache = new Map();
 window.getActiveTab = getActiveTab;
 window.DOM = DOM;
 window.state = state;
+window.ScramjetEngine = ScramjetEngine;
+window.CookieEditorLib = CookieEditorLib;
+window.getCookiesForUrl = getCookiesForUrl;
 async function preparePageHtml(fullText, validBase){
 window.preparePageHtml = preparePageHtml;
   let htmlToProcess = String(fullText || '');
